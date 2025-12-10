@@ -10,10 +10,13 @@ export function DestinationsComp() {
   ];
 
   return (
-    <div className="py-8 px-4 w-160">
-      <h1 className="text-3xl font-bold mb-6 text-center text-red-500">
-        Destinations
-      </h1>
+    <div className="py-8 px-4">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+          Popular Destinations
+        </h1>
+        <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto rounded-full"></div>
+      </div>
 
       <div className="relative max-w-4xl mx-auto">
         {/* Sol Ok */}
