@@ -41,14 +41,23 @@ export function Header() {
       </div>
       <div
         className={`absolute left-0 w-full flex items-center bg-gray-500/70 h-26 transition-all duration-300 ${
-          !isOnTop ? "top-0" : "top-10"
+          !isOnTop ? "top-0 bg-white" : "top-10"
         }`}
       >
         <img className="h-12 ml-5" src="logo1.png" alt="logo" />
 
-        <div className="ml-30 flex items-center text-white text-[17px] gap-15">
+        <div
+          className={`ml-30 flex items-center  text-[17px] gap-15
+          ${!isOnTop ? "text-black" : "text-white"}
+        `}
+        >
           {/*menu items*/}
-          <a className="hover:text-amber-300 cursor-pointer transition">Home</a>
+          <a
+            className="hover:text-amber-300 cursor-pointer transition"
+            onClick={() => navigate("/")}
+          >
+            Home
+          </a>
           <div className="relative group">
             <a
               className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
