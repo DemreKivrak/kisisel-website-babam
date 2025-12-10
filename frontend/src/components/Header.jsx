@@ -44,7 +44,12 @@ export function Header() {
           !isOnTop ? "top-0 bg-white" : "top-10"
         }`}
       >
-        <img className="h-12 ml-5" src="logo1.png" alt="logo" />
+        <img
+          className="h-12 ml-5 cursor-pointer"
+          src="logo1.png"
+          alt="logo"
+          onClick={() => navigate("/")}
+        />
 
         <div
           className={`ml-30 flex items-center  text-[17px] gap-15
@@ -92,7 +97,10 @@ export function Header() {
           </div>
 
           <div className="relative group">
-            <a className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1">
+            <a
+              className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
+              onClick={() => navigate("/destinations")}
+            >
               Destinations
               <svg
                 className="w-4 h-4 transition-transform group-hover:rotate-180"
