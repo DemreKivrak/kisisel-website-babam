@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
 
 export function Destinations() {
+  const navigate = useNavigate();
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [tours, setTours] = useState([]);
@@ -19,15 +21,17 @@ export function Destinations() {
         api.getTours(),
       ]);
 
-      // Add default highlights for destinations
+      // Parse highlights from database
       const destinationsWithDefaults = destinationsData.map((dest) => ({
         ...dest,
-        highlights: [
-          "Historical Sites",
-          "Cultural Experiences",
-          "Local Cuisine",
-          "Natural Beauty",
-        ],
+        highlights: dest.highlights
+          ? dest.highlights.split("\n").filter((h) => h.trim())
+          : [
+              "Historical Sites",
+              "Cultural Experiences",
+              "Local Cuisine",
+              "Natural Beauty",
+            ],
       }));
 
       setDestinations(destinationsWithDefaults);
@@ -291,7 +295,10 @@ export function Destinations() {
                       <h3 className="text-lg font-bold text-gray-900 uppercase mb-4">
                         {tour.name}
                       </h3>
-                      <button className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white py-2 rounded-md hover:shadow-lg transition-all duration-300 font-semibold">
+                      <button
+                        className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white py-2 rounded-md hover:shadow-lg transition-all duration-300 font-semibold"
+                        onClick={() => navigate(`/tourpage/${tour.id}`)}
+                      >
                         View Details
                       </button>
                     </div>

@@ -9,6 +9,9 @@ export function Admin() {
   const [formData, setFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   // Load data on mount
   useEffect(() => {
@@ -31,17 +34,56 @@ export function Admin() {
     }
   };
 
+  // Image upload function
+  const handleImageUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    setUploading(true);
+    try {
+      const API_URL =
+        import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+      const response = await fetch(`${API_URL}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.url) {
+        return data.url;
+      }
+      throw new Error("Upload failed");
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   // Destination Functions
   const handleAddDestination = async () => {
     if (formData.name && formData.description) {
       try {
+        let imageUrl = formData.img || "default.jpg";
+
+        // Upload image if file is selected
+        if (imageFile) {
+          const uploadedUrl = await handleImageUpload(imageFile);
+          if (uploadedUrl) {
+            imageUrl = uploadedUrl;
+          }
+        }
+
         const newDest = await api.createDestination({
           name: formData.name,
           description: formData.description,
-          img: formData.img || "default.jpg",
+          img: imageUrl,
+          highlights: formData.highlights || "",
         });
         setDestinations([...destinations, newDest]);
         setFormData({});
+        setImageFile(null);
         setIsAdding(false);
       } catch (error) {
         console.error("Error adding destination:", error);
@@ -57,14 +99,26 @@ export function Admin() {
 
   const handleUpdateDestination = async () => {
     try {
-      await api.updateDestination(editingItem, formData);
+      let imageUrl = formData.img;
+
+      // Upload new image if file is selected
+      if (imageFile) {
+        const uploadedUrl = await handleImageUpload(imageFile);
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        }
+      }
+
+      const updatedData = { ...formData, img: imageUrl };
+      await api.updateDestination(editingItem, updatedData);
       setDestinations(
         destinations.map((d) =>
-          d.id === editingItem ? { ...d, ...formData } : d
+          d.id === editingItem ? { ...d, ...updatedData } : d
         )
       );
       setEditingItem(null);
       setFormData({});
+      setImageFile(null);
     } catch (error) {
       console.error("Error updating destination:", error);
       alert("Failed to update destination");
@@ -87,14 +141,36 @@ export function Admin() {
   const handleAddTour = async () => {
     if (formData.name && formData.destination && formData.price) {
       try {
+        let imageUrls = [];
+
+        // Upload multiple images if files are selected
+        if (imageFiles.length > 0) {
+          setUploading(true);
+          for (const file of imageFiles) {
+            const uploadedUrl = await handleImageUpload(file);
+            if (uploadedUrl) {
+              imageUrls.push(uploadedUrl);
+            }
+          }
+          setUploading(false);
+        }
+
         const newTour = await api.createTour({
           name: formData.name,
           destination: formData.destination,
           price: formData.price,
           duration: formData.duration || "N/A",
+          images: imageUrls.join(","),
+          overview: formData.overview || "",
+          highlights: formData.highlights || "",
+          included: formData.included || "",
+          not_included: formData.not_included || "",
+          itinerary: formData.itinerary || "",
+          is_recommended: formData.is_recommended || false,
         });
         setTours([...tours, newTour]);
         setFormData({});
+        setImageFiles([]);
         setIsAdding(false);
       } catch (error) {
         console.error("Error adding tour:", error);
@@ -110,12 +186,32 @@ export function Admin() {
 
   const handleUpdateTour = async () => {
     try {
-      await api.updateTour(editingItem, formData);
+      let imageUrls = formData.images ? formData.images.split(",") : [];
+
+      // Upload new images if files are selected
+      if (imageFiles.length > 0) {
+        setUploading(true);
+        for (const file of imageFiles) {
+          const uploadedUrl = await handleImageUpload(file);
+          if (uploadedUrl) {
+            imageUrls.push(uploadedUrl);
+          }
+        }
+        setUploading(false);
+      }
+
+      const updatedData = {
+        ...formData,
+        images: imageUrls.join(","),
+      };
+
+      await api.updateTour(editingItem, updatedData);
       setTours(
-        tours.map((t) => (t.id === editingItem ? { ...t, ...formData } : t))
+        tours.map((t) => (t.id === editingItem ? { ...t, ...updatedData } : t))
       );
       setEditingItem(null);
       setFormData({});
+      setImageFiles([]);
     } catch (error) {
       console.error("Error updating tour:", error);
       alert("Failed to update tour");
@@ -138,6 +234,8 @@ export function Admin() {
     setEditingItem(null);
     setIsAdding(false);
     setFormData({});
+    setImageFile(null);
+    setImageFiles([]);
   };
 
   if (loading) {
@@ -213,15 +311,22 @@ export function Admin() {
                     }
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                   />
-                  <input
-                    type="text"
-                    placeholder="Image filename"
-                    value={formData.img || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, img: e.target.value })
-                    }
-                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Upload Image
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setImageFile(e.target.files[0])}
+                      className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
+                    />
+                    {uploading && (
+                      <p className="text-sm text-amber-600 mt-1">
+                        Uploading image...
+                      </p>
+                    )}
+                  </div>
                   <input
                     type="text"
                     placeholder="Description"
@@ -230,6 +335,15 @@ export function Admin() {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                  />
+                  <textarea
+                    placeholder="Top Attractions (one per line)"
+                    value={formData.highlights || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, highlights: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                    rows="4"
                   />
                 </div>
                 <div className="flex gap-3 mt-4">
@@ -270,14 +384,25 @@ export function Admin() {
                           }
                           className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                         />
-                        <input
-                          type="text"
-                          value={formData.img || ""}
-                          onChange={(e) =>
-                            setFormData({ ...formData, img: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        />
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Upload New Image (optional)
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setImageFile(e.target.files[0])}
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
+                          />
+                          {uploading && (
+                            <p className="text-sm text-amber-600 mt-1">
+                              Uploading image...
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">
+                            Current: {formData.img}
+                          </p>
+                        </div>
                         <input
                           type="text"
                           value={formData.description || ""}
@@ -288,6 +413,18 @@ export function Admin() {
                             })
                           }
                           className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                        />
+                        <textarea
+                          placeholder="Top Attractions (one per line)"
+                          value={formData.highlights || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              highlights: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                          rows="4"
                         />
                       </div>
                       <div className="flex gap-3 mt-4">
@@ -365,15 +502,20 @@ export function Admin() {
                     }
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                   />
-                  <input
-                    type="text"
-                    placeholder="Destination"
+                  <select
                     value={formData.destination || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, destination: e.target.value })
                     }
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                  />
+                  >
+                    <option value="">Select Destination</option>
+                    {destinations.map((dest) => (
+                      <option key={dest.id} value={dest.name}>
+                        {dest.name}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     type="text"
                     placeholder="Price (e.g., 500 €)"
@@ -392,6 +534,93 @@ export function Admin() {
                     }
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                   />
+                  <textarea
+                    placeholder="Overview"
+                    value={formData.overview || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, overview: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                    rows="3"
+                  />
+                  <textarea
+                    placeholder="Highlights (one per line)"
+                    value={formData.highlights || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, highlights: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                    rows="4"
+                  />
+                  <textarea
+                    placeholder="Included (one per line)"
+                    value={formData.included || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, included: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                    rows="4"
+                  />
+                  <textarea
+                    placeholder="Not Included (one per line)"
+                    value={formData.not_included || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, not_included: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                    rows="4"
+                  />
+                  <textarea
+                    placeholder="Itinerary - Format: Day 1 | Title | Description (each day on new line)"
+                    value={formData.itinerary || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, itinerary: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                    rows="6"
+                  />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Upload Images (Multiple)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) =>
+                        setImageFiles(Array.from(e.target.files))
+                      }
+                      className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
+                    />
+                    {imageFiles.length > 0 && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        {imageFiles.length} file(s) selected
+                      </p>
+                    )}
+                    {uploading && (
+                      <p className="text-sm text-amber-600 mt-1">
+                        Uploading images...
+                      </p>
+                    )}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_recommended || false}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            is_recommended: e.target.checked,
+                          })
+                        }
+                        className="w-4 h-4 text-amber-500 border-gray-300 rounded focus:ring-amber-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Add to Recommended Tours (Homepage)
+                      </span>
+                    </label>
+                  </div>
                 </div>
                 <div className="flex gap-3 mt-4">
                   <button
@@ -429,8 +658,7 @@ export function Admin() {
                           }
                           className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                         />
-                        <input
-                          type="text"
+                        <select
                           value={formData.destination || ""}
                           onChange={(e) =>
                             setFormData({
@@ -439,7 +667,14 @@ export function Admin() {
                             })
                           }
                           className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        />
+                        >
+                          <option value="">Select Destination</option>
+                          {destinations.map((dest) => (
+                            <option key={dest.id} value={dest.name}>
+                              {dest.name}
+                            </option>
+                          ))}
+                        </select>
                         <input
                           type="text"
                           value={formData.price || ""}
@@ -459,6 +694,114 @@ export function Admin() {
                           }
                           className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                         />
+                        <textarea
+                          placeholder="Overview"
+                          value={formData.overview || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              overview: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                          rows="3"
+                        />
+                        <textarea
+                          placeholder="Highlights (one per line)"
+                          value={formData.highlights || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              highlights: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                          rows="4"
+                        />
+                        <textarea
+                          placeholder="Included (one per line)"
+                          value={formData.included || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              included: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                          rows="4"
+                        />
+                        <textarea
+                          placeholder="Not Included (one per line)"
+                          value={formData.not_included || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              not_included: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                          rows="4"
+                        />
+                        <textarea
+                          placeholder="Itinerary - Format: Day 1 | Title | Description (each day on new line)"
+                          value={formData.itinerary || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              itinerary: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                          rows="6"
+                        />
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Add More Images (Multiple)
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) =>
+                              setImageFiles(Array.from(e.target.files))
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
+                          />
+                          {formData.images && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Current images:{" "}
+                              {formData.images.split(",").length}
+                            </p>
+                          )}
+                          {imageFiles.length > 0 && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              {imageFiles.length} new file(s) selected
+                            </p>
+                          )}
+                          {uploading && (
+                            <p className="text-sm text-amber-600 mt-1">
+                              Uploading images...
+                            </p>
+                          )}
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.is_recommended || false}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  is_recommended: e.target.checked,
+                                })
+                              }
+                              className="w-4 h-4 text-amber-500 border-gray-300 rounded focus:ring-amber-500"
+                            />
+                            <span className="text-sm font-medium text-gray-700">
+                              Add to Recommended Tours (Homepage)
+                            </span>
+                          </label>
+                        </div>
                       </div>
                       <div className="flex gap-3 mt-4">
                         <button

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 
 export function Recommended() {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,10 +15,12 @@ export function Recommended() {
   const loadTours = async () => {
     try {
       const data = await api.getTours();
-      // Take first 3 tours for recommended section
-      const toursWithDefaults = data.slice(0, 3).map((tour) => ({
+      // Filter only recommended tours
+      const recommendedTours = data.filter((tour) => tour.is_recommended);
+      const toursWithDefaults = recommendedTours.map((tour) => ({
+        id: tour.id,
         name: tour.name,
-        img: tour.img || "homepage-pic-1.jpg",
+        img: tour.images ? tour.images.split(",")[0] : "homepage-pic-1.jpg",
         price: tour.price,
         info: tour.duration || "tour info",
       }));
@@ -98,7 +102,10 @@ export function Recommended() {
             >
               {recommended.map((dest, i) => (
                 <div key={i} className="min-w-full px-4">
-                  <div className="relative bg-gray-300 rounded-lg overflow-hidden shadow-lg">
+                  <div
+                    className="relative bg-gray-300 rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-2xl transition-shadow"
+                    onClick={() => navigate(`/tourpage/${dest.id}`)}
+                  >
                     <img
                       src={dest.img}
                       alt={dest.name}

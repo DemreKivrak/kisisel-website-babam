@@ -1,82 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Header } from "./Header";
+import { api } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export function TourPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [tourData, setTourData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  // Örnek tur verisi
-  const tourData = {
-    name: "MEDITERRANEAN GLAMOUR",
-    destination: "Antalya",
-    duration: "04 Nights / 05 Days",
-    price: "775 €",
-    rating: 4.8,
-    reviews: 156,
-    images: [
-      "homepage-pic-1.jpg",
-      "homepage-pic-1.jpg",
-      "homepage-pic-1.jpg",
-      "homepage-pic-1.jpg",
-      "homepage-pic-1.jpg",
-    ],
-    overview:
-      "Experience the stunning beauty of Turkey's Mediterranean coast with this comprehensive 5-day tour. Explore ancient ruins, pristine beaches, and vibrant local culture.",
-    highlights: [
-      "Visit ancient ruins of Perge and Aspendos",
-      "Explore the historic old town of Kaleiçi",
-      "Relax on pristine Mediterranean beaches",
-      "Witness the breathtaking Düden Waterfalls",
-      "Experience traditional Turkish cuisine",
-      "All-inclusive resort accommodation",
-    ],
-    included: [
-      "4 nights accommodation in 5-star resort",
-      "Daily breakfast and dinner",
-      "Round-trip airport transfers",
-      "Professional English-speaking guide",
-      "All entrance fees to attractions",
-      "Air-conditioned transportation",
-    ],
-    notIncluded: [
-      "International flights",
-      "Travel insurance",
-      "Personal expenses",
-      "Lunches",
-      "Optional activities",
-    ],
-    itinerary: [
-      {
-        day: 1,
-        title: "Arrival in Antalya",
-        description:
-          "Arrive at Antalya airport, meet your guide, and transfer to your resort. Evening at leisure to explore the hotel facilities.",
-      },
-      {
-        day: 2,
-        title: "Ancient Cities Tour",
-        description:
-          "Full-day tour visiting the ancient ruins of Perge and Aspendos. Marvel at the well-preserved Roman theater and ancient stadium.",
-      },
-      {
-        day: 3,
-        title: "Kaleiçi & Düden Waterfalls",
-        description:
-          "Explore the charming old town of Kaleiçi with its narrow streets and Ottoman houses. Visit the spectacular Düden Waterfalls in the afternoon.",
-      },
-      {
-        day: 4,
-        title: "Beach & Leisure Day",
-        description:
-          "Free day to enjoy the resort facilities and Mediterranean beaches. Optional water sports and activities available.",
-      },
-      {
-        day: 5,
-        title: "Departure",
-        description:
-          "Final breakfast at the resort. Transfer to Antalya airport for your departure flight.",
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchTourData = async () => {
+      try {
+        const tour = await api.getTour(id);
+
+        // Parse string data into arrays/objects
+        const parsedTour = {
+          ...tour,
+          images: tour.images ? tour.images.split(",") : [],
+          highlights: tour.highlights
+            ? tour.highlights.split("\n").filter((h) => h.trim())
+            : [],
+          included: tour.included
+            ? tour.included.split("\n").filter((i) => i.trim())
+            : [],
+          notIncluded: tour.not_included
+            ? tour.not_included.split("\n").filter((n) => n.trim())
+            : [],
+          itinerary: tour.itinerary
+            ? tour.itinerary
+                .split("\n")
+                .filter((i) => i.trim())
+                .map((item, idx) => {
+                  const parts = item.split("|").map((p) => p.trim());
+                  return {
+                    day: idx + 1,
+                    title: parts[1] || "Day Activity",
+                    description: parts[2] || "",
+                  };
+                })
+            : [],
+        };
+
+        setTourData(parsedTour);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching tour:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchTourData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+        <Header />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-xl text-gray-600">Loading tour details...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!tourData) {
+    return (
+      <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+        <Header />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-xl text-gray-600">Tour not found</div>
+        </div>
+      </div>
+    );
+  }
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % tourData.images.length);
@@ -119,11 +118,36 @@ export function TourPage() {
           {/* Main Image Slider */}
           <div className="relative">
             <div className="relative h-96 lg:h-[500px] rounded-xl overflow-hidden shadow-2xl">
-              <img
-                src={tourData.images[currentImageIndex]}
-                alt={`Tour image ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover"
-              />
+              {tourData.images[currentImageIndex] &&
+              tourData.images[currentImageIndex] !== "homepage-pic-1.jpg" ? (
+                <img
+                  src={tourData.images[currentImageIndex]}
+                  alt={`Tour image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <div className="text-center text-gray-500">
+                    <svg
+                      className="w-24 h-24 mx-auto mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <p className="text-lg font-semibold">No image uploaded</p>
+                    <p className="text-sm">
+                      Please upload tour images from admin panel
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Navigation Arrows */}
               <button
@@ -205,13 +229,6 @@ export function TourPage() {
               </h1>
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-1">
-                  <span className="text-yellow-500">⭐</span>
-                  <span className="font-semibold">{tourData.rating}</span>
-                  <span className="text-gray-500 text-sm">
-                    ({tourData.reviews} reviews)
-                  </span>
-                </div>
                 <div className="text-gray-600">
                   <span className="font-semibold">🕐 {tourData.duration}</span>
                 </div>
@@ -226,17 +243,18 @@ export function TourPage() {
                     </p>
                     <p className="text-gray-500 text-sm">per person</p>
                   </div>
-                  <button className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  <button
+                    onClick={() => navigate("/contact")}
+                    className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer
+                    "
+                  >
                     Book Now
                   </button>
                 </div>
               </div>
 
               <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span>Free cancellation up to 24 hours before</span>
-                </div>
+                <div className="flex items-center gap-2"></div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
                   <span>Instant confirmation</span>
@@ -280,25 +298,33 @@ export function TourPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-semibold text-green-700 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-green-700 mb-3 flex items-center gap-2 pl-50">
                   <span className="text-xl">✓</span> Included
                 </h3>
                 <ul className="space-y-2">
                   {tourData.included.map((item, idx) => (
-                    <li key={idx} className="text-gray-700 pl-6">
-                      • {item}
+                    <li
+                      key={idx}
+                      className="flex items-start gap-2 text-gray-700 pl-50"
+                    >
+                      <span className="text-green-600 mt-1">•</span>
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-red-700 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-red-700 mb-3 flex items-center gap-2 pl-50">
                   <span className="text-xl">✗</span> Not Included
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-2 pl-50">
                   {tourData.notIncluded.map((item, idx) => (
-                    <li key={idx} className="text-gray-700 pl-6">
-                      • {item}
+                    <li
+                      key={idx}
+                      className="flex items-start gap-2 text-gray-700"
+                    >
+                      <span className="text-red-600 mt-1">•</span>
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -342,7 +368,10 @@ export function TourPage() {
               Starting from {tourData.price}
             </p>
           </div>
-          <button className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          <button
+            onClick={() => navigate("/contact")}
+            className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+          >
             Book This Tour
           </button>
         </div>
