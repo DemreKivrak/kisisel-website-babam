@@ -1,27 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "../../services/api";
 
 export function Recommended() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const recommended = [
-    {
-      name: "Tour name-1",
-      img: "homepage-pic-1.jpg ",
-      price: "100 €",
-      info: "tour info",
-    },
-    {
-      name: "Tour name-2",
-      img: "homepage-pic-1.jpg",
-      price: "200 €",
-      info: "tour info",
-    },
-    {
-      name: "Tour name-3",
-      img: "homepage-pic-1.jpg",
-      price: "300 €",
-      info: "tour info",
-    },
-  ];
+  const [recommended, setRecommended] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTours();
+  }, []);
+
+  const loadTours = async () => {
+    try {
+      const data = await api.getTours();
+      // Take first 3 tours for recommended section
+      const toursWithDefaults = data.slice(0, 3).map((tour) => ({
+        name: tour.name,
+        img: tour.img || "homepage-pic-1.jpg",
+        price: tour.price,
+        info: tour.duration || "tour info",
+      }));
+      setRecommended(toursWithDefaults);
+    } catch (error) {
+      console.error("Error loading tours:", error);
+      // Fallback to default data
+      setRecommended([
+        {
+          name: "Tour name-1",
+          img: "homepage-pic-1.jpg",
+          price: "100 €",
+          info: "tour info",
+        },
+        {
+          name: "Tour name-2",
+          img: "homepage-pic-1.jpg",
+          price: "200 €",
+          info: "tour info",
+        },
+        {
+          name: "Tour name-3",
+          img: "homepage-pic-1.jpg",
+          price: "300 €",
+          info: "tour info",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-8 px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="py-8 px-4">

@@ -12,7 +12,7 @@ export function Contact() {
           src="homepage-pic-1.jpg"
           alt="Turkey landscape"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 flex items-center justify-center">
+        <div className="absolute inset-0 bg-linear-to-b from-black/50 to-black/30 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-6xl font-bold text-white mb-4">CONTACT US</h1>
             <p className="text-xl text-white/90">
@@ -28,7 +28,7 @@ export function Contact() {
           {/* Phone Card */}
           <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
             <div className="flex flex-col items-center text-center">
-              <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-4 rounded-full mb-4">
+              <div className="bg-linear-to-br from-amber-400 to-orange-500 p-4 rounded-full mb-4">
                 <img
                   className="h-12 w-12"
                   src="icons8-call-50.png"
@@ -51,7 +51,7 @@ export function Contact() {
           {/* Email Card */}
           <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
             <div className="flex flex-col items-center text-center">
-              <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-4 rounded-full mb-4">
+              <div className="bg-linear-to-br from-amber-400 to-orange-500 p-4 rounded-full mb-4">
                 <img
                   className="h-12 w-12"
                   src="icons8-email-64.png"
@@ -72,7 +72,7 @@ export function Contact() {
           {/* Location Card */}
           <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
             <div className="flex flex-col items-center text-center">
-              <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-4 rounded-full mb-4">
+              <div className="bg-linear-to-br from-amber-400 to-orange-500 p-4 rounded-full mb-4">
                 <svg
                   className="h-12 w-12 text-white"
                   fill="none"

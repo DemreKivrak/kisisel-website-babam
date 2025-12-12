@@ -1,13 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { TourPage } from "../../components/TourPage";
+import { api } from "../../services/api";
 
 export function Tours() {
   const [selectedDestination, setSelectedDestination] = useState("All");
+  const [tours, setTours] = useState([]);
+  const [destinations, setDestinations] = useState(["All"]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const tours = [
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [toursData, destinationsData] = await Promise.all([
+        api.getTours(),
+        api.getDestinations(),
+      ]);
+
+      // Add default properties for tours
+      const toursWithDefaults = toursData.map((tour) => ({
+        ...tour,
+        img: tour.img || "homepage-pic-1.jpg",
+        type: "Guaranteed Departured Tour",
+      }));
+
+      setTours(toursWithDefaults);
+
+      // Build destinations list from unique tour destinations
+      const uniqueDestinations = [
+        "All",
+        ...new Set(toursData.map((t) => t.destination)),
+      ];
+      setDestinations(uniqueDestinations);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toursHardcoded = [
     {
       id: 1,
       name: "MEDITERRANEAN GLAMOUR",
@@ -64,20 +101,24 @@ export function Tours() {
     },
   ];
 
-  const destinations = [
-    "All",
-    "Istanbul",
-    "Cappadocia",
-    "Antalya",
-    "Bodrum",
-    "Trabzon",
-    "Pamukkale",
-  ];
-
   const filteredTours =
     selectedDestination === "All"
       ? tours
       : tours.filter((tour) => tour.destination === selectedDestination);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg">Loading tours...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">

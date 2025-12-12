@@ -1,13 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "../../services/api";
 
 export function DestinationsComp() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [destinations, setDestinations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const destinations = [
-    { name: "Destination-1", img: "homepage-pic-1.jpg" },
-    { name: "Destination-2", img: "homepage-pic-1.jpg" },
-    { name: "Destination-3", img: "homepage-pic-1.jpg" },
-  ];
+  useEffect(() => {
+    loadDestinations();
+  }, []);
+
+  const loadDestinations = async () => {
+    try {
+      const data = await api.getDestinations();
+      // Take first 3 destinations for slider
+      setDestinations(data.slice(0, 3));
+    } catch (error) {
+      console.error("Error loading destinations:", error);
+      // Fallback to default data
+      setDestinations([
+        { name: "Destination-1", img: "homepage-pic-1.jpg" },
+        { name: "Destination-2", img: "homepage-pic-1.jpg" },
+        { name: "Destination-3", img: "homepage-pic-1.jpg" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-8 px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 px-4">

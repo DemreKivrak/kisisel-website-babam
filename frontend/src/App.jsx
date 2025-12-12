@@ -6,6 +6,7 @@ import { Tours } from "./pages/Tours/Tours.jsx";
 import { Destinations } from "./pages/Destinations.jsx";
 import { TourPage } from "./components/TourPage.jsx";
 import { Contact } from "./pages/Contact.jsx";
+import { Admin } from "./pages/Admin.jsx";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/tourpage" element={<TourPage />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Router>
     </>

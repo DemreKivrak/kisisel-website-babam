@@ -1,10 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "../components/Header";
+import { api } from "../services/api";
 
 export function Destinations() {
   const [selectedDestination, setSelectedDestination] = useState(null);
+  const [destinations, setDestinations] = useState([]);
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const destinations = [
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [destinationsData, toursData] = await Promise.all([
+        api.getDestinations(),
+        api.getTours(),
+      ]);
+
+      // Add default highlights for destinations
+      const destinationsWithDefaults = destinationsData.map((dest) => ({
+        ...dest,
+        highlights: [
+          "Historical Sites",
+          "Cultural Experiences",
+          "Local Cuisine",
+          "Natural Beauty",
+        ],
+      }));
+
+      setDestinations(destinationsWithDefaults);
+      setTours(toursData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const destinationsHardcoded = [
     {
       id: 1,
       name: "Istanbul",
@@ -85,96 +120,23 @@ export function Destinations() {
     },
   ];
 
-  const tours = [
-    {
-      id: 1,
-      name: "ISTANBUL HIGHLIGHTS",
-      destination: "Istanbul",
-      price: "520 €",
-      duration: "03 Nights / 04 Days",
-    },
-    {
-      id: 2,
-      name: "BOSPHORUS CRUISE TOUR",
-      destination: "Istanbul",
-      price: "380 €",
-      duration: "02 Nights / 03 Days",
-    },
-    {
-      id: 3,
-      name: "CAPPADOCIA DAYDREAM",
-      destination: "Cappadocia",
-      price: "365 €",
-      duration: "01 Night / 02 Days",
-    },
-    {
-      id: 4,
-      name: "BALLOON & CAVE ADVENTURE",
-      destination: "Cappadocia",
-      price: "485 €",
-      duration: "02 Nights / 03 Days",
-    },
-    {
-      id: 5,
-      name: "MEDITERRANEAN GLAMOUR",
-      destination: "Antalya",
-      price: "775 €",
-      duration: "04 Nights / 05 Days",
-    },
-    {
-      id: 6,
-      name: "ANTALYA BEACH ESCAPE",
-      destination: "Antalya",
-      price: "620 €",
-      duration: "03 Nights / 04 Days",
-    },
-    {
-      id: 7,
-      name: "AEGEAN PARADISE",
-      destination: "Bodrum",
-      price: "890 €",
-      duration: "05 Nights / 06 Days",
-    },
-    {
-      id: 8,
-      name: "BODRUM SAILING TOUR",
-      destination: "Bodrum",
-      price: "720 €",
-      duration: "04 Nights / 05 Days",
-    },
-    {
-      id: 9,
-      name: "PAMUKKALE THERMAL",
-      destination: "Pamukkale",
-      price: "425 €",
-      duration: "02 Nights / 03 Days",
-    },
-    {
-      id: 10,
-      name: "COTTON CASTLE WONDER",
-      destination: "Pamukkale",
-      price: "320 €",
-      duration: "01 Night / 02 Days",
-    },
-    {
-      id: 11,
-      name: "BLACK SEA ADVENTURE",
-      destination: "Trabzon",
-      price: "650 €",
-      duration: "04 Nights / 05 Days",
-    },
-    {
-      id: 12,
-      name: "TRABZON HIGHLANDS",
-      destination: "Trabzon",
-      price: "540 €",
-      duration: "03 Nights / 04 Days",
-    },
-  ];
-
   const filteredTours = selectedDestination
     ? tours.filter((tour) => tour.destination === selectedDestination.name)
     : [];
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg">Loading destinations...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
