@@ -39,7 +39,7 @@ export function Header() {
   return (
     <div className="fixed top-0 left-0 w-full z-10">
       <div
-        className={`bg-gray-500/70 h-10 flex items-center text-[12px] border-b border-gray-200 transition-all duration-300 ${
+        className={`bg-gray-500/50 h-10 flex items-center text-[12px] border-b border-gray-200 transition-all duration-300 ${
           isVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 -translate-y-full pointer-events-none"
@@ -51,11 +51,11 @@ export function Header() {
           alt="phone"
         ></img>
         <p className="text-white">
-          +90 531 795 40 75 | info@gurtour.com | Gurtour Travel Agency
+          +90 532 231 57 57 | yukselkivrak@gmail.com | Sunup Travel
         </p>
       </div>
       <div
-        className={`absolute left-0 w-full flex items-center bg-gray-500/70 h-26 transition-all duration-300 ${
+        className={`absolute left-0 w-full flex items-center bg-gray-500/50 h-26 transition-all duration-300 ${
           !isOnTop ? "top-0 bg-white" : "top-10"
         }`}
       >
