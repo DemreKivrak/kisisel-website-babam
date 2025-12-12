@@ -4,6 +4,8 @@ import "./App.css";
 import { Homepage } from "./pages/homepage/homepage.jsx";
 import { Tours } from "./pages/Tours/Tours.jsx";
 import { Destinations } from "./pages/Destinations.jsx";
+import { TourPage } from "./components/TourPage.jsx";
+import { Contact } from "./pages/Contact.jsx";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/tours" element={<Tours />} />
           <Route path="/destinations" element={<Destinations />} />
+          <Route path="/tourpage" element={<TourPage />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </Router>
     </>

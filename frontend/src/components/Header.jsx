@@ -128,7 +128,10 @@ export function Header() {
               </li>
             </ul>
           </div>
-          <a className="hover:text-amber-300 cursor-pointer transition">
+          <a
+            className="hover:text-amber-300 cursor-pointer transition"
+            onClick={() => navigate("/contact")}
+          >
             Contact
           </a>
           <a className="hover:text-amber-300 cursor-pointer transition">
