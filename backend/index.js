@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 dotenv.config();
 
@@ -82,6 +84,38 @@ function initializeDatabase() {
     )
   `);
 
+  // Users table for admin authentication
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create default admin user if not exists
+  db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
+    if (!err && row.count === 0) {
+      const defaultUsername = "admin";
+      const defaultPassword = "admin123"; // Şifrenizi değiştirin!
+      bcrypt.hash(defaultPassword, 10, (err, hash) => {
+        if (!err) {
+          db.run("INSERT INTO users (username, password) VALUES (?, ?)", [
+            defaultUsername,
+            hash,
+          ]);
+          console.log(
+            "Default admin user created - Username: admin, Password: admin123"
+          );
+          console.log(
+            "⚠️  IMPORTANT: Change the default password immediately!"
+          );
+        }
+      });
+    }
+  });
+
   // Insert sample data if tables are empty
   db.get("SELECT COUNT(*) as count FROM destinations", (err, row) => {
     if (!err && row.count === 0) {
@@ -114,7 +148,140 @@ function initializeDatabase() {
   });
 }
 
+// JWT Secret Key
+const JWT_SECRET =
+  process.env.JWT_SECRET || "your-secret-key-change-this-in-production";
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access denied. No token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+};
+
 // Routes
+
+// Authentication endpoints
+app.post("/api/auth/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res
+      .status(400)
+      .json({ error: "Username and password are required" });
+  }
+
+  db.get(
+    "SELECT * FROM users WHERE username = ?",
+    [username],
+    async (err, user) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
+      res.json({
+        token,
+        user: { id: user.id, username: user.username },
+      });
+    }
+  );
+});
+
+// Verify token endpoint
+app.get("/api/auth/verify", verifyToken, (req, res) => {
+  res.json({ valid: true, user: req.user });
+});
+
+// Change password endpoint
+app.post("/api/auth/change-password", verifyToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ error: "Current password and new password are required" });
+  }
+
+  if (newPassword.length < 6) {
+    return res
+      .status(400)
+      .json({ error: "New password must be at least 6 characters" });
+  }
+
+  try {
+    // Get current user from database
+    db.get(
+      "SELECT * FROM users WHERE id = ?",
+      [req.user.id],
+      async (err, user) => {
+        if (err) {
+          return res.status(500).json({ error: "Database error" });
+        }
+
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        // Verify current password
+        const isValidPassword = await bcrypt.compare(
+          currentPassword,
+          user.password
+        );
+        if (!isValidPassword) {
+          return res
+            .status(401)
+            .json({ error: "Current password is incorrect" });
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password in database
+        db.run(
+          "UPDATE users SET password = ? WHERE id = ?",
+          [hashedPassword, req.user.id],
+          (err) => {
+            if (err) {
+              return res
+                .status(500)
+                .json({ error: "Failed to update password" });
+            }
+
+            res.json({ message: "Password changed successfully" });
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 // Get all destinations
 app.get("/api/destinations", (req, res) => {
@@ -145,7 +312,7 @@ app.get("/api/destinations/:id", (req, res) => {
 });
 
 // Create new destination
-app.post("/api/destinations", (req, res) => {
+app.post("/api/destinations", verifyToken, (req, res) => {
   const { name, description, img, highlights } = req.body;
   db.run(
     "INSERT INTO destinations (name, description, img, highlights) VALUES (?, ?, ?, ?)",
@@ -161,7 +328,7 @@ app.post("/api/destinations", (req, res) => {
 });
 
 // Update destination
-app.put("/api/destinations/:id", (req, res) => {
+app.put("/api/destinations/:id", verifyToken, (req, res) => {
   const { name, description, img, highlights } = req.body;
   db.run(
     "UPDATE destinations SET name = ?, description = ?, img = ?, highlights = ? WHERE id = ?",
@@ -177,7 +344,7 @@ app.put("/api/destinations/:id", (req, res) => {
 });
 
 // Delete destination
-app.delete("/api/destinations/:id", (req, res) => {
+app.delete("/api/destinations/:id", verifyToken, (req, res) => {
   db.run(
     "DELETE FROM destinations WHERE id = ?",
     [req.params.id],
@@ -227,7 +394,7 @@ app.get("/api/tours/:id", (req, res) => {
 });
 
 // Create new tour
-app.post("/api/tours", (req, res) => {
+app.post("/api/tours", verifyToken, (req, res) => {
   const {
     name,
     destination,
@@ -282,7 +449,7 @@ app.post("/api/tours", (req, res) => {
 });
 
 // Update tour
-app.put("/api/tours/:id", (req, res) => {
+app.put("/api/tours/:id", verifyToken, (req, res) => {
   const {
     name,
     destination,
@@ -326,7 +493,7 @@ app.put("/api/tours/:id", (req, res) => {
 });
 
 // Delete tour
-app.delete("/api/tours/:id", (req, res) => {
+app.delete("/api/tours/:id", verifyToken, (req, res) => {
   db.run("DELETE FROM tours WHERE id = ?", [req.params.id], function (err) {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -337,7 +504,7 @@ app.delete("/api/tours/:id", (req, res) => {
 });
 
 // Image upload endpoint
-app.post("/api/upload", upload.single("image"), (req, res) => {
+app.post("/api/upload", verifyToken, upload.single("image"), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });

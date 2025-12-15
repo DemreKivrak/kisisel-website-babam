@@ -126,7 +126,7 @@ export function Header() {
             Contact
           </a>
           <a className="hover:text-amber-300 cursor-pointer transition">
-            About us
+            About
           </a>
         </div>
       </div>

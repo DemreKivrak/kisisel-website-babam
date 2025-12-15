@@ -6,6 +6,7 @@ import { Recommended } from "./Recommended.jsx";
 export function Homepage() {
   return (
     <div className="relative bg-gradient-to-b from-gray-50 to-white">
+      <title>test</title>
       <Header />
 
       <div className="relative">

@@ -1,5 +1,22 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
+// Helper to get auth token from localStorage
+const getAuthToken = () => {
+  return localStorage.getItem("adminToken");
+};
+
+// Helper to create headers with auth token
+const getAuthHeaders = () => {
+  const token = getAuthToken();
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 export const api = {
   // Destinations
   getDestinations: async () => {
@@ -17,7 +34,7 @@ export const api = {
   createDestination: async (data) => {
     const response = await fetch(`${API_URL}/destinations`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error("Failed to create destination");
@@ -27,7 +44,7 @@ export const api = {
   updateDestination: async (id, data) => {
     const response = await fetch(`${API_URL}/destinations/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error("Failed to update destination");
@@ -37,6 +54,7 @@ export const api = {
   deleteDestination: async (id) => {
     const response = await fetch(`${API_URL}/destinations/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error("Failed to delete destination");
     return response.json();
@@ -61,7 +79,7 @@ export const api = {
   createTour: async (data) => {
     const response = await fetch(`${API_URL}/tours`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error("Failed to create tour");
@@ -71,7 +89,7 @@ export const api = {
   updateTour: async (id, data) => {
     const response = await fetch(`${API_URL}/tours/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error("Failed to update tour");
@@ -81,8 +99,44 @@ export const api = {
   deleteTour: async (id) => {
     const response = await fetch(`${API_URL}/tours/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error("Failed to delete tour");
+    return response.json();
+  },
+
+  // Image Upload
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const token = getAuthToken();
+    const headers = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/upload`, {
+      method: "POST",
+      headers: headers,
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error("Failed to upload image");
+    return response.json();
+  },
+
+  // Change Password
+  changePassword: async (currentPassword, newPassword) => {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to change password");
+    }
     return response.json();
   },
 };
