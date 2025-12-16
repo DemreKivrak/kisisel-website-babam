@@ -6,16 +6,25 @@ import { Recommended } from "./Recommended.jsx";
 export function Homepage() {
   return (
     <div className="relative bg-gradient-to-b from-gray-50 to-white">
-      <title>test</title>
+      <title>Anatolia Horizon Travel Agency</title>
       <Header />
 
       <div className="relative">
         <img
-          className="w-full h-150 block object-cover"
-          src="homepage-pic-1.jpg"
+          className="w-full h-130 block object-cover"
+          src="homepage-pic.jpg"
           alt="Turkey landscape"
         ></img>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent"></div>
+
+        {/* Hero Text Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+          <div className="max-w-4xl">
+            <h1 className="text-5xl md:text-6xl text-white mb-6 drop-shadow-2xl mt-14 font-serif">
+              ANATOLIA HORIZON TRAVEL
+            </h1>
+          </div>
+        </div>
       </div>
 
       <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 py-12 px-6 text-center shadow-inner">

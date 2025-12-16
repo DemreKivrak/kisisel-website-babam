@@ -51,7 +51,7 @@ export function Header() {
           alt="phone"
         ></img>
         <p className="text-white">
-          +90 532 231 57 57 | yukselkivrak@gmail.com | Sunup Travel
+          +90 532 231 57 58 | yukselkivrak@hotmail.com
         </p>
       </div>
       <div
@@ -60,14 +60,14 @@ export function Header() {
         }`}
       >
         <img
-          className="h-12 ml-5 cursor-pointer"
-          src="logo1.png"
+          className=" cursor-pointer h-24 ml-10"
+          src="logo-2-new.png"
           alt="logo"
           onClick={() => navigate("/")}
         />
 
         <div
-          className={`ml-30 flex items-center  text-[17px] gap-15
+          className={`ml-35 flex items-center  text-[17px] gap-15
           ${!isOnTop ? "text-black" : "text-white"}
         `}
         >
@@ -112,7 +112,12 @@ export function Header() {
                 <li
                   key={dest.id}
                   className="hover:bg-gray-100 px-4 py-2 cursor-pointer transition hover:text-amber-300"
-                  onClick={() => navigate("/destinations")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(
+                      `/tours?destination=${encodeURIComponent(dest.name)}`
+                    );
+                  }}
                 >
                   <a className="block w-full">{dest.name}</a>
                 </li>
@@ -125,7 +130,10 @@ export function Header() {
           >
             Contact
           </a>
-          <a className="hover:text-amber-300 cursor-pointer transition">
+          <a
+            onClick={() => navigate("/about")}
+            className="hover:text-amber-300 cursor-pointer transition"
+          >
             About
           </a>
         </div>

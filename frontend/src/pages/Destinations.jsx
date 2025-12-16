@@ -144,6 +144,7 @@ export function Destinations() {
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+      <title>Destinations</title>
       <Header />
 
       {/* Hero Section */}

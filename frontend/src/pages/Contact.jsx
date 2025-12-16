@@ -3,6 +3,7 @@ import { Header } from "../components/Header";
 export function Contact() {
   return (
     <div className="bg-white min-h-screen">
+      <title>Contact us</title>
       <Header />
 
       {/* Hero Section */}
@@ -63,7 +64,7 @@ export function Contact() {
                 href="mailto:ornekemail@gmail.com"
                 className="text-xl font-semibold text-green-400 hover:text-green-700 transition break-all"
               >
-                yukselkivrak@gmail.com
+                yukselkivrak@hotmail.com
               </a>
               <p className="text-sm text-gray-500 mt-2">Response within 24h</p>
             </div>

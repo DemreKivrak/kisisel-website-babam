@@ -122,6 +122,7 @@ export function Tours() {
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+      <title>Tours</title>
       <Header />
 
       {/* Hero Section */}

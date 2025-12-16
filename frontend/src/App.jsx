@@ -9,6 +9,7 @@ import { TourPage } from "./components/TourPage.jsx";
 import { Contact } from "./pages/Contact.jsx";
 import { Admin } from "./pages/Admin.jsx";
 import { Login } from "./pages/Login.jsx";
+import { About } from "./pages/About.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/tourpage/:id" element={<TourPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/about" element={<About />} />
           <Route
             path="/admin"
             element={
