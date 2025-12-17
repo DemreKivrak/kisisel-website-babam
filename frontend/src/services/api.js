@@ -139,4 +139,46 @@ export const api = {
     }
     return response.json();
   },
+
+  // Rental Cars
+  getRentalCars: async () => {
+    const response = await fetch(`${API_URL}/rental-cars`);
+    if (!response.ok) throw new Error("Failed to fetch rental cars");
+    return response.json();
+  },
+
+  getRentalCar: async (id) => {
+    const response = await fetch(`${API_URL}/rental-cars/${id}`);
+    if (!response.ok) throw new Error("Failed to fetch rental car");
+    return response.json();
+  },
+
+  createRentalCar: async (data) => {
+    const response = await fetch(`${API_URL}/rental-cars`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to create rental car");
+    return response.json();
+  },
+
+  updateRentalCar: async (id, data) => {
+    const response = await fetch(`${API_URL}/rental-cars/${id}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to update rental car");
+    return response.json();
+  },
+
+  deleteRentalCar: async (id) => {
+    const response = await fetch(`${API_URL}/rental-cars/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to delete rental car");
+    return response.json();
+  },
 };

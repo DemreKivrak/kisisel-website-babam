@@ -10,6 +10,7 @@ import { Contact } from "./pages/Contact.jsx";
 import { Admin } from "./pages/Admin.jsx";
 import { Login } from "./pages/Login.jsx";
 import { About } from "./pages/About.jsx";
+import { Services } from "./pages/Services.jsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
           <Route
             path="/admin"
             element={

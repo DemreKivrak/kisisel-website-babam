@@ -124,6 +124,40 @@ export function Header() {
               ))}
             </ul>
           </div>
+
+          <div className="relative group">
+            <a
+              className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
+              onClick={() => navigate("/services")}
+            >
+              Services
+              <svg
+                className="w-4 h-4 transition-transform group-hover:rotate-180"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </a>
+            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-white text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1">
+              <li
+                className="hover:bg-gray-100 px-4 py-2 cursor-pointer transition hover:text-amber-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/services");
+                }}
+              >
+                <a className="block w-full">Car Rental</a>
+              </li>
+            </ul>
+          </div>
+
           <a
             className="hover:text-amber-300 cursor-pointer transition"
             onClick={() => navigate("/contact")}

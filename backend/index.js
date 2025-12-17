@@ -94,6 +94,24 @@ function initializeDatabase() {
     )
   `);
 
+  // Rental cars table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS rental_cars (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      model TEXT NOT NULL,
+      description TEXT,
+      images TEXT,
+      features TEXT,
+      transmission TEXT,
+      fuel TEXT,
+      doors TEXT,
+      daily_price TEXT,
+      weekly_price TEXT,
+      color TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Create default admin user if not exists
   db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
     if (!err && row.count === 0) {
@@ -517,6 +535,142 @@ app.post("/api/upload", verifyToken, upload.single("image"), (req, res) => {
     console.error("Upload error:", error);
     res.status(500).json({ error: "Failed to upload image" });
   }
+});
+
+// ===== RENTAL CARS ENDPOINTS =====
+
+// Get all rental cars
+app.get("/api/rental-cars", (req, res) => {
+  db.all("SELECT * FROM rental_cars ORDER BY created_at DESC", (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      // Parse JSON strings back to arrays/objects
+      const cars = rows.map((car) => ({
+        ...car,
+        images: car.images ? JSON.parse(car.images) : [],
+        features: car.features ? JSON.parse(car.features) : [],
+      }));
+      res.json(cars);
+    }
+  });
+});
+
+// Get single rental car
+app.get("/api/rental-cars/:id", (req, res) => {
+  db.get(
+    "SELECT * FROM rental_cars WHERE id = ?",
+    [req.params.id],
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else if (!row) {
+        res.status(404).json({ error: "Rental car not found" });
+      } else {
+        const car = {
+          ...row,
+          images: row.images ? JSON.parse(row.images) : [],
+          features: row.features ? JSON.parse(row.features) : [],
+        };
+        res.json(car);
+      }
+    }
+  );
+});
+
+// Create new rental car
+app.post("/api/rental-cars", verifyToken, (req, res) => {
+  const {
+    model,
+    description,
+    images,
+    features,
+    transmission,
+    fuel,
+    doors,
+    daily_price,
+    weekly_price,
+    color,
+  } = req.body;
+
+  db.run(
+    `INSERT INTO rental_cars (model, description, images, features, transmission, fuel, doors, daily_price, weekly_price, color)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      model,
+      description,
+      JSON.stringify(images || []),
+      JSON.stringify(features || []),
+      transmission,
+      fuel,
+      doors,
+      daily_price,
+      weekly_price,
+      color,
+    ],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ id: this.lastID, message: "Rental car created" });
+      }
+    }
+  );
+});
+
+// Update rental car
+app.put("/api/rental-cars/:id", verifyToken, (req, res) => {
+  const {
+    model,
+    description,
+    images,
+    features,
+    transmission,
+    fuel,
+    doors,
+    daily_price,
+    weekly_price,
+    color,
+  } = req.body;
+
+  db.run(
+    `UPDATE rental_cars SET model = ?, description = ?, images = ?, features = ?, transmission = ?, fuel = ?, doors = ?, daily_price = ?, weekly_price = ?, color = ? WHERE id = ?`,
+    [
+      model,
+      description,
+      JSON.stringify(images || []),
+      JSON.stringify(features || []),
+      transmission,
+      fuel,
+      doors,
+      daily_price,
+      weekly_price,
+      color,
+      req.params.id,
+    ],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Rental car updated" });
+      }
+    }
+  );
+});
+
+// Delete rental car
+app.delete("/api/rental-cars/:id", verifyToken, (req, res) => {
+  db.run(
+    "DELETE FROM rental_cars WHERE id = ?",
+    [req.params.id],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Rental car deleted" });
+      }
+    }
+  );
 });
 
 // Health check

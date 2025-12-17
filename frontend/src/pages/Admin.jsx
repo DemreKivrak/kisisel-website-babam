@@ -9,6 +9,7 @@ export function Admin() {
   const [activeTab, setActiveTab] = useState("destinations");
   const [destinations, setDestinations] = useState([]);
   const [tours, setTours] = useState([]);
+  const [rentalCars, setRentalCars] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
@@ -32,12 +33,14 @@ export function Admin() {
 
   const loadData = async () => {
     try {
-      const [destinationsData, toursData] = await Promise.all([
+      const [destinationsData, toursData, rentalCarsData] = await Promise.all([
         api.getDestinations(),
         api.getTours(),
+        api.getRentalCars(),
       ]);
       setDestinations(destinationsData);
       setTours(toursData);
+      setRentalCars(rentalCarsData);
     } catch (error) {
       console.error("Error loading data:", error);
       alert("Failed to load data from server");
@@ -284,6 +287,91 @@ export function Admin() {
     }
   };
 
+  // Rental Cars Functions
+  const handleAddRentalCar = async () => {
+    if (formData.model) {
+      try {
+        // Upload images if provided
+        let imageUrls = [];
+        if (imageFiles && imageFiles.length > 0) {
+          for (const file of imageFiles) {
+            const uploadedUrl = await handleImageUpload(file);
+            if (uploadedUrl) {
+              imageUrls.push(uploadedUrl);
+            }
+          }
+        }
+
+        const carData = {
+          ...formData,
+          images: imageUrls.length > 0 ? imageUrls : formData.images || [],
+          features: formData.features || [],
+        };
+
+        const result = await api.createRentalCar(carData);
+        const newCar = { ...carData, id: result.id };
+        setRentalCars([...rentalCars, newCar]);
+        handleCancel();
+      } catch (error) {
+        console.error("Error adding rental car:", error);
+        alert("Failed to add rental car");
+      }
+    } else {
+      alert("Please fill in model");
+    }
+  };
+
+  const handleEditRentalCar = (car) => {
+    setEditingItem(car);
+    setFormData(car);
+    setIsAdding(false);
+  };
+
+  const handleUpdateRentalCar = async () => {
+    if (editingItem) {
+      try {
+        // Upload new images if provided
+        let imageUrls = [...(formData.images || [])];
+        if (imageFiles && imageFiles.length > 0) {
+          for (const file of imageFiles) {
+            const uploadedUrl = await handleImageUpload(file);
+            if (uploadedUrl) {
+              imageUrls.push(uploadedUrl);
+            }
+          }
+        }
+
+        const carData = {
+          ...formData,
+          images: imageUrls,
+        };
+
+        await api.updateRentalCar(editingItem.id, carData);
+        setRentalCars(
+          rentalCars.map((c) =>
+            c.id === editingItem.id ? { ...carData, id: c.id } : c
+          )
+        );
+        handleCancel();
+      } catch (error) {
+        console.error("Error updating rental car:", error);
+        alert("Failed to update rental car");
+      }
+    }
+  };
+
+  const handleDeleteRentalCar = async (id) => {
+    if (confirm("Are you sure you want to delete this rental car?")) {
+      try {
+        await api.deleteRentalCar(id);
+        setRentalCars(rentalCars.filter((c) => c.id !== id));
+      } catch (error) {
+        console.error("Error deleting rental car:", error);
+        alert("Failed to delete rental car");
+      }
+    }
+  };
+
   const handleCancel = () => {
     setEditingItem(null);
     setIsAdding(false);
@@ -384,6 +472,16 @@ export function Admin() {
             }`}
           >
             Tours ({tours.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("rental-cars")}
+            className={`px-6 py-3 rounded-lg font-semibold transition ${
+              activeTab === "rental-cars"
+                ? "bg-amber-500 text-white shadow-lg"
+                : "bg-white text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            Rental Cars ({rentalCars.length})
           </button>
         </div>
 
@@ -942,6 +1040,375 @@ export function Admin() {
                         </button>
                         <button
                           onClick={() => handleDeleteTour(tour.id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Rental Cars Tab */}
+        {activeTab === "rental-cars" && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Rental Cars</h2>
+              <button
+                onClick={() => setIsAdding(true)}
+                className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition flex items-center gap-2"
+              >
+                <span className="text-xl">+</span> Add New Rental Car
+              </button>
+            </div>
+
+            {/* Add Form */}
+            {isAdding && (
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h3 className="text-xl font-bold mb-4">Add New Rental Car</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Model (e.g., Fiat Egea or similar)"
+                    value={formData.model || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, model: e.target.value })
+                    }
+                    className="border p-3 rounded-lg col-span-2"
+                  />
+                  <textarea
+                    placeholder="Description"
+                    value={formData.description || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    className="border p-3 rounded-lg col-span-2"
+                    rows="3"
+                  />
+
+                  <div className="col-span-2 grid grid-cols-3 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Transmission (e.g., Automatic)"
+                      value={formData.transmission || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          transmission: e.target.value,
+                        })
+                      }
+                      className="border p-3 rounded-lg"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Fuel Type (e.g., Diesel)"
+                      value={formData.fuel || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, fuel: e.target.value })
+                      }
+                      className="border p-3 rounded-lg"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Doors (e.g., 4 Doors)"
+                      value={formData.doors || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, doors: e.target.value })
+                      }
+                      className="border p-3 rounded-lg"
+                    />
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder="Daily Price (e.g., €55)"
+                    value={formData.daily_price || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, daily_price: e.target.value })
+                    }
+                    className="border p-3 rounded-lg"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Weekly Price (e.g., €330)"
+                    value={formData.weekly_price || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, weekly_price: e.target.value })
+                    }
+                    className="border p-3 rounded-lg"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Color (e.g., blue, red)"
+                    value={formData.color || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, color: e.target.value })
+                    }
+                    className="border p-3 rounded-lg"
+                  />
+
+                  <div className="col-span-2">
+                    <label className="block mb-2 font-semibold">
+                      Features (one per line)
+                    </label>
+                    <textarea
+                      placeholder="5 Passengers&#10;Premium Comfort&#10;GPS Navigation"
+                      value={
+                        Array.isArray(formData.features)
+                          ? formData.features.join("\n")
+                          : formData.features || ""
+                      }
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          features: e.target.value
+                            .split("\n")
+                            .filter((f) => f.trim()),
+                        })
+                      }
+                      className="border p-3 rounded-lg w-full"
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block mb-2 font-semibold">Images</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) =>
+                        setImageFiles(Array.from(e.target.files))
+                      }
+                      className="border p-3 rounded-lg w-full"
+                    />
+                    {uploading && (
+                      <p className="text-blue-500 mt-2">Uploading...</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={handleAddRentalCar}
+                    className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+                    disabled={uploading}
+                  >
+                    Add Car
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Cars List */}
+            <div className="space-y-4">
+              {rentalCars.map((car) => (
+                <div
+                  key={car.id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                >
+                  {editingItem?.id === car.id ? (
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold mb-4">
+                        Edit Rental Car
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Model"
+                          value={formData.model || ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, model: e.target.value })
+                          }
+                          className="border p-3 rounded-lg col-span-2"
+                        />
+                        <textarea
+                          placeholder="Description"
+                          value={formData.description || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              description: e.target.value,
+                            })
+                          }
+                          className="border p-3 rounded-lg col-span-2"
+                          rows="3"
+                        />
+
+                        <div className="col-span-2 grid grid-cols-3 gap-4">
+                          <input
+                            type="text"
+                            placeholder="Transmission"
+                            value={formData.transmission || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                transmission: e.target.value,
+                              })
+                            }
+                            className="border p-3 rounded-lg"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Fuel Type"
+                            value={formData.fuel || ""}
+                            onChange={(e) =>
+                              setFormData({ ...formData, fuel: e.target.value })
+                            }
+                            className="border p-3 rounded-lg"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Doors"
+                            value={formData.doors || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                doors: e.target.value,
+                              })
+                            }
+                            className="border p-3 rounded-lg"
+                          />
+                        </div>
+
+                        <input
+                          type="text"
+                          placeholder="Daily Price"
+                          value={formData.daily_price || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              daily_price: e.target.value,
+                            })
+                          }
+                          className="border p-3 rounded-lg"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Weekly Price"
+                          value={formData.weekly_price || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              weekly_price: e.target.value,
+                            })
+                          }
+                          className="border p-3 rounded-lg"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Color"
+                          value={formData.color || ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, color: e.target.value })
+                          }
+                          className="border p-3 rounded-lg"
+                        />
+
+                        <div className="col-span-2">
+                          <label className="block mb-2 font-semibold">
+                            Features
+                          </label>
+                          <textarea
+                            value={
+                              Array.isArray(formData.features)
+                                ? formData.features.join("\n")
+                                : formData.features || ""
+                            }
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                features: e.target.value
+                                  .split("\n")
+                                  .filter((f) => f.trim()),
+                              })
+                            }
+                            className="border p-3 rounded-lg w-full"
+                            rows="4"
+                          />
+                        </div>
+
+                        <div className="col-span-2">
+                          <label className="block mb-2 font-semibold">
+                            Add More Images
+                          </label>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) =>
+                              setImageFiles(Array.from(e.target.files))
+                            }
+                            className="border p-3 rounded-lg w-full"
+                          />
+                          {uploading && (
+                            <p className="text-blue-500 mt-2">Uploading...</p>
+                          )}
+                          {formData.images && formData.images.length > 0 && (
+                            <div className="mt-2">
+                              <p className="text-sm text-gray-600">
+                                Current images: {formData.images.length}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 mt-6">
+                        <button
+                          onClick={handleUpdateRentalCar}
+                          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+                          disabled={uploading}
+                        >
+                          Update Car
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center p-6">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-3xl">{car.icon}</span>
+                          <h3 className="text-xl font-bold text-gray-800">
+                            {car.name}
+                          </h3>
+                        </div>
+                        <p className="text-gray-600 mb-1">{car.model}</p>
+                        <p className="text-sm text-gray-500 mb-2">
+                          {car.description}
+                        </p>
+                        <div className="flex gap-4 text-sm text-gray-600">
+                          <span>💰 {car.daily_price}/day</span>
+                          <span>📅 {car.weekly_price}/week</span>
+                          <span>⚙️ {car.transmission}</span>
+                          <span>⛽ {car.fuel}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditRentalCar(car)}
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRentalCar(car.id)}
                           className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                         >
                           Delete
