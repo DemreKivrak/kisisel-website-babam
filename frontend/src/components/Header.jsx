@@ -107,11 +107,15 @@ export function Header() {
                 />
               </svg>
             </a>
-            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-white text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1">
+            <ul
+              className=" invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1 border-gray-200
+            
+            "
+            >
               {destinations.map((dest) => (
                 <li
                   key={dest.id}
-                  className="hover:bg-gray-100 px-4 py-2 cursor-pointer transition hover:text-amber-300"
+                  className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
                   onClick={(e) => {
                     e.stopPropagation();
                     navigate(
@@ -145,9 +149,9 @@ export function Header() {
                 />
               </svg>
             </a>
-            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-white text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1">
+            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1 border-gray-200">
               <li
-                className="hover:bg-gray-100 px-4 py-2 cursor-pointer transition hover:text-amber-300"
+                className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate("/services");

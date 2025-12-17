@@ -1,6 +1,35 @@
 import { Header } from "../components/Header";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export function Contact() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const scrollToElement = (elementId) => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        const yOffset = -100; // Bu değeri değiştirerek scroll konumunu ayarlayın
+        const y =
+          element.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    };
+
+    // Check if there's a scrollTo in location state
+    if (location.state?.scrollTo) {
+      setTimeout(() => scrollToElement(location.state.scrollTo), 300);
+    } else {
+      // Handle hash from URL (for HashRouter: #/contact#section)
+      const url = window.location.href;
+      const hashIndex = url.lastIndexOf("#");
+      if (hashIndex > 0 && url.indexOf("#") !== hashIndex) {
+        const sectionId = url.substring(hashIndex + 1);
+        setTimeout(() => scrollToElement(sectionId), 300);
+      }
+    }
+  }, [location]);
+
   return (
     <div className="bg-white min-h-screen">
       <title>Contact us</title>
@@ -23,7 +52,7 @@ export function Contact() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div id="contact" className="max-w-7xl mx-auto px-4 py-16">
         {/* Quick Contact Cards */}
         <div className="flex justify-evenly gap-6 mb-16">
           {/* Phone Card */}

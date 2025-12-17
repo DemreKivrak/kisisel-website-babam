@@ -244,7 +244,7 @@ export function TourPage() {
                     <p className="text-gray-500 text-sm">per person</p>
                   </div>
                   <button
-                    onClick={() => navigate("/contact")}
+                    onClick={() => navigate("/contact#contact")}
                     className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer
                     "
                   >
@@ -369,7 +369,7 @@ export function TourPage() {
             </p>
           </div>
           <button
-            onClick={() => navigate("/contact")}
+            onClick={() => navigate("/contact#contact")}
             className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
           >
             Book This Tour

@@ -240,7 +240,7 @@ export function About() {
               View Tours
             </Link>
             <Link
-              to="/contact"
+              to="/contact#contact"
               className="bg-gray-800 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-900 transition-all transform hover:scale-105 shadow-lg"
             >
               Contact

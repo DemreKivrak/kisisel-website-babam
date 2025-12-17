@@ -194,7 +194,7 @@ export function Services() {
                         </div>
                       </div>
                       <Link
-                        to="/contact"
+                        to="/contact#contact"
                         className="block w-full bg-blue-500 text-white py-4 rounded-xl font-bold text-center hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
                       >
                         Request Quote & Book Now
@@ -218,7 +218,7 @@ export function Services() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/contact"
+              to="/contact#contact"
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
             >
               Contact Us
