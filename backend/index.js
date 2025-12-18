@@ -37,7 +37,14 @@ const upload = multer({
 });
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? process.env.FRONTEND_URL || "*"
+      : "http://localhost:5173",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Database initialization
@@ -676,6 +683,14 @@ app.delete("/api/rental-cars/:id", verifyToken, (req, res) => {
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+// Serve frontend static files (if exists)
+app.use(express.static("public"));
+
+// Catch-all route for React Router (must be after API routes)
+app.get("*", (req, res) => {
+  res.sendFile("public/index.html", { root: "." });
 });
 
 // Start server

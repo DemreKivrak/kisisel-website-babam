@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "zip": "powershell \"Get-ChildItem -Path . -Exclude node_modules,database.sqlite,*.zip,*.log,.env,dist,temp-check | Compress-Archive -DestinationPath deployment.zip -Force\""
   },
   "keywords": [
     "express",
@@ -16,15 +17,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
     "nodemon": "^3.0.2"
   }
 }
