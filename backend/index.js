@@ -308,6 +308,46 @@ app.post("/api/auth/change-password", verifyToken, async (req, res) => {
   }
 });
 
+// Setup admin endpoint (TEMPORARY - remove after first use)
+app.post("/api/setup-admin", async (req, res) => {
+  try {
+    // Check if any users exist
+    db.get("SELECT COUNT(*) as count FROM users", async (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+
+      // If users exist, don't allow setup
+      if (row.count > 0) {
+        return res.status(400).json({ error: "Admin already exists" });
+      }
+
+      // Create default admin
+      const defaultUsername = "admin";
+      const defaultPassword = "admin123";
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+      db.run(
+        "INSERT INTO users (username, password) VALUES (?, ?)",
+        [defaultUsername, hashedPassword],
+        (err) => {
+          if (err) {
+            return res.status(500).json({ error: "Failed to create admin" });
+          }
+
+          res.json({
+            message: "Admin user created successfully",
+            username: defaultUsername,
+            password: defaultPassword,
+          });
+        }
+      );
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Get all destinations
 app.get("/api/destinations", (req, res) => {
   db.all("SELECT * FROM destinations ORDER BY created_at DESC", (err, rows) => {

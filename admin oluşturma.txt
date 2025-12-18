@@ -1,0 +1,3 @@
+fetch('/api/setup-admin', { method: 'POST' })
+  .then(r => r.json())
+  .then(data => console.log(data))
