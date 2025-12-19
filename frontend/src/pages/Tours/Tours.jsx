@@ -23,11 +23,18 @@ export function Tours() {
       ]);
 
       // Add default properties for tours
-      const toursWithDefaults = toursData.map((tour) => ({
-        ...tour,
-        img: tour.img || "homepage-pic-1.jpg",
-        type: "Guaranteed Departured Tour",
-      }));
+      const toursWithDefaults = toursData.map((tour) => {
+        // Get first image from images field (comma-separated string)
+        const firstImage = tour.images
+          ? tour.images.split(",")[0].trim()
+          : "homepage-pic-1.jpg";
+
+        return {
+          ...tour,
+          img: firstImage,
+          type: "Guaranteed Departured Tour",
+        };
+      });
 
       setTours(toursWithDefaults);
 

@@ -281,7 +281,7 @@ export function TourPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Tour Highlights
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-50 gap-x-55">
               {tourData.highlights.map((highlight, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <span className="text-amber-500 text-xl">✦</span>

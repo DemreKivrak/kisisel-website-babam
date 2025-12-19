@@ -241,6 +241,16 @@ export function Admin() {
     setFormData(tour);
   };
 
+  const handleRemoveTourImage = (imageUrl) => {
+    if (confirm("Are you sure you want to remove this image?")) {
+      const currentImages = formData.images ? formData.images.split(",") : [];
+      const updatedImages = currentImages.filter(
+        (img) => img.trim() !== imageUrl.trim()
+      );
+      setFormData({ ...formData, images: updatedImages.join(",") });
+    }
+  };
+
   const handleUpdateTour = async () => {
     try {
       let imageUrls = formData.images ? formData.images.split(",") : [];
@@ -957,6 +967,34 @@ export function Admin() {
                         />
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Current Images
+                          </label>
+                          {formData.images && formData.images.trim() !== "" ? (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                              {formData.images.split(",").map((img, idx) => (
+                                <div key={idx} className="relative group">
+                                  <img
+                                    src={img.trim()}
+                                    alt={`Tour image ${idx + 1}`}
+                                    className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveTourImage(img)}
+                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                    title="Remove image"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 mb-4">
+                              No images uploaded yet
+                            </p>
+                          )}
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
                             Add More Images (Multiple)
                           </label>
                           <input
@@ -968,12 +1006,6 @@ export function Admin() {
                             }
                             className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
                           />
-                          {formData.images && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              Current images:{" "}
-                              {formData.images.split(",").length}
-                            </p>
-                          )}
                           {imageFiles.length > 0 && (
                             <p className="text-sm text-gray-600 mt-1">
                               {imageFiles.length} new file(s) selected

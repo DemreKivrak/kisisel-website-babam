@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
 
 export function Destinations() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [tours, setTours] = useState([]);
@@ -13,6 +14,19 @@ export function Destinations() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Open destination from URL hash
+  useEffect(() => {
+    if (location.hash && destinations.length > 0) {
+      const destId = parseInt(location.hash.substring(1));
+      const destination = destinations.find((d) => d.id === destId);
+      if (destination) {
+        setSelectedDestination(destination);
+        // Scroll to top after opening
+        setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+      }
+    }
+  }, [location.hash, destinations]);
 
   const loadData = async () => {
     try {
@@ -26,12 +40,7 @@ export function Destinations() {
         ...dest,
         highlights: dest.highlights
           ? dest.highlights.split("\n").filter((h) => h.trim())
-          : [
-              "Historical Sites",
-              "Cultural Experiences",
-              "Local Cuisine",
-              "Natural Beauty",
-            ],
+          : [],
       }));
 
       setDestinations(destinationsWithDefaults);

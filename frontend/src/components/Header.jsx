@@ -118,9 +118,7 @@ export function Header() {
                   className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(
-                      `/tours?destination=${encodeURIComponent(dest.name)}`
-                    );
+                    navigate(`/destinations#${dest.id}`);
                   }}
                 >
                   <a className="block w-full">{dest.name}</a>
