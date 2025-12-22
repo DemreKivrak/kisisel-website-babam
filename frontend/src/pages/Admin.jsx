@@ -10,6 +10,7 @@ export function Admin() {
   const [destinations, setDestinations] = useState([]);
   const [tours, setTours] = useState([]);
   const [rentalCars, setRentalCars] = useState([]);
+  const [galleryItems, setGalleryItems] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
@@ -33,14 +34,17 @@ export function Admin() {
 
   const loadData = async () => {
     try {
-      const [destinationsData, toursData, rentalCarsData] = await Promise.all([
-        api.getDestinations(),
-        api.getTours(),
-        api.getRentalCars(),
-      ]);
+      const [destinationsData, toursData, rentalCarsData, galleryData] =
+        await Promise.all([
+          api.getDestinations(),
+          api.getTours(),
+          api.getRentalCars(),
+          api.getGallery(),
+        ]);
       setDestinations(destinationsData);
       setTours(toursData);
       setRentalCars(rentalCarsData);
+      setGalleryItems(galleryData);
     } catch (error) {
       console.error("Error loading data:", error);
       alert("Failed to load data from server");
@@ -492,6 +496,16 @@ export function Admin() {
             }`}
           >
             Rental Cars ({rentalCars.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("gallery")}
+            className={`px-6 py-3 rounded-lg font-semibold transition ${
+              activeTab === "gallery"
+                ? "bg-purple-500 text-white shadow-lg"
+                : "bg-white text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            Galeri ({galleryItems.length})
           </button>
         </div>
 
@@ -1579,6 +1593,297 @@ export function Admin() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Gallery Tab */}
+      {activeTab === "gallery" && (
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Galeri Yönetimi</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setIsAdding(true);
+                  setFormData({ type: "image", title: "", description: "" });
+                }}
+                className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition"
+              >
+                + Fotoğraf Ekle
+              </button>
+              <button
+                onClick={() => {
+                  setIsAdding(true);
+                  setFormData({
+                    type: "video",
+                    title: "",
+                    description: "",
+                    url: "",
+                  });
+                }}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+              >
+                + Video Ekle
+              </button>
+            </div>
+          </div>
+
+          {/* Add/Edit Form */}
+          {isAdding && (
+            <div className="mb-6 p-6 bg-gray-50 rounded-lg border-2 border-purple-200">
+              <h3 className="text-xl font-bold mb-4">
+                {formData.type === "image" ? "Fotoğraf" : "Video"} Ekle
+              </h3>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setUploading(true);
+
+                  try {
+                    if (formData.type === "image") {
+                      if (!imageFile) {
+                        alert("Lütfen bir fotoğraf seçin");
+                        return;
+                      }
+                      await api.addGalleryImage(
+                        imageFile,
+                        formData.title,
+                        formData.description
+                      );
+                    } else {
+                      await api.addGalleryVideo(
+                        formData.url,
+                        formData.title,
+                        formData.description
+                      );
+                    }
+
+                    await loadData();
+                    setIsAdding(false);
+                    setFormData({});
+                    setImageFile(null);
+                    alert("Başarıyla eklendi!");
+                  } catch (error) {
+                    console.error("Error adding gallery item:", error);
+                    alert("Eklerken bir hata oluştu: " + error.message);
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+                className="space-y-4"
+              >
+                {formData.type === "image" ? (
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      Fotoğraf
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setImageFile(e.target.files[0])}
+                      className="w-full px-4 py-2 border rounded-lg"
+                      required
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      YouTube URL
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      value={formData.url || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, url: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border rounded-lg"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    Başlık
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    Açıklama
+                  </label>
+                  <textarea
+                    value={formData.description || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border rounded-lg"
+                    rows="3"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={uploading}
+                    className="flex-1 bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 transition disabled:opacity-50"
+                  >
+                    {uploading ? "Yükleniyor..." : "Ekle"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAdding(false);
+                      setFormData({});
+                      setImageFile(null);
+                    }}
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition"
+                  >
+                    İptal
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Gallery Items Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {galleryItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white border rounded-lg overflow-hidden shadow-md hover:shadow-xl transition"
+              >
+                <div className="relative h-48">
+                  <img
+                    src={item.thumbnail || item.url}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {item.type === "video" && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="60"
+                        height="60"
+                        fill="white"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4">
+                  {editingItem?.id === item.id ? (
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={editingItem.title}
+                        onChange={(e) =>
+                          setEditingItem({
+                            ...editingItem,
+                            title: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 border rounded"
+                        placeholder="Başlık"
+                      />
+                      <textarea
+                        value={editingItem.description}
+                        onChange={(e) =>
+                          setEditingItem({
+                            ...editingItem,
+                            description: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 border rounded"
+                        rows="2"
+                        placeholder="Açıklama"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            try {
+                              await api.updateGalleryItem(
+                                editingItem.id,
+                                editingItem.title,
+                                editingItem.description
+                              );
+                              await loadData();
+                              setEditingItem(null);
+                              alert("Güncellendi!");
+                            } catch (error) {
+                              alert("Hata: " + error.message);
+                            }
+                          }}
+                          className="flex-1 bg-green-500 text-white py-2 rounded hover:bg-green-600"
+                        >
+                          Kaydet
+                        </button>
+                        <button
+                          onClick={() => setEditingItem(null)}
+                          className="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
+                        >
+                          İptal
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="font-bold text-lg mb-1">{item.title}</h3>
+                      <p className="text-gray-600 text-sm mb-3">
+                        {item.description}
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingItem(item)}
+                          className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 text-sm"
+                        >
+                          Düzenle
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (
+                              confirm(
+                                "Bu öğeyi silmek istediğinize emin misiniz?"
+                              )
+                            ) {
+                              try {
+                                await api.deleteGalleryItem(item.id);
+                                await loadData();
+                                alert("Silindi!");
+                              } catch (error) {
+                                alert("Hata: " + error.message);
+                              }
+                            }
+                          }}
+                          className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600 text-sm"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {galleryItems.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              <p>Henüz galeri öğesi eklenmemiş.</p>
+            </div>
+          )}
         </div>
       )}
     </div>

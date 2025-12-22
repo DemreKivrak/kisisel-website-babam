@@ -181,4 +181,62 @@ export const api = {
     if (!response.ok) throw new Error("Failed to delete rental car");
     return response.json();
   },
+
+  // Gallery
+  getGallery: async () => {
+    const response = await fetch(`${API_URL}/gallery`);
+    if (!response.ok) throw new Error("Failed to fetch gallery");
+    return response.json();
+  },
+
+  addGalleryImage: async (file, title, description) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("title", title);
+    formData.append("description", description);
+
+    const token = getAuthToken();
+    const headers = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/gallery/image`, {
+      method: "POST",
+      headers: headers,
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error("Failed to add image");
+    return response.json();
+  },
+
+  addGalleryVideo: async (url, title, description) => {
+    const response = await fetch(`${API_URL}/gallery/video`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ url, title, description }),
+    });
+    if (!response.ok) throw new Error("Failed to add video");
+    return response.json();
+  },
+
+  updateGalleryItem: async (id, title, description) => {
+    const response = await fetch(`${API_URL}/gallery/${id}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ title, description }),
+    });
+    if (!response.ok) throw new Error("Failed to update gallery item");
+    return response.json();
+  },
+
+  deleteGalleryItem: async (id) => {
+    const response = await fetch(`${API_URL}/gallery/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to delete gallery item");
+    return response.json();
+  },
 };

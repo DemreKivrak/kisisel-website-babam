@@ -11,6 +11,7 @@ import { Admin } from "./pages/Admin.jsx";
 import { Login } from "./pages/Login.jsx";
 import { About } from "./pages/About.jsx";
 import { Services } from "./pages/Services.jsx";
+import { Galery } from "./pages/Galery.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/galery" element={<Galery />} />
           <Route
             path="/admin"
             element={

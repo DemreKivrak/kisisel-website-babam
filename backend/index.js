@@ -119,6 +119,19 @@ function initializeDatabase() {
     )
   `);
 
+  // Gallery table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS gallery (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT NOT NULL,
+      url TEXT NOT NULL,
+      thumbnail TEXT,
+      title TEXT NOT NULL,
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Create default admin user if not exists
   db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
     if (!err && row.count === 0) {
@@ -718,6 +731,152 @@ app.delete("/api/rental-cars/:id", verifyToken, (req, res) => {
       }
     }
   );
+});
+
+// ============================================
+// Gallery Routes
+// ============================================
+
+// Get all gallery items
+app.get("/api/gallery", (req, res) => {
+  db.all("SELECT * FROM gallery ORDER BY created_at DESC", [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Add gallery item (image)
+app.post(
+  "/api/gallery/image",
+  verifyToken,
+  upload.single("image"),
+  (req, res) => {
+    const { title, description } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Image file is required" });
+    }
+
+    const url = req.file.path;
+    const thumbnail = req.file.path.replace(
+      "/upload/",
+      "/upload/w_400,h_300,c_fill/"
+    );
+
+    db.run(
+      "INSERT INTO gallery (type, url, thumbnail, title, description) VALUES (?, ?, ?, ?, ?)",
+      ["image", url, thumbnail, title, description],
+      function (err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json({
+            id: this.lastID,
+            type: "image",
+            url,
+            thumbnail,
+            title,
+            description,
+          });
+        }
+      }
+    );
+  }
+);
+
+// Add gallery item (video)
+app.post("/api/gallery/video", verifyToken, (req, res) => {
+  const { url, title, description } = req.body;
+
+  if (!url || !title) {
+    return res.status(400).json({ error: "URL and title are required" });
+  }
+
+  // Convert YouTube URL to embed format
+  let embedUrl = url;
+  if (url.includes("youtube.com/watch?v=")) {
+    const videoId = url.split("v=")[1]?.split("&")[0];
+    embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  } else if (url.includes("youtu.be/")) {
+    const videoId = url.split("youtu.be/")[1]?.split("?")[0];
+    embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  }
+
+  // Get YouTube thumbnail
+  const videoId = embedUrl.split("/embed/")[1]?.split("?")[0];
+  const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+  db.run(
+    "INSERT INTO gallery (type, url, thumbnail, title, description) VALUES (?, ?, ?, ?, ?)",
+    ["video", embedUrl, thumbnail, title, description],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({
+          id: this.lastID,
+          type: "video",
+          url: embedUrl,
+          thumbnail,
+          title,
+          description,
+        });
+      }
+    }
+  );
+});
+
+// Update gallery item
+app.put("/api/gallery/:id", verifyToken, (req, res) => {
+  const { id } = req.params;
+  const { title, description } = req.body;
+
+  db.run(
+    "UPDATE gallery SET title = ?, description = ? WHERE id = ?",
+    [title, description, id],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else if (this.changes === 0) {
+        res.status(404).json({ error: "Gallery item not found" });
+      } else {
+        res.json({ message: "Gallery item updated" });
+      }
+    }
+  );
+});
+
+// Delete gallery item
+app.delete("/api/gallery/:id", verifyToken, (req, res) => {
+  const { id } = req.params;
+
+  db.get("SELECT * FROM gallery WHERE id = ?", [id], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (!row) {
+      return res.status(404).json({ error: "Gallery item not found" });
+    }
+
+    // If it's an image, delete from Cloudinary
+    if (row.type === "image" && row.url.includes("cloudinary")) {
+      const publicId = row.url.split("/").slice(-2).join("/").split(".")[0];
+      cloudinary.uploader.destroy(publicId, (error) => {
+        if (error) console.error("Error deleting from Cloudinary:", error);
+      });
+    }
+
+    db.run("DELETE FROM gallery WHERE id = ?", [id], function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Gallery item deleted" });
+      }
+    });
+  });
 });
 
 // Health check

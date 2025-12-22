@@ -166,12 +166,45 @@ export function Header() {
           >
             Contact
           </a>
-          <a
-            onClick={() => navigate("/about")}
-            className="hover:text-amber-300 cursor-pointer transition"
-          >
-            About
-          </a>
+
+          <div className="relative group">
+            <a className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1">
+              About
+              <svg
+                className="w-4 h-4 transition-transform group-hover:rotate-180"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </a>
+            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1 border-gray-200">
+              <li
+                className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/about");
+                }}
+              >
+                <a className="block w-full">About us</a>
+              </li>
+              <li
+                className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/galery");
+                }}
+              >
+                <a className="block w-full">Gallery</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
