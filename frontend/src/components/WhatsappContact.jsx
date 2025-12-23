@@ -1,9 +1,17 @@
+import { useMenu } from "../contexts/MenuContext";
+
 export function WhatsappContact() {
+  const { mobileMenuOpen } = useMenu();
+
   const handleWhatsApp = () => {
     const phone = "905322315758";
     const message = encodeURIComponent("");
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   };
+
+  if (mobileMenuOpen) {
+    return null;
+  }
 
   return (
     <>
