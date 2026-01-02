@@ -884,12 +884,19 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// Serve frontend static files (if exists)
-app.use(express.static("public"));
-
-// Catch-all route for React Router (must be after API routes)
-app.get("*", (req, res) => {
-  res.sendFile("public/index.html", { root: "." });
+// Root endpoint - API info
+app.get("/", (req, res) => {
+  res.json({
+    message: "Tourism Website API",
+    status: "running",
+    endpoints: {
+      destinations: "/api/destinations",
+      tours: "/api/tours",
+      auth: "/api/auth",
+      upload: "/api/upload",
+      health: "/api/health",
+    },
+  });
 });
 
 // Start server
