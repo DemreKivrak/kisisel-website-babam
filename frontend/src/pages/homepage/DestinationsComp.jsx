@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 
 export function DestinationsComp() {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadDestinations();
@@ -84,12 +86,13 @@ export function DestinationsComp() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-12"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-12 py-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {destinations.map((dest, i) => (
             <div
               key={i}
+              onClick={() => navigate(`/destinations#${dest.id}`)}
               className="group relative flex-shrink-0 w-80 overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
             >
               {/* Image Container */}
