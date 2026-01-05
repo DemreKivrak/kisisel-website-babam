@@ -1,5 +1,6 @@
 import { Header } from "../components/Header";
 import { Link } from "react-router-dom";
+import { PageEnd } from "../components/PageEnd";
 
 export function About() {
   return (
@@ -248,6 +249,7 @@ export function About() {
           </div>
         </div>
       </div>
+      <PageEnd />
     </>
   );
 }

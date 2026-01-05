@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 
 export function Recommended() {
   const navigate = useNavigate();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     loadTours();
@@ -15,7 +15,6 @@ export function Recommended() {
   const loadTours = async () => {
     try {
       const data = await api.getTours();
-      // Filter only recommended tours
       const recommendedTours = data.filter((tour) => tour.is_recommended);
       const toursWithDefaults = recommendedTours.map((tour) => ({
         id: tour.id,
@@ -24,157 +23,217 @@ export function Recommended() {
         price: tour.price,
         info: tour.duration || "tour info",
       }));
-      setRecommended(toursWithDefaults);
+      setRecommended(toursWithDefaults.slice(0, 10));
     } catch (error) {
       console.error("Error loading tours:", error);
-      // Fallback to default data
-      setRecommended([
-        {
-          name: "Tour name-1",
-          img: "homepage-pic-1.jpg",
-          price: "100 €",
-          info: "tour info",
-        },
-        {
-          name: "Tour name-2",
-          img: "homepage-pic-1.jpg",
-          price: "200 €",
-          info: "tour info",
-        },
-        {
-          name: "Tour name-3",
-          img: "homepage-pic-1.jpg",
-          price: "300 €",
-          info: "tour info",
-        },
-      ]);
+      setRecommended([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
   if (loading) {
     return (
-      <div className="py-8 px-4">
+      <div className="py-16 px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-amber-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading tours...</p>
         </div>
       </div>
     );
   }
+
   return (
-    <>
-      <div className="py-8 px-4">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+    <div className="py-16 px-4 bg-gradient-to-b from-white to-amber-50/30">
+      <div className="text-center mb-16">
+        <div className="inline-block">
+          <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase mb-2 block">
+            Handpicked For You
+          </span>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent font-serif">
             Recommended Tours
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto rounded-full"></div>
+          <div className="w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
         </div>
+        <p className="mt-6 text-gray-600 text-lg max-w-2xl mx-auto">
+          Carefully curated experiences designed to create unforgettable
+          memories
+        </p>
+      </div>
 
-        <div className="relative max-w-4xl mx-auto">
-          {/* Sol Ok */}
-          <button
-            onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-            disabled={currentIndex === 0}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg z-10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      <div className="max-w-7xl mx-auto relative">
+        {/* Sol Ok */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+        >
+          <svg
+            className="w-6 h-6 text-gray-800"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
 
-          {/* Slider Container */}
-          <div className="overflow-hidden rounded-lg">
+        {/* Scrollable Container */}
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-12"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {recommended.map((tour, i) => (
             <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+              key={i}
+              onClick={() => navigate(`/tourpage/${tour.id}`)}
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 flex-shrink-0 w-96"
             >
-              {recommended.map((dest, i) => (
-                <div key={i} className="min-w-full px-4">
-                  <div
-                    className="relative bg-gray-300 rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-2xl transition-shadow"
-                    onClick={() => navigate(`/tourpage/${dest.id}`)}
+              {/* Image Container */}
+              <div className="relative h-64 overflow-hidden">
+                <img
+                  src={tour.img}
+                  alt={tour.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+                {/* Recommended Badge */}
+                <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
                   >
-                    <img
-                      src={dest.img}
-                      alt={dest.name}
-                      className="w-full h-96 object-cover"
-                    />
-                    <div className="absolute bottom-24 right-4 px-4 py-2 z-10">
-                      <p className="text-sm text-white drop-shadow-lg">
-                        Starting From
-                      </p>
-                      <p className="text-3xl font-bold text-white drop-shadow-lg">
-                        {dest.price}
-                      </p>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-white p-4">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">
-                        {dest.info}
-                      </p>
-                      <h3 className="text-xl font-bold text-gray-900 uppercase mt-1">
-                        {dest.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Guaranteed Departured Tours
-                      </p>
-                    </div>
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  RECOMMENDED
+                </div>
+
+                {/* Price Tag */}
+                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg">
+                  <p className="text-xs text-gray-600 font-medium">
+                    Starting From
+                  </p>
+                  <p className="text-2xl font-bold text-amber-600">
+                    {tour.price}
+                  </p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {/* Duration Badge */}
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-1 text-amber-600 bg-amber-50 px-3 py-1 rounded-full text-sm font-medium">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {tour.info}
                   </div>
                 </div>
-              ))}
+
+                {/* Tour Name */}
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amber-600 transition-colors duration-300">
+                  {tour.name}
+                </h3>
+
+                {/* Features */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600"></div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <svg
+                      className="w-4 h-4 text-blue-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>Expert Guide Included</span>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg">
+                  <span>View Details</span>
+                  <svg
+                    className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Hover Border Effect */}
+              <div className="absolute inset-0 border-2 border-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
             </div>
-          </div>
-
-          {/* Sağ Ok */}
-          <button
-            onClick={() =>
-              setCurrentIndex((prev) =>
-                Math.min(recommended.length - 1, prev + 1)
-              )
-            }
-            disabled={currentIndex === recommended.length - 1}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg z-10 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-4">
-            {recommended.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentIndex(i)}
-                className={`w-3 h-3 rounded-full transition ${
-                  i === currentIndex ? "bg-gray-800" : "bg-gray-400"
-                }`}
-              />
-            ))}
-          </div>
+          ))}
         </div>
+
+        {/* Sağ Ok */}
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+        >
+          <svg
+            className="w-6 h-6 text-gray-800"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
       </div>
-    </>
+
+      {/* Custom CSS to hide scrollbar */}
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
   );
 }

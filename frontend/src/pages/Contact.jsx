@@ -1,6 +1,7 @@
 import { Header } from "../components/Header";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { PageEnd } from "../components/PageEnd";
 
 export function Contact() {
   const location = useLocation();
@@ -153,6 +154,7 @@ export function Contact() {
           </div>
         </div>
       </div>
+      <PageEnd />
     </div>
   );
 }

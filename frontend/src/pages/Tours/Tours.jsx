@@ -3,6 +3,7 @@ import { Header } from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
+import { PageEnd } from "../../components/PageEnd";
 
 export function Tours() {
   const [selectedDestination, setSelectedDestination] = useState("All");
@@ -222,6 +223,7 @@ export function Tours() {
           </div>
         )}
       </div>
+      <PageEnd />
     </div>
   );
 }

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "../../services/api";
 
 export function DestinationsComp() {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     loadDestinations();
@@ -13,49 +13,61 @@ export function DestinationsComp() {
   const loadDestinations = async () => {
     try {
       const data = await api.getDestinations();
-      // Take first 3 destinations for slider
-      setDestinations(data.slice(0, 3));
+      setDestinations(data.slice(0, 10));
     } catch (error) {
       console.error("Error loading destinations:", error);
-      // Fallback to default data
-      setDestinations([
-        { name: "Destination-1", img: "homepage-pic-1.jpg" },
-        { name: "Destination-2", img: "homepage-pic-1.jpg" },
-        { name: "Destination-3", img: "homepage-pic-1.jpg" },
-      ]);
+      setDestinations([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
   if (loading) {
     return (
-      <div className="py-8 px-4">
+      <div className="py-16 px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-amber-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading destinations...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="py-8 px-4">
+    <div className="py-16 px-4">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
-          Popular Destinations
-        </h1>
-        <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto rounded-full"></div>
+        <div className="inline-block">
+          <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase mb-2 block">
+            Discover
+          </span>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent mb-5 font-serif">
+            Popular Destinations
+          </h1>
+          <div className="w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
+        </div>
+        <p className="mt-6 text-gray-600 text-lg max-w-2xl mx-auto">
+          Explore Turkey's most breathtaking locations and hidden gems
+        </p>
       </div>
 
-      <div className="relative max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto relative">
         {/* Sol Ok */}
         <button
-          onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-          disabled={currentIndex === 0}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg z-10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          onClick={() => scroll("left")}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
         >
           <svg
-            className="w-6 h-6"
+            className="w-6 h-6 text-gray-800"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -63,49 +75,78 @@ export function DestinationsComp() {
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
+              strokeWidth={2.5}
               d="M15 19l-7-7 7-7"
             />
           </svg>
         </button>
 
-        {/* Slider Container */}
-        <div className="overflow-hidden rounded-lg">
-          <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-          >
-            {destinations.map((dest, i) => (
-              <div key={i} className="min-w-full px-4">
-                <div className="relative bg-gray-300 rounded-lg overflow-hidden shadow-lg">
-                  <img
-                    src={dest.img}
-                    alt={dest.name}
-                    className="w-full h-96 object-cover"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                    <h3 className="text-4xl font-bold text-white">
-                      {dest.name}
-                    </h3>
-                  </div>
+        {/* Scrollable Container */}
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-12"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {destinations.map((dest, i) => (
+            <div
+              key={i}
+              className="group relative flex-shrink-0 w-80 overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+            >
+              {/* Image Container */}
+              <div className="relative h-96 overflow-hidden">
+                <img
+                  src={dest.img}
+                  alt={dest.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-70 group-hover:opacity-80 transition-opacity duration-500"></div>
+
+                {/* Animated Corner Badge */}
+              </div>
+
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <h3 className="text-3xl font-bold text-white mb-2 transform group-hover:translate-x-2 transition-transform duration-300">
+                  {dest.name}
+                </h3>
+                <div className="flex items-center gap-2 text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium">Explore More →</span>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Hover Border Effect */}
+              <div className="absolute inset-0 border-4 border-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
+            </div>
+          ))}
         </div>
 
         {/* Sağ Ok */}
         <button
-          onClick={() =>
-            setCurrentIndex((prev) =>
-              Math.min(destinations.length - 1, prev + 1)
-            )
-          }
-          disabled={currentIndex === destinations.length - 1}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg z-10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          onClick={() => scroll("right")}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
         >
           <svg
-            className="w-6 h-6"
+            className="w-6 h-6 text-gray-800"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -113,25 +154,19 @@ export function DestinationsComp() {
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
+              strokeWidth={2.5}
               d="M9 5l7 7-7 7"
             />
           </svg>
         </button>
-
-        {/* Dots Indicator */}
-        <div className="flex justify-center gap-2 mt-4">
-          {destinations.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={`w-3 h-3 rounded-full transition ${
-                i === currentIndex ? "bg-gray-800" : "bg-gray-400"
-              }`}
-            />
-          ))}
-        </div>
       </div>
+
+      {/* Custom CSS to hide scrollbar */}
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

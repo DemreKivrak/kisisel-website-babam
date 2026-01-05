@@ -2,6 +2,7 @@ import { Header } from "../../components/Header.jsx";
 import { WhatsappContact } from "../../components/WhatsappContact.jsx";
 import { DestinationsComp } from "./DestinationsComp.jsx";
 import { Recommended } from "./Recommended.jsx";
+import { PageEnd } from "../../components/PageEnd.jsx";
 
 export function Homepage() {
   return (
@@ -42,6 +43,7 @@ export function Homepage() {
       </div>
 
       <WhatsappContact />
+      <PageEnd />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
+import { PageEnd } from "../components/PageEnd";
 
 export function Destinations() {
   const navigate = useNavigate();
@@ -319,6 +320,7 @@ export function Destinations() {
           </div>
         )}
       </div>
+      <PageEnd />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Header } from "../components/Header";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
+import { PageEnd } from "../components/PageEnd";
 
 export function Services() {
   const [carCategories, setCarCategories] = useState([]);
@@ -226,6 +227,7 @@ export function Services() {
           </div>
         </div>
       </div>
+      <PageEnd />
     </>
   );
 }
