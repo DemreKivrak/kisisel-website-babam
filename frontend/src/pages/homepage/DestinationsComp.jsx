@@ -46,27 +46,27 @@ export function DestinationsComp() {
   }
 
   return (
-    <div className="py-16 px-4">
+    <div className="py-16 px-4 overflow-hidden">
       <div className="text-center mb-12">
-        <div className="inline-block">
+        <div className="inline-block px-4">
           <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase mb-2 block">
             Discover
           </span>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent mb-5 font-serif">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent mb-5 font-serif">
             Popular Destinations
           </h1>
-          <div className="w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
+          <div className="w-32 md:w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
         </div>
-        <p className="mt-6 text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="mt-6 text-gray-600 text-base md:text-lg max-w-2xl mx-auto px-4">
           Explore Turkey's most breathtaking locations and hidden gems
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto relative">
+      <div className="max-w-7xl mx-auto relative px-2 md:px-0">
         {/* Sol Ok */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+          className="hidden md:block absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
         >
           <svg
             className="w-6 h-6 text-gray-800"
@@ -86,7 +86,7 @@ export function DestinationsComp() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-12 py-4"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {destinations.map((dest, i) => (
@@ -146,7 +146,7 @@ export function DestinationsComp() {
         {/* Sağ Ok */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+          className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
         >
           <svg
             className="w-6 h-6 text-gray-800"

@@ -65,13 +65,13 @@ export function Header() {
       </div>
       {/* Main Header */}
       <div
-        className={`absolute left-0 w-full flex items-center bg-gray-500/50 h-20 md:h-26 transition-all duration-300 ${
+        className={`absolute left-0 w-full max-w-[100vw] flex items-center bg-gray-500/50 h-20 md:h-26 transition-all duration-300 ${
           !isOnTop ? "top-0 bg-white" : "md:top-10 top-0"
         }`}
       >
         {/* Logo */}
         <img
-          className="cursor-pointer h-16 md:h-24 ml-4 md:ml-10"
+          className="cursor-pointer h-12 md:h-24 ml-2 md:ml-10 flex-shrink-0"
           src="logo-2-new.png"
           alt="logo"
           onClick={() => handleNavigate("/")}
@@ -79,7 +79,7 @@ export function Header() {
 
         {/* Hamburger Button - Mobile Only */}
         <button
-          className={`md:hidden ml-auto mr-4 flex flex-col gap-1.5 p-2 ${
+          className={`md:hidden ml-auto mr-2 flex flex-col gap-1.5 p-2 flex-shrink-0 ${
             !isOnTop ? "text-black" : "text-white"
           }`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
