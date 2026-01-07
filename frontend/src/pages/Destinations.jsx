@@ -288,7 +288,11 @@ export function Destinations() {
                   >
                     <div className="relative h-48">
                       <img
-                        src="homepage-pic-1.jpg"
+                        src={
+                          tour.images
+                            ? tour.images.split(",")[0].trim()
+                            : "homepage-pic-1.jpg"
+                        }
                         alt={tour.name}
                         className="w-full h-full object-cover"
                       />

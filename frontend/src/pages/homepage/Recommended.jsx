@@ -102,7 +102,7 @@ export function Recommended() {
             <div
               key={i}
               onClick={() => navigate(`/tourpage/${tour.id}`)}
-              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 flex-shrink-0 w-96"
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 flex-shrink-0 w-[280px] md:w-96"
             >
               {/* Image Container */}
               <div className="relative h-64 overflow-hidden">

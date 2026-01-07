@@ -93,7 +93,7 @@ export function DestinationsComp() {
             <div
               key={i}
               onClick={() => navigate(`/destinations#${dest.id}`)}
-              className="group relative flex-shrink-0 w-80 overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative flex-shrink-0 w-[280px] md:w-80 overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
             >
               {/* Image Container */}
               <div className="relative h-96 overflow-hidden">
