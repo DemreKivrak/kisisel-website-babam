@@ -95,7 +95,7 @@ export function Recommended() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {recommended.map((tour, i) => (

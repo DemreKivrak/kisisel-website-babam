@@ -281,7 +281,7 @@ export function TourPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Tour Highlights
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-50 gap-x-55">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-x-55 gap-x-5 mt-10 md:mt-0 md:ml-50">
               {tourData.highlights.map((highlight, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <span className="text-amber-500 text-xl">✦</span>
@@ -296,16 +296,16 @@ export function TourPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               What's Included
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="ml-2 md:ml-50 md:gap-x-55 grid grid-cols-2 mt-10 md:mt-0  md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-semibold text-green-700 mb-3 flex items-center gap-2 pl-50">
+                <h3 className="font-semibold text-green-700 mb-3 flex items-center gap-2">
                   <span className="text-xl">✓</span> Included
                 </h3>
                 <ul className="space-y-2">
                   {tourData.included.map((item, idx) => (
                     <li
                       key={idx}
-                      className="flex items-start gap-2 text-gray-700 pl-50"
+                      className="flex items-start gap-2 text-gray-700"
                     >
                       <span className="text-green-600 mt-1">•</span>
                       <span>{item}</span>
@@ -314,10 +314,10 @@ export function TourPage() {
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-red-700 mb-3 flex items-center gap-2 pl-50">
+                <h3 className="font-semibold text-red-700 mb-3 flex items-center gap-2">
                   <span className="text-xl">✗</span> Not Included
                 </h3>
-                <ul className="space-y-2 pl-50">
+                <ul className="space-y-2">
                   {tourData.notIncluded.map((item, idx) => (
                     <li
                       key={idx}

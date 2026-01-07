@@ -203,7 +203,7 @@ export function Tours() {
                     📍 {tour.destination}
                   </span>
                   <button
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-md hover:shadow-lg transition-all duration-300 text-sm font-semibold"
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-md hover:shadow-lg transition-all duration-300 text-sm font-semibold cursor-pointer"
                     onClick={() => navigate(`/tourpage/${tour.id}`)}
                   >
                     View Details
