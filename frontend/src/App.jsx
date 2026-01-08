@@ -3,6 +3,7 @@ import "./App.css";
 import { AuthProvider } from "./contexts/AuthContext";
 import { MenuProvider } from "./contexts/MenuContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { Homepage } from "./pages/homepage/Homepage.jsx";
 import { Tours } from "./pages/Tours/Tours.jsx";
 import { Destinations } from "./pages/Destinations.jsx";
@@ -17,6 +18,7 @@ import { Galery } from "./pages/Galery.jsx";
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <MenuProvider>
           <Routes>

@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 
 /*
-  server: {
+ server: {
     proxy: {
       "/api": {
         target: "http://localhost:3001",
@@ -14,6 +14,7 @@ import tailwindcss from "@tailwindcss/vite";
       },
     },
   },
+  
 */
 
 export default defineConfig({
