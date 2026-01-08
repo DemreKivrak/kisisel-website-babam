@@ -178,14 +178,6 @@ export function Tours() {
                   alt={tour.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-
-                {/* Price Badge */}
-                <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-md shadow-lg z-10">
-                  <p className="text-xs text-gray-600">Starting From</p>
-                  <p className="text-2xl font-bold text-gray-800">
-                    {tour.price}
-                  </p>
-                </div>
               </div>
 
               {/* Tour Info */}

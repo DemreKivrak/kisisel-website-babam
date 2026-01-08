@@ -26,6 +26,12 @@ export function Admin() {
   });
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [tourPricing, setTourPricing] = useState([]);
+  const [newPricing, setNewPricing] = useState({
+    min_persons: "",
+    max_persons: "",
+    price_per_person: "",
+  });
 
   // Load data on mount
   useEffect(() => {
@@ -200,7 +206,7 @@ export function Admin() {
 
   // Tour Functions
   const handleAddTour = async () => {
-    if (formData.name && formData.destination && formData.price) {
+    if (formData.name && formData.destination) {
       try {
         let imageUrls = [];
 
@@ -219,7 +225,7 @@ export function Admin() {
         const newTour = await api.createTour({
           name: formData.name,
           destination: formData.destination,
-          price: formData.price,
+          price: "", // Legacy field - not used anymore
           duration: formData.duration || "N/A",
           images: imageUrls.join(","),
           overview: formData.overview || "",
@@ -243,6 +249,7 @@ export function Admin() {
   const handleEditTour = (tour) => {
     setEditingItem(tour.id);
     setFormData(tour);
+    loadTourPricing(tour.id);
   };
 
   const handleRemoveTourImage = (imageUrl) => {
@@ -297,6 +304,44 @@ export function Admin() {
       } catch (error) {
         console.error("Error deleting tour:", error);
         alert("Failed to delete tour");
+      }
+    }
+  };
+
+  // Tour Pricing Functions
+  const loadTourPricing = async (tourId) => {
+    try {
+      const pricing = await api.getTourPricing(tourId);
+      setTourPricing(pricing);
+    } catch (error) {
+      console.error("Error loading pricing:", error);
+      setTourPricing([]);
+    }
+  };
+
+  const handleAddPricing = async (tourId) => {
+    if (!newPricing.min_persons || !newPricing.price_per_person) {
+      alert("Please fill in minimum persons and price per person");
+      return;
+    }
+    try {
+      const created = await api.createTourPricing(tourId, newPricing);
+      setTourPricing([...tourPricing, created]);
+      setNewPricing({ min_persons: "", max_persons: "", price_per_person: "" });
+    } catch (error) {
+      console.error("Error adding pricing:", error);
+      alert("Failed to add pricing");
+    }
+  };
+
+  const handleDeletePricing = async (tourId, pricingId) => {
+    if (confirm("Are you sure you want to delete this pricing entry?")) {
+      try {
+        await api.deleteTourPricing(tourId, pricingId);
+        setTourPricing(tourPricing.filter((p) => p.id !== pricingId));
+      } catch (error) {
+        console.error("Error deleting pricing:", error);
+        alert("Failed to delete pricing");
       }
     }
   };
@@ -392,6 +437,8 @@ export function Admin() {
     setFormData({});
     setImageFile(null);
     setImageFiles([]);
+    setTourPricing([]);
+    setNewPricing({ min_persons: "", max_persons: "", price_per_person: "" });
   };
 
   if (loading) {
@@ -743,15 +790,6 @@ export function Admin() {
                   </select>
                   <input
                     type="text"
-                    placeholder="Price (e.g., 500 €)"
-                    value={formData.price || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
-                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                  />
-                  <input
-                    type="text"
                     placeholder="Duration (e.g., 3 Nights / 4 Days)"
                     value={formData.duration || ""}
                     onChange={(e) =>
@@ -902,14 +940,7 @@ export function Admin() {
                         </select>
                         <input
                           type="text"
-                          value={formData.price || ""}
-                          onChange={(e) =>
-                            setFormData({ ...formData, price: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        />
-                        <input
-                          type="text"
+                          placeholder="Duration"
                           value={formData.duration || ""}
                           onChange={(e) =>
                             setFormData({
@@ -1048,6 +1079,97 @@ export function Admin() {
                               Add to Recommended Tours (Homepage)
                             </span>
                           </label>
+                        </div>
+
+                        {/* Pricing Management Section */}
+                        <div className="md:col-span-2 border-t pt-4 mt-4">
+                          <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                            💰 Pricing by Group Size
+                          </h4>
+
+                          {/* Existing Pricing */}
+                          {tourPricing.length > 0 ? (
+                            <div className="space-y-2 mb-4">
+                              {tourPricing.map((pricing) => (
+                                <div
+                                  key={pricing.id}
+                                  className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3"
+                                >
+                                  <div className="flex items-center gap-4">
+                                    <span className="bg-green-500 text-white font-bold px-3 py-1 rounded-full text-sm">
+                                      {pricing.min_persons}
+                                    </span>
+                                    <span className="text-xl font-bold text-gray-900">
+                                      {pricing.price_per_person}
+                                    </span>
+                                    <span className="text-gray-600 text-sm">
+                                      per person
+                                    </span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleDeletePricing(
+                                        formData.id,
+                                        pricing.id
+                                      )
+                                    }
+                                    className="text-red-600 hover:text-red-800 font-semibold"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 mb-4">
+                              No pricing added yet
+                            </p>
+                          )}
+
+                          {/* Add New Pricing */}
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h5 className="text-sm font-semibold text-gray-700 mb-3">
+                              Add New Pricing Entry
+                            </h5>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <input
+                                type="text"
+                                placeholder="Group size (e.g., 1-2 persons)"
+                                value={newPricing.min_persons}
+                                onChange={(e) =>
+                                  setNewPricing({
+                                    ...newPricing,
+                                    min_persons: e.target.value,
+                                  })
+                                }
+                                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Price (e.g., 500 €)"
+                                value={newPricing.price_per_person}
+                                onChange={(e) =>
+                                  setNewPricing({
+                                    ...newPricing,
+                                    price_per_person: e.target.value,
+                                  })
+                                }
+                                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleAddPricing(formData.id)}
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 font-semibold"
+                              >
+                                Add
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              💡 Enter custom text for group size (e.g., "1-2
+                              persons", "3+ persons")
+                            </p>
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-3 mt-4">

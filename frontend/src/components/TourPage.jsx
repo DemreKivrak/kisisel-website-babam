@@ -235,18 +235,16 @@ export function TourPage() {
               </div>
 
               <div className="border-t border-b border-gray-200 py-4 mb-6">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm">Starting From</p>
-                    <p className="text-4xl font-bold text-gray-900">
-                      {tourData.price}
-                    </p>
-                    <p className="text-gray-500 text-sm">per person</p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-gray-600 text-sm mb-2">
+                    Pricing varies by group size
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    See pricing details below
+                  </p>
                   <button
                     onClick={() => navigate("/contact#contact")}
-                    className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer
-                    "
+                    className="mt-4 w-full bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
                   >
                     Book Now
                   </button>
@@ -333,7 +331,7 @@ export function TourPage() {
           </section>
 
           {/* Itinerary */}
-          <section>
+          <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Detailed Itinerary
             </h2>
@@ -356,21 +354,57 @@ export function TourPage() {
               ))}
             </div>
           </section>
+
+          {/* Pricing Table */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Pricing Details
+            </h2>
+            {tourData.pricing && tourData.pricing.length > 0 ? (
+              <div className="space-y-4">
+                {tourData.pricing.map((priceEntry, idx) => (
+                  <div
+                    key={priceEntry.id || idx}
+                    className="border-l-4 border-green-500 pl-6 pb-4"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="bg-green-500 text-white font-bold px-3 py-1 rounded-full text-sm">
+                        {priceEntry.min_persons}
+                      </span>
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {priceEntry.price_per_person}
+                      </h3>
+                      <span className="text-gray-600 text-sm">per person</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <p className="text-gray-600">
+                  Pricing information will be available soon.
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Please contact us for current rates.
+                </p>
+              </div>
+            )}
+          </section>
         </div>
 
         {/* Bottom Booking CTA */}
-        <div className="mt-8 bg-linear-to-r from-amber-50 to-orange-50 rounded-xl shadow-lg p-6 flex items-center justify-between">
+        <div className="mt-8 bg-linear-to-r from-amber-50 to-orange-50 rounded-xl shadow-lg p-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <p className="text-gray-600 mb-1">
               Don't miss out on this amazing experience!
             </p>
-            <p className="text-2xl font-bold text-gray-900">
-              Starting from {tourData.price}
+            <p className="text-lg font-semibold text-gray-900">
+              Contact us for the best rates based on your group size
             </p>
           </div>
           <button
             onClick={() => navigate("/contact#contact")}
-            className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+            className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer whitespace-nowrap"
           >
             Book This Tour
           </button>

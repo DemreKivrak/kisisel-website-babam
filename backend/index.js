@@ -132,6 +132,19 @@ function initializeDatabase() {
     )
   `);
 
+  // Tour Pricing table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS tour_pricing (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tour_id INTEGER NOT NULL,
+      min_persons INTEGER NOT NULL,
+      max_persons INTEGER,
+      price_per_person TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tour_id) REFERENCES tours(id) ON DELETE CASCADE
+    )
+  `);
+
   // Create default admin user if not exists
   db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
     if (!err && row.count === 0) {
@@ -449,24 +462,63 @@ app.get("/api/tours", (req, res) => {
 
   query += " ORDER BY created_at DESC";
 
-  db.all(query, params, (err, rows) => {
+  db.all(query, params, (err, tours) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
-      res.json(rows);
+      // Get pricing for each tour
+      const tourIds = tours.map((t) => t.id);
+      if (tourIds.length === 0) {
+        return res.json(tours);
+      }
+
+      const placeholders = tourIds.map(() => "?").join(",");
+      db.all(
+        `SELECT * FROM tour_pricing WHERE tour_id IN (${placeholders}) ORDER BY min_persons ASC`,
+        tourIds,
+        (err, pricingData) => {
+          if (err) {
+            console.error("Error fetching pricing:", err);
+            return res.json(tours);
+          }
+
+          // Attach pricing to tours
+          const toursWithPricing = tours.map((tour) => ({
+            ...tour,
+            pricing: pricingData.filter((p) => p.tour_id === tour.id),
+          }));
+
+          res.json(toursWithPricing);
+        }
+      );
     }
   });
 });
 
 // Get single tour
 app.get("/api/tours/:id", (req, res) => {
-  db.get("SELECT * FROM tours WHERE id = ?", [req.params.id], (err, row) => {
+  db.get("SELECT * FROM tours WHERE id = ?", [req.params.id], (err, tour) => {
     if (err) {
       res.status(500).json({ error: err.message });
-    } else if (!row) {
+    } else if (!tour) {
       res.status(404).json({ error: "Tour not found" });
     } else {
-      res.json(row);
+      // Get pricing for this tour
+      db.all(
+        "SELECT * FROM tour_pricing WHERE tour_id = ? ORDER BY min_persons ASC",
+        [tour.id],
+        (err, pricing) => {
+          if (err) {
+            console.error("Error fetching pricing:", err);
+            return res.json(tour);
+          }
+
+          res.json({
+            ...tour,
+            pricing: pricing || [],
+          });
+        }
+      );
     }
   });
 });
@@ -579,6 +631,91 @@ app.delete("/api/tours/:id", verifyToken, (req, res) => {
       res.json({ message: "Tour deleted", changes: this.changes });
     }
   });
+});
+
+// ===== TOUR PRICING ENDPOINTS =====
+
+// Get pricing for a specific tour
+app.get("/api/tours/:tourId/pricing", (req, res) => {
+  db.all(
+    "SELECT * FROM tour_pricing WHERE tour_id = ? ORDER BY min_persons ASC",
+    [req.params.tourId],
+    (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json(rows);
+      }
+    }
+  );
+});
+
+// Create new pricing entry for a tour
+app.post("/api/tours/:tourId/pricing", verifyToken, (req, res) => {
+  const { min_persons, max_persons, price_per_person } = req.body;
+  const tourId = req.params.tourId;
+
+  if (!min_persons || !price_per_person) {
+    return res
+      .status(400)
+      .json({ error: "min_persons and price_per_person are required" });
+  }
+
+  db.run(
+    "INSERT INTO tour_pricing (tour_id, min_persons, max_persons, price_per_person) VALUES (?, ?, ?, ?)",
+    [tourId, min_persons, max_persons, price_per_person],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({
+          id: this.lastID,
+          tour_id: tourId,
+          min_persons,
+          max_persons,
+          price_per_person,
+        });
+      }
+    }
+  );
+});
+
+// Update pricing entry
+app.put("/api/tours/:tourId/pricing/:id", verifyToken, (req, res) => {
+  const { min_persons, max_persons, price_per_person } = req.body;
+
+  db.run(
+    "UPDATE tour_pricing SET min_persons = ?, max_persons = ?, price_per_person = ? WHERE id = ? AND tour_id = ?",
+    [
+      min_persons,
+      max_persons,
+      price_per_person,
+      req.params.id,
+      req.params.tourId,
+    ],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Pricing updated", changes: this.changes });
+      }
+    }
+  );
+});
+
+// Delete pricing entry
+app.delete("/api/tours/:tourId/pricing/:id", verifyToken, (req, res) => {
+  db.run(
+    "DELETE FROM tour_pricing WHERE id = ? AND tour_id = ?",
+    [req.params.id, req.params.tourId],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ message: "Pricing deleted", changes: this.changes });
+      }
+    }
+  );
 });
 
 // Image upload endpoint

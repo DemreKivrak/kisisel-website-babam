@@ -124,16 +124,6 @@ export function Recommended() {
                   </svg>
                   RECOMMENDED
                 </div>
-
-                {/* Price Tag */}
-                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg">
-                  <p className="text-xs text-gray-600 font-medium">
-                    Starting From
-                  </p>
-                  <p className="text-2xl font-bold text-amber-600">
-                    {tour.price}
-                  </p>
-                </div>
               </div>
 
               {/* Content */}

@@ -105,6 +105,48 @@ export const api = {
     return response.json();
   },
 
+  // Tour Pricing
+  getTourPricing: async (tourId) => {
+    const response = await fetch(`${API_URL}/tours/${tourId}/pricing`);
+    if (!response.ok) throw new Error("Failed to fetch tour pricing");
+    return response.json();
+  },
+
+  createTourPricing: async (tourId, data) => {
+    const response = await fetch(`${API_URL}/tours/${tourId}/pricing`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to create pricing");
+    return response.json();
+  },
+
+  updateTourPricing: async (tourId, pricingId, data) => {
+    const response = await fetch(
+      `${API_URL}/tours/${tourId}/pricing/${pricingId}`,
+      {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+      }
+    );
+    if (!response.ok) throw new Error("Failed to update pricing");
+    return response.json();
+  },
+
+  deleteTourPricing: async (tourId, pricingId) => {
+    const response = await fetch(
+      `${API_URL}/tours/${tourId}/pricing/${pricingId}`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      }
+    );
+    if (!response.ok) throw new Error("Failed to delete pricing");
+    return response.json();
+  },
+
   // Image Upload
   uploadImage: async (file) => {
     const formData = new FormData();
