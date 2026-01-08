@@ -306,7 +306,7 @@ export function Destinations() {
                         {tour.name}
                       </h3>
                       <button
-                        className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white py-2 rounded-md hover:shadow-lg transition-all duration-300 font-semibold"
+                        className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white py-2 rounded-md hover:shadow-lg transition-all duration-300 font-semibold cursor-pointer"
                         onClick={() => navigate(`/tourpage/${tour.id}`)}
                       >
                         View Details
