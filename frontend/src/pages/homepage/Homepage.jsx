@@ -12,7 +12,7 @@ export function Homepage() {
 
       <div className="relative">
         <img
-          className="w-full h-145 block object-cover"
+          className="w-full md:h-125 h-125 block object-cover"
           src="homepage-pic.jpg"
           alt="Turkey landscape"
         ></img>
