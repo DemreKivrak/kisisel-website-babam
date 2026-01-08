@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
 import { PageEnd } from "../../components/PageEnd";
+import { WhatsappContact } from "../../components/WhatsappContact";
 
 export function Tours() {
   const [selectedDestination, setSelectedDestination] = useState("All");
@@ -215,6 +216,7 @@ export function Tours() {
           </div>
         )}
       </div>
+      <WhatsappContact />
       <PageEnd />
     </div>
   );
