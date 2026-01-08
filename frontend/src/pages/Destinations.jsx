@@ -297,12 +297,6 @@ export function Destinations() {
                         alt={tour.name}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-4 right-4 bg-white px-3 py-2 rounded-md shadow-lg">
-                        <p className="text-xs text-gray-600">Starting From</p>
-                        <p className="text-xl font-bold text-gray-800">
-                          {tour.price}
-                        </p>
-                      </div>
                     </div>
                     <div className="p-5">
                       <p className="text-xs text-gray-500 uppercase mb-2">
