@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Header } from "./Header";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { PagePopup } from "./PagePopup";
 
 export function TourPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -97,6 +98,7 @@ export function TourPage() {
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+      <PagePopup />
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8 mt-30">

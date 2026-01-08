@@ -5,6 +5,7 @@ import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
 import { PageEnd } from "../../components/PageEnd";
 import { WhatsappContact } from "../../components/WhatsappContact";
+import { PagePopup } from "../../components/PagePopup";
 
 export function Tours() {
   const [selectedDestination, setSelectedDestination] = useState("All");
@@ -119,6 +120,7 @@ export function Tours() {
     return (
       <>
         <Header />
+
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
@@ -132,6 +134,7 @@ export function Tours() {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
       <title>Tours</title>
+      <PagePopup />
       <Header />
 
       {/* Hero Section */}
