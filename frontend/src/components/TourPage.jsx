@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "./Header";
 import { api } from "../services/api";
@@ -10,6 +10,14 @@ export function TourPage() {
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
+  const pricingRef = useRef(null);
+
+  const scrollToPricing = () => {
+    pricingRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -239,7 +247,10 @@ export function TourPage() {
                   <p className="text-gray-600 text-sm mb-2">
                     Pricing varies by group size
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p
+                    onClick={scrollToPricing}
+                    className="text-sm text-gray-500 cursor-pointer hover:text-amber-500 transition-colors duration-400"
+                  >
                     See pricing details below
                   </p>
                   <button
@@ -356,7 +367,7 @@ export function TourPage() {
           </section>
 
           {/* Pricing Table */}
-          <section>
+          <section ref={pricingRef}>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Pricing Details
             </h2>

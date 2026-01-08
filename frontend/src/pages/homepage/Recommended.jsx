@@ -95,14 +95,14 @@ export function Recommended() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4 snap-x snap-mandatory"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {recommended.map((tour, i) => (
             <div
               key={i}
               onClick={() => navigate(`/tourpage/${tour.id}`)}
-              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 flex-shrink-0 w-[280px] md:w-96"
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 flex-shrink-0 w-[280px] md:w-96 snap-center"
             >
               {/* Image Container */}
               <div className="relative h-64 overflow-hidden">

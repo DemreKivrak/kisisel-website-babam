@@ -86,14 +86,14 @@ export function DestinationsComp() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4 snap-x snap-mandatory"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {destinations.map((dest, i) => (
             <div
               key={i}
               onClick={() => navigate(`/destinations#${dest.id}`)}
-              className="group relative flex-shrink-0 w-[280px] md:w-80 overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
+              className="group relative flex-shrink-0 w-[280px] md:w-80 overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2 snap-center"
             >
               {/* Image Container */}
               <div className="relative h-96 overflow-hidden">
