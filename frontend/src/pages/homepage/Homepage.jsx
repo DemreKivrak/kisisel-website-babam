@@ -32,7 +32,7 @@ export function Homepage() {
 
         <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 py-12 px-6 text-center shadow-inner">
           <p className="text-2xl md:text-3xl lg:text-4xl font-serif italic text-gray-700 max-w-3xl mx-auto">
-            "Explore Turkey, Embrace the Journey."
+            "Explore Turkey,, Embrace the Journey."
           </p>
           <p className="text-gray-500 mt-2 text-xs md:text-sm tracking-wider uppercase">
             Your Gateway to Unforgettable Experiences
