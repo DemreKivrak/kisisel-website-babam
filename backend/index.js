@@ -52,7 +52,8 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
   if (err) {
     console.error("Database connection error:", err.message);
   } else {
-    console.log("Connected to SQLite database");
+    console.log("Connected to SQLite database at:", DB_PATH);
+    console.log("Environment variables - DB_PATH:", process.env.DB_PATH);
     initializeDatabase();
   }
 });
