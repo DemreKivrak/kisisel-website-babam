@@ -8,7 +8,6 @@ import { PagePopup } from "../../components/PagePopup.jsx";
 export function Homepage() {
   return (
     <>
-      <PagePopup />
       <div className="relative bg-gradient-to-b from-gray-50 to-white overflow-x-hidden max-w-full">
         <title>Anatolia Horizon Travel Agency</title>
         <Header />
