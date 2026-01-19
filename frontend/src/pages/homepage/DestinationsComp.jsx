@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../../services/api";
 
 export function DestinationsComp() {
+  const { t } = useTranslation();
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
@@ -39,7 +41,7 @@ export function DestinationsComp() {
       <div className="py-16 px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-amber-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading destinations...</p>
+          <p className="mt-4 text-gray-600">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -50,15 +52,15 @@ export function DestinationsComp() {
       <div className="text-center mb-12">
         <div className="inline-block px-4">
           <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase mb-2 block">
-            Discover
+            {t("destinations.discover")}
           </span>
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent mb-5 font-serif">
-            Popular Destinations
+            {t("destinations.popularTitle")}
           </h1>
           <div className="w-32 md:w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
         </div>
         <p className="mt-6 text-gray-600 text-base md:text-lg max-w-2xl mx-auto px-4">
-          Explore Turkey's most breathtaking locations and hidden gems
+          {t("destinations.popularSubtitle")}
         </p>
       </div>
 
@@ -133,7 +135,9 @@ export function DestinationsComp() {
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <span className="text-sm font-medium">Explore More →</span>
+                  <span className="text-sm font-medium">
+                    {t("destinations.exploreMore")} →
+                  </span>
                 </div>
               </div>
 

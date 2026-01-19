@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../../services/api";
 
 export function Recommended() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ export function Recommended() {
       <div className="py-16 px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-amber-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading tours...</p>
+          <p className="mt-4 text-gray-600">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -58,16 +60,15 @@ export function Recommended() {
       <div className="text-center mb-16">
         <div className="inline-block px-4">
           <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase mb-2 block">
-            Handpicked For You
+            {t("tours.handpicked")}
           </span>
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent font-serif">
-            Recommended Tours
+            {t("tours.recommended")}
           </h1>
           <div className="w-32 md:w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
         </div>
         <p className="mt-6 text-gray-600 text-base md:text-lg max-w-2xl mx-auto px-4">
-          Carefully curated experiences designed to create unforgettable
-          memories
+          {t("tours.recommendedSubtitle")}
         </p>
       </div>
 
@@ -122,7 +123,7 @@ export function Recommended() {
                   >
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  RECOMMENDED
+                  {t("tours.recommendedBadge")}
                 </div>
               </div>
 
@@ -168,13 +169,13 @@ export function Recommended() {
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span>Expert Guide Included</span>
+                    <span>{t("tours.expertGuide")}</span>
                   </div>
                 </div>
 
                 {/* CTA Button */}
                 <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg">
-                  <span>View Details</span>
+                  <span>{t("tours.viewDetails")}</span>
                   <svg
                     className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
                     fill="none"

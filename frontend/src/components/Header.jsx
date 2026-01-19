@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../services/api";
 import { useMenu } from "../contexts/MenuContext";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Header() {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
   const [isOnTop, setIsOnTop] = useState(true);
   const [destinations, setDestinations] = useState([]);
@@ -63,7 +66,7 @@ export function Header() {
       </div>
       {/* Main Header */}
       <div
-        className={`absolute left-0 w-full max-w-[100vw] flex items-center bg-gray-500/50 h-20 md:h-26 transition-all duration-300 ${
+        className={`absolute left-0 w-full max-w-[100vw] flex items-center justify-between bg-gray-500/50 h-20 md:h-26 transition-all duration-300 ${
           !isOnTop ? "top-0 bg-white" : "md:top-10 top-0"
         }`}
       >
@@ -77,34 +80,9 @@ export function Header() {
           />
         </div>
 
-        {/* Hamburger Button - Mobile Only */}
-        <button
-          className={`md:hidden ml-auto mr-2 flex flex-col gap-1.5 p-2 flex-shrink-0 ${
-            !isOnTop ? "text-black" : "text-white"
-          }`}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Menu"
-        >
-          <span
-            className={`w-6 h-0.5 bg-current transition-transform ${
-              mobileMenuOpen ? "rotate-45 translate-y-2" : ""
-            }`}
-          ></span>
-          <span
-            className={`w-6 h-0.5 bg-current transition-opacity ${
-              mobileMenuOpen ? "opacity-0" : ""
-            }`}
-          ></span>
-          <span
-            className={`w-6 h-0.5 bg-current transition-transform ${
-              mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
-          ></span>
-        </button>
-
-        {/* Desktop Menu */}
+        {/* Desktop Menu - Center */}
         <div
-          className={`hidden md:flex ml-10 lg:ml-35 items-center text-[17px] gap-6 lg:gap-15 ${
+          className={`hidden md:flex items-center text-[17px] gap-6 lg:gap-10 ${
             !isOnTop ? "text-black" : "text-white"
           }`}
         >
@@ -113,14 +91,14 @@ export function Header() {
             className="hover:text-amber-300 cursor-pointer transition"
             onClick={() => handleNavigate("/")}
           >
-            Home
+            {t("nav.home")}
           </a>
           <div className="relative group">
             <a
               className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
               onClick={() => navigate("/tours")}
             >
-              Tours
+              {t("nav.tours")}
             </a>
           </div>
 
@@ -129,7 +107,7 @@ export function Header() {
               className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
               onClick={() => navigate("/destinations")}
             >
-              Destinations
+              {t("nav.destinations")}
               <svg
                 className="w-4 h-4 transition-transform group-hover:rotate-180"
                 fill="none"
@@ -169,7 +147,7 @@ export function Header() {
               className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
               onClick={() => navigate("/services")}
             >
-              Services
+              {t("nav.services")}
               <svg
                 className="w-4 h-4 transition-transform group-hover:rotate-180"
                 fill="none"
@@ -192,7 +170,7 @@ export function Header() {
                   navigate("/services");
                 }}
               >
-                <a className="block w-full">Car Rental</a>
+                <a className="block w-full">{t("nav.carRental")}</a>
               </li>
             </ul>
           </div>
@@ -201,12 +179,12 @@ export function Header() {
             className="hover:text-amber-300 cursor-pointer transition"
             onClick={() => navigate("/contact")}
           >
-            Contact
+            {t("nav.contact")}
           </a>
 
           <div className="relative group">
             <a className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1">
-              About
+              {t("nav.about")}
               <svg
                 className="w-4 h-4 transition-transform group-hover:rotate-180"
                 fill="none"
@@ -229,7 +207,7 @@ export function Header() {
                   navigate("/about");
                 }}
               >
-                <a className="block w-full">About us</a>
+                <a className="block w-full">{t("nav.about")}</a>
               </li>
               <li
                 className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
@@ -238,10 +216,43 @@ export function Header() {
                   navigate("/galery");
                 }}
               >
-                <a className="block w-full">Gallery</a>
+                <a className="block w-full">{t("nav.gallery")}</a>
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Right side - Language Switcher & Mobile Menu Button */}
+        <div className="flex items-center gap-4 mr-4 md:mr-10">
+          {/* Language Switcher - Desktop & Mobile */}
+          <div className={!isOnTop ? "text-black" : "text-white"}>
+            <LanguageSwitcher />
+          </div>
+
+          {/* Hamburger Button - Mobile Only */}
+          <button
+            className={`md:hidden flex flex-col gap-1.5 p-2 flex-shrink-0 ${
+              !isOnTop ? "text-black" : "text-white"
+            }`}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu"
+          >
+            <span
+              className={`w-6 h-0.5 bg-current transition-transform ${
+                mobileMenuOpen ? "rotate-45 translate-y-2" : ""
+              }`}
+            ></span>
+            <span
+              className={`w-6 h-0.5 bg-current transition-opacity ${
+                mobileMenuOpen ? "opacity-0" : ""
+              }`}
+            ></span>
+            <span
+              className={`w-6 h-0.5 bg-current transition-transform ${
+                mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
+              }`}
+            ></span>
+          </button>
         </div>
       </div>
 
@@ -258,20 +269,20 @@ export function Header() {
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
             onClick={() => handleNavigate("/")}
           >
-            Home
+            {t("nav.home")}
           </a>
           <a
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
             onClick={() => handleNavigate("/tours")}
           >
-            Tours
+            {t("nav.tours")}
           </a>
           <div>
             <div
               className="px-6 py-3 ml-6 hover:bg-gray-100 cursor-pointer transition text-gray-800"
               onClick={() => setMobileDestinationsOpen(!mobileDestinationsOpen)}
             >
-              Destinations
+              {t("nav.destinations")}
               <svg
                 className={`w-4 h-4 inline-block ml-2 transition-transform ${
                   mobileDestinationsOpen ? "rotate-180" : ""
@@ -306,25 +317,25 @@ export function Header() {
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
             onClick={() => handleNavigate("/services")}
           >
-            Services
+            {t("nav.services")}
           </a>
           <a
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
             onClick={() => handleNavigate("/contact")}
           >
-            Contact
+            {t("nav.contact")}
           </a>
           <a
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
             onClick={() => handleNavigate("/about")}
           >
-            About us
+            {t("nav.about")}
           </a>
           <a
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
             onClick={() => handleNavigate("/galery")}
           >
-            Gallery
+            {t("nav.gallery")}
           </a>
         </nav>
       </div>

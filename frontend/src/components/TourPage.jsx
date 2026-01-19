@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Header } from "./Header";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
-
 export function TourPage() {
+  const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [tourData, setTourData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +70,7 @@ export function TourPage() {
       <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
         <Header />
         <div className="flex items-center justify-center h-96">
-          <div className="text-xl text-gray-600">Loading tour details...</div>
+          <div className="text-xl text-gray-600">{t("common.loading")}</div>
         </div>
       </div>
     );
@@ -92,13 +93,12 @@ export function TourPage() {
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prev) => (prev - 1 + tourData.images.length) % tourData.images.length
+      (prev) => (prev - 1 + tourData.images.length) % tourData.images.length,
     );
   };
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
-     
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8 mt-30">
@@ -120,7 +120,7 @@ export function TourPage() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          <span className="font-medium">Back to Tours</span>
+          <span className="font-medium">{t("nav.tours")}</span>
         </button>
 
         {/* Image Gallery Section */}
@@ -259,7 +259,7 @@ export function TourPage() {
                     onClick={() => navigate("/contact#contact")}
                     className="mt-4 w-full bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
                   >
-                    Book Now
+                    {t("common.bookNow")}
                   </button>
                 </div>
               </div>
@@ -283,14 +283,16 @@ export function TourPage() {
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Overview */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {t("tours.overview")}
+            </h2>
             <p className="text-gray-700 leading-relaxed">{tourData.overview}</p>
           </section>
 
           {/* Highlights */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Tour Highlights
+              {t("tours.highlights")}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-x-55 gap-x-5 mt-10 md:mt-0 md:ml-50">
               {tourData.highlights.map((highlight, idx) => (
@@ -305,12 +307,12 @@ export function TourPage() {
           {/* What's Included */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              What's Included
+              {t("tours.included")}
             </h2>
             <div className="ml-2 md:ml-50 md:gap-x-55 grid grid-cols-2 mt-10 md:mt-0  md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold text-green-700 mb-3 flex items-center gap-2">
-                  <span className="text-xl">✓</span> Included
+                  <span className="text-xl">✓</span> {t("tours.included")}
                 </h3>
                 <ul className="space-y-2">
                   {tourData.included.map((item, idx) => (
@@ -326,7 +328,7 @@ export function TourPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-red-700 mb-3 flex items-center gap-2">
-                  <span className="text-xl">✗</span> Not Included
+                  <span className="text-xl">✗</span> {t("tours.notIncluded")}
                 </h3>
                 <ul className="space-y-2">
                   {tourData.notIncluded.map((item, idx) => (
@@ -346,7 +348,7 @@ export function TourPage() {
           {/* Itinerary */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Detailed Itinerary
+              {t("tours.itinerary")}
             </h2>
             <div className="space-y-4">
               {tourData.itinerary.map((day) => (
@@ -371,7 +373,7 @@ export function TourPage() {
           {/* Pricing Table */}
           <section ref={pricingRef}>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Pricing Details
+              {t("tours.price")}
             </h2>
             {tourData.pricing && tourData.pricing.length > 0 ? (
               <div className="space-y-4">
@@ -419,7 +421,7 @@ export function TourPage() {
             onClick={() => navigate("/contact#contact")}
             className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer whitespace-nowrap"
           >
-            Book This Tour
+            {t("common.bookNow")}
           </button>
         </div>
       </div>

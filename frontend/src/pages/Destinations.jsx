@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
 import { PageEnd } from "../components/PageEnd";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Destinations() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedDestination, setSelectedDestination] = useState(null);
@@ -146,7 +148,9 @@ export function Destinations() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Loading destinations...</p>
+            <p className="text-gray-600 text-lg">
+              {t("destinations.loadingText")}
+            </p>
           </div>
         </div>
       </>
@@ -162,12 +166,9 @@ export function Destinations() {
       <div className="relative bg-linear-to-r from-amber-100 via-orange-50 to-amber-100 py-16 mt-20">
         <div className="max-w-7xl mx-auto px-4 text-center mt-15">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4">
-            Explore Destinations
+            {t("destinations.exploreTitle")}
           </h1>
-          <p className="text-xl text-gray-600">
-            Discover Turkey's most captivating locations and find your perfect
-            tour
-          </p>
+          <p className="text-xl text-gray-600">{t("destinations.subtitle")}</p>
         </div>
       </div>
 
@@ -233,7 +234,7 @@ export function Destinations() {
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              Back to Destinations
+              {t("destinations.backButton")}
             </button>
 
             {/* Destination Hero */}
@@ -258,7 +259,7 @@ export function Destinations() {
             {/* Highlights */}
             <div className="mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                Top Attractions
+                {t("destinations.topAttractions")}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {selectedDestination.highlights.map((highlight, idx) => (
@@ -276,7 +277,7 @@ export function Destinations() {
             <div>
               <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  Available Tours in {selectedDestination.name}
+                  {t("destinations.availableTours")} {selectedDestination.name}
                 </h2>
                 <div className="w-24 h-1 bg-linear-to-r from-amber-400 to-orange-500 rounded-full"></div>
               </div>
@@ -309,7 +310,7 @@ export function Destinations() {
                         className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white py-2 rounded-md hover:shadow-lg transition-all duration-300 font-semibold cursor-pointer"
                         onClick={() => navigate(`/tourpage/${tour.id}`)}
                       >
-                        View Details
+                        {t("tours.viewDetails")}
                       </button>
                     </div>
                   </div>

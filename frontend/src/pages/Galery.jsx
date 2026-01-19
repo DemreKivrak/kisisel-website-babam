@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
 import { PageEnd } from "../components/PageEnd";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Galery() {
+  const { t } = useTranslation();
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [filter, setFilter] = useState("all");
   const [items, setItems] = useState([]);
@@ -68,7 +70,7 @@ export function Galery() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-xl text-slate-600">Loading...</p>
+            <p className="text-xl text-slate-600">{t("gallery.loading")}</p>
           </div>
         </div>
       ) : (
@@ -77,11 +79,10 @@ export function Galery() {
             {/* Header */}
             <div className="text-center mb-12 pt-8 mt-25">
               <h1 className="text-5xl font-bold text-slate-800 mb-4">
-                Gallery
+                {t("gallery.title")}
               </h1>
               <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                Discover the most beautiful moments and destinations from our
-                trips
+                {t("gallery.subtitle")}
               </p>
             </div>
 
@@ -95,7 +96,7 @@ export function Galery() {
                 }`}
                 onClick={() => setFilter("all")}
               >
-                All ({items.length})
+                {t("gallery.all")} ({items.length})
               </button>
               <button
                 className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:-translate-y-1 hover:shadow-xl ${
@@ -105,7 +106,8 @@ export function Galery() {
                 }`}
                 onClick={() => setFilter("image")}
               >
-                Photos ({items.filter((item) => item.type === "image").length})
+                {t("gallery.photos")} (
+                {items.filter((item) => item.type === "image").length})
               </button>
               <button
                 className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:-translate-y-1 hover:shadow-xl ${
@@ -115,7 +117,8 @@ export function Galery() {
                 }`}
                 onClick={() => setFilter("video")}
               >
-                Videos ({items.filter((item) => item.type === "video").length})
+                {t("gallery.videos")} (
+                {items.filter((item) => item.type === "video").length})
               </button>
             </div>
 
@@ -163,7 +166,7 @@ export function Galery() {
             {/* No Results */}
             {filteredItems.length === 0 && (
               <div className="text-center py-16 text-slate-500 text-xl">
-                <p>No content available in this category yet.</p>
+                <p>{t("gallery.noContent")}</p>
               </div>
             )}
 

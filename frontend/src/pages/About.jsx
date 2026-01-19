@@ -1,9 +1,11 @@
 import { Header } from "../components/Header";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { PageEnd } from "../components/PageEnd";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function About() {
+  const { t } = useTranslation();
   return (
     <>
       <Header />
@@ -14,10 +16,10 @@ export function About() {
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 pt-20">
-            Discover Turkey with a Passion
+            {t("about.heroTitle")}
           </h1>
           <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto">
-            Your Expert Tour Guide, Yuksel Kivrak
+            {t("about.heroSubtitle")}
           </p>
         </div>
       </div>
@@ -35,32 +37,25 @@ export function About() {
                   className="w-40 h-40 rounded-full mx-auto mb-6 object-cover shadow-xl border-1 border-gray-100 "
                 />
                 <h3 className="text-2xl font-bold text-gray-800">
-                  Yuksel Kivrak
+                  {t("about.guideName")}
                 </h3>
                 <p className="text-blue-700 font-semibold mt-2">
-                  Licensed Tour Guide
+                  {t("about.licenseGuide")}
                 </p>
-                <p className="text-gray-600 mt-1">30+ Years Experience</p>
+                <p className="text-gray-600 mt-1">{t("about.experience")}</p>
               </div>
             </div>
           </div>
 
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              Welcome to My World
+              {t("about.welcomeTitle")}
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              The most picturesque and pleasant way to discover Istanbul and
-              Turkey is with your expert tour guide, Yuksel Kivrak. Over 30
-              years ago I arrived in Istanbul, basing myself in Old Ottoman and
-              the Byzantine Capital.
+              {t("about.welcome1")}
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              With a passion to show others my magnificent, historic city - and
-              its surrounding areas - I obtained a Tourist Guide License,
-              allowing me the pleasure to present to you one of the most
-              beautiful countries in the world, Turkey, and its fascinating
-              cities such as Istanbul, the capital of tourism in Turkey.
+              {t("about.welcome2")}
             </p>
           </div>
         </div>
@@ -73,41 +68,32 @@ export function About() {
                 🏛️
               </div>
               <h3 className="font-bold text-xl text-gray-800 mb-2">
-                Historic Expertise
+                {t("about.historicTitle")}
               </h3>
-              <p className="text-gray-600">
-                Deep knowledge of Ottoman and Byzantine history
-              </p>
+              <p className="text-gray-600">{t("about.historicDesc")}</p>
             </div>
             <div className="text-center">
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl">
                 🚶
               </div>
               <h3 className="font-bold text-xl text-gray-800 mb-2">
-                Local Knowledge
+                {t("about.localTitle")}
               </h3>
-              <p className="text-gray-600">
-                Walked and cycled every corner of Istanbul
-              </p>
+              <p className="text-gray-600">{t("about.localDesc")}</p>
             </div>
             <div className="text-center">
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl">
                 ❤️
               </div>
               <h3 className="font-bold text-xl text-gray-800 mb-2">
-                Unwavering Passion
+                {t("about.passionTitle")}
               </h3>
-              <p className="text-gray-600">
-                30+ years of enthusiasm for this impressive metropolis
-              </p>
+              <p className="text-gray-600">{t("about.passionDesc")}</p>
             </div>
           </div>
 
           <p className="text-lg text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
-            I have walked and cycled every corner of this wonderful city,
-            witnessed the many changes throughout the years, and have never lost
-            my enthusiasm for this impressive metropolis or my desire for others
-            to see it as I do, in all its greatness.
+            {t("about.experienceText")}
           </p>
         </div>
 
@@ -118,19 +104,14 @@ export function About() {
               <span className="text-6xl">🕊️</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-              The ANZAC Spirit
+              {t("about.anzacTitle")}
             </h2>
             <div className="max-w-3xl mx-auto">
               <p className="text-lg text-gray-200 leading-relaxed mb-6">
-                Living in Çanakkale for 4 years, I have witnessed firsthand the
-                Australian spirit and respect for the fallen ones of ANZAC and
-                the tragic events that occurred at the Gallipoli Peninsula.
+                {t("about.anzac1")}
               </p>
               <p className="text-lg text-gray-200 leading-relaxed italic border-l-4 border-blue-500 pl-6">
-                "Countless times I have solemnly looked out over that
-                battlefield with my head bowed in respect for our lost loved
-                ones. Such memories and visions are instilled in my heart
-                forever, and they will be in yours as well, I am sure."
+                "{t("about.anzac2")}"
               </p>
             </div>
           </div>
@@ -139,88 +120,65 @@ export function About() {
         {/* Services Section */}
         <div className="mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-12">
-            What I Offer
+            {t("about.offerTitle")}
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border-t-4 border-blue-500">
               <div className="text-4xl mb-4">🏛️</div>
               <h3 className="font-bold text-xl text-gray-800 mb-3">
-                Architecture & History
+                {t("about.architectureTitle")}
               </h3>
-              <p className="text-gray-600">
-                Explore magnificent Ottoman palaces, Byzantine churches, and
-                ancient architectural wonders
-              </p>
+              <p className="text-gray-600">{t("about.architectureDesc")}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border-t-4 border-blue-500">
               <div className="text-4xl mb-4">🏺</div>
               <h3 className="font-bold text-xl text-gray-800 mb-3">
-                Ancient Ruins
+                {t("about.ruinsTitle")}
               </h3>
-              <p className="text-gray-600">
-                Discover the remnants of ancient civilizations and walk through
-                millennia of history
-              </p>
+              <p className="text-gray-600">{t("about.ruinsDesc")}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-500">
               <div className="text-4xl mb-4">🏞️</div>
               <h3 className="font-bold text-xl text-gray-800 mb-3">
-                Natural Beauty
+                {t("about.beautyTitle")}
               </h3>
-              <p className="text-gray-600">
-                Experience breathtaking landscapes, from coastal paradises to
-                fairy chimneys
-              </p>
+              <p className="text-gray-600">{t("about.beautyDesc")}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border-t-4 border-purple-500">
               <div className="text-4xl mb-4">🎭</div>
               <h3 className="font-bold text-xl text-gray-800 mb-3">
-                Local Culture
+                {t("about.cultureTitle")}
               </h3>
-              <p className="text-gray-600">
-                Immerse yourself in authentic Turkish culture, traditions, and
-                daily life
-              </p>
+              <p className="text-gray-600">{t("about.cultureDesc")}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border-t-4 border-red-500">
               <div className="text-4xl mb-4">⚔️</div>
               <h3 className="font-bold text-xl text-gray-800 mb-3">
-                ANZAC Battlefields
+                {t("about.battlefieldsTitle")}
               </h3>
-              <p className="text-gray-600">
-                Solemn and respectful tours of Gallipoli Peninsula's historic
-                battlefields
-              </p>
+              <p className="text-gray-600">{t("about.battlefieldsDesc")}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border-t-4 border-blue-500">
               <div className="text-4xl mb-4">✨</div>
               <h3 className="font-bold text-xl text-gray-800 mb-3">
-                Custom Tours
+                {t("about.customTitle")}
               </h3>
-              <p className="text-gray-600">
-                Personalized itineraries tailored to your interests and schedule
-              </p>
+              <p className="text-gray-600">{t("about.customDesc")}</p>
             </div>
           </div>
 
           <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-8 text-center">
             <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto mb-6">
-              I have personally travelled with numerous Tour Groups throughout
-              this stunning land. Are you interested in architecture, history,
-              ancient ruins, natural beauty, local culture or the ANZAC
-              battlefields? Your time is precious, so tell me what you would
-              like to see and I will make it happen for you.
+              {t("about.serviceDesc1")}
             </p>
             <p className="text-xl font-semibold text-gray-800">
-              Nothing is too much trouble, because I want you to discover the
-              heartbeat and spirit of Turkey in the best possible way: with me
-              as your passionate, knowledgeable tour guide.
+              {t("about.serviceDesc2")}
             </p>
           </div>
         </div>
@@ -228,24 +186,23 @@ export function About() {
         {/* Call to Action */}
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-3xl p-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Explore Turkey?
+            {t("about.readyTitle")}
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Let's create unforgettable memories together. Browse our tours or
-            get in touch to plan your perfect Turkish adventure.
+            {t("about.readyDesc")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/tours"
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
             >
-              View Tours
+              {t("about.viewTours")}
             </Link>
             <Link
               to="/contact#contact"
               className="bg-gray-800 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-900 transition-all transform hover:scale-105 shadow-lg"
             >
-              Contact
+              {t("about.contact")}
             </Link>
           </div>
         </div>

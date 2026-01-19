@@ -1,12 +1,13 @@
 import { Header } from "../components/Header";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "../services/api";
 import { PageEnd } from "../components/PageEnd";
 import { WhatsappContact } from "../components/WhatsappContact";
 
-
 export function Services() {
+  const { t } = useTranslation();
   const [carCategories, setCarCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +56,6 @@ export function Services() {
 
   return (
     <>
-  
       <Header />
 
       {/* Hero Section */}
@@ -63,11 +63,10 @@ export function Services() {
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 pt-20">
-            Car Rental Services
+            {t("services.carRentalTitle")}
           </h1>
           <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto">
-            Explore Turkey at your own pace with our reliable and comfortable
-            vehicles
+            {t("services.subtitle")}
           </p>
         </div>
       </div>
@@ -77,12 +76,10 @@ export function Services() {
         {/* Introduction */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-6">
-            Choose Your Perfect Vehicle
+            {t("services.chooseVehicle")}
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Whether you're traveling solo, with family, or in a group, we have
-            the perfect vehicle for your Turkish adventure. All vehicles are
-            well-maintained, insured, and ready for your journey.
+            {t("services.chooseDescription")}
           </p>
         </div>
 
@@ -91,12 +88,12 @@ export function Services() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading rental cars...</p>
+              <p className="text-gray-600">{t("services.loading")}</p>
             </div>
           ) : displayCars.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
               <p className="text-gray-600 text-lg">
-                No rental cars available at the moment.
+                {t("services.noAvailable")}
               </p>
             </div>
           ) : (
@@ -104,7 +101,7 @@ export function Services() {
               <div
                 key={index}
                 className={`bg-white rounded-3xl shadow-xl overflow-hidden border-l-8 ${getColorClasses(
-                  category.color
+                  category.color,
                 )} hover:shadow-2xl transition-all duration-300`}
               >
                 <div className="grid md:grid-cols-2 gap-6">
@@ -139,20 +136,24 @@ export function Services() {
                     <div className="grid grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-xl">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">
-                          Transmission
+                          {t("services.transmission")}
                         </p>
                         <p className="text-sm font-semibold text-gray-800">
                           {category.specs.transmission}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
+                        <p className="text-xs text-gray-500 mb-1">
+                          {t("services.fuelType")}
+                        </p>
                         <p className="text-sm font-semibold text-gray-800">
                           {category.specs.fuel}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Doors</p>
+                        <p className="text-xs text-gray-500 mb-1">
+                          {t("services.doors")}
+                        </p>
                         <p className="text-sm font-semibold text-gray-800">
                           {category.specs.doors}
                         </p>
@@ -162,7 +163,7 @@ export function Services() {
                     {/* Features */}
                     <div className="mb-6">
                       <h4 className="font-bold text-gray-800 mb-3">
-                        Features:
+                        {t("services.features")}
                       </h4>
                       <div className="grid grid-cols-2 gap-2">
                         {category.features.map((feature, idx) => (
@@ -183,16 +184,19 @@ export function Services() {
                     <div className="border-t pt-6 mt-6">
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <p className="text-sm text-gray-500">Starting from</p>
+                          <p className="text-sm text-gray-500">
+                            {t("services.startingFrom")}
+                          </p>
                           <div className="flex items-baseline gap-3">
                             <p className="text-3xl font-bold text-blue-600">
                               {category.dailyPrice}
                               <span className="text-lg text-gray-500">
-                                /day
+                                {t("services.perDay")}
                               </span>
                             </p>
                             <p className="text-sm text-gray-600">
-                              or {category.weeklyPrice}/week
+                              {t("services.or")} {category.weeklyPrice}
+                              {t("services.perWeek")}
                             </p>
                           </div>
                         </div>
@@ -201,7 +205,7 @@ export function Services() {
                         to="/contact#contact"
                         className="block w-full bg-blue-500 text-white py-4 rounded-xl font-bold text-center hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl"
                       >
-                        Request Quote & Book Now
+                        {t("services.requestQuote")}
                       </Link>
                     </div>
                   </div>
@@ -214,18 +218,17 @@ export function Services() {
         {/* Call to Action */}
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-3xl p-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Hit the Road?
+            {t("services.readyToRide")}
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Contact us today for availability, pricing, and special offers.
-            Let's make your Turkish journey unforgettable!
+            {t("services.readyDescription")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact#contact"
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
             >
-              Contact Us
+              {t("services.contactUs")}
             </Link>
           </div>
         </div>

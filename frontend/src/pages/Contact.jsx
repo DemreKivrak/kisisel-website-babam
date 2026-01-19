@@ -1,11 +1,15 @@
 import { Header } from "../components/Header";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { PageEnd } from "../components/PageEnd";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Contact() {
+  const { t } = useTranslation();
   const location = useLocation();
+  const yandexLink =
+    "https://yandex.com.tr/maps/org/oltre_turizm/1254953363/?ll=28.986200%2C41.043300&z=14";
 
   useEffect(() => {
     const scrollToElement = (elementId) => {
@@ -46,10 +50,10 @@ export function Contact() {
         />
         <div className="absolute inset-0 bg-linear-to-b from-black/50 to-black/30 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-6xl font-bold text-white mb-4">CONTACT US</h1>
-            <p className="text-xl text-white/90">
-              We're here to help plan your perfect Turkish adventure
-            </p>
+            <h1 className="text-6xl font-bold text-white mb-4">
+              {t("contact.title").toUpperCase()}
+            </h1>
+            <p className="text-xl text-white/90">{t("contact.heroSubtitle")}</p>
           </div>
         </div>
       </div>
@@ -67,8 +71,8 @@ export function Contact() {
                   alt="Phone"
                 />
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                MOBILE & WHATSAPP
+              <h3 className="text-lg font-bold text-gray-800 mb-2 md:mt-10">
+                {t("contact.phone").toUpperCase()}
               </h3>
               <a
                 href="tel:+905322315758"
@@ -76,7 +80,9 @@ export function Contact() {
               >
                 +90 536 223 83 40
               </a>
-              <p className="text-sm text-gray-500 mt-2">Available 24/7</p>
+              <p className="text-sm text-gray-500 mt-2">
+                {t("contact.available")}
+              </p>
             </div>
           </div>
 
@@ -90,14 +96,18 @@ export function Contact() {
                   alt="Email"
                 />
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">EMAIL</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-2 md:mt-10">
+                {t("contact.email").toUpperCase()}
+              </h3>
               <a
                 href="mailto:ornekemail@gmail.com"
                 className="text-xl font-semibold text-green-400 hover:text-green-700 transition break-all"
               >
                 oltretour@hotmail.com
               </a>
-              <p className="text-sm text-gray-500 mt-2">Response within 24h</p>
+              <p className="text-sm text-gray-500 mt-2">
+                {t("contact.response")}
+              </p>
             </div>
           </div>
 
@@ -115,11 +125,23 @@ export function Contact() {
                   alt="location"
                 />
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">LOCATION</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                {t("contact.location").toUpperCase()}
+              </h3>
               <p className="">
                 Bozkurt Mah.Ergenekon Cad.Muratoğlu Çarşısı No:41 Kat:3
                 Daire:116 Pangaltı-Şişli/Istanbul
               </p>
+              <button
+                className="
+                bg-green-400 mt-5 rounded-xl font-semibold px-2 py-1 text-white cursor-pointer group-hover:shadow hover:bg-green-600 transition duration-300 
+              "
+                onClick={() =>
+                  window.open(yandexLink, "_blank", "noopener,noreferrer")
+                }
+              >
+                {t("contact.viewOnMap")}
+              </button>
             </div>
           </div>
         </div>
@@ -127,51 +149,43 @@ export function Contact() {
         {/* Why Choose Us Section */}
         <div className="bg-linear-to-br from-amber-50 to-orange-50 rounded-xl p-12 max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-            Why Choose Us?
+            {t("contact.whyChoose")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex items-start gap-4">
               <span className="text-amber-500 text-3xl">✓</span>
               <div>
                 <h4 className="font-semibold text-gray-800 text-lg">
-                  Expert Local Guides
+                  {t("contact.expertGuides")}
                 </h4>
-                <p className="text-gray-600">
-                  Professional English-speaking guides with deep local knowledge
-                </p>
+                <p className="text-gray-600">{t("contact.expertGuidesDesc")}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <span className="text-amber-500 text-3xl">✓</span>
               <div>
                 <h4 className="font-semibold text-gray-800 text-lg">
-                  Best Price Guarantee
+                  {t("contact.bestPrice")}
                 </h4>
-                <p className="text-gray-600">
-                  Competitive prices with no hidden fees
-                </p>
+                <p className="text-gray-600">{t("contact.bestPriceDesc")}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <span className="text-amber-500 text-3xl">✓</span>
               <div>
                 <h4 className="font-semibold text-gray-800 text-lg">
-                  24/7 Support
+                  {t("contact.support")}
                 </h4>
-                <p className="text-gray-600">
-                  Always available to help during your journey
-                </p>
+                <p className="text-gray-600">{t("contact.supportDesc")}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <span className="text-amber-500 text-3xl">✓</span>
               <div>
                 <h4 className="font-semibold text-gray-800 text-lg">
-                  Quality Service
+                  {t("contact.quality")}
                 </h4>
-                <p className="text-gray-600">
-                  Dedicated to making your journey unforgettable
-                </p>
+                <p className="text-gray-600">{t("contact.qualityDesc")}</p>
               </div>
             </div>
           </div>

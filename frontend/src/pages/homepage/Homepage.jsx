@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Header } from "../../components/Header.jsx";
 import { WhatsappContact } from "../../components/WhatsappContact.jsx";
 import { DestinationsComp } from "./DestinationsComp.jsx";
@@ -5,6 +6,7 @@ import { Recommended } from "./Recommended.jsx";
 import { PageEnd } from "../../components/PageEnd.jsx";
 
 export function Homepage() {
+  const { t } = useTranslation();
   return (
     <>
       <div className="relative bg-gradient-to-b from-gray-50 to-white overflow-x-hidden max-w-full">
@@ -31,10 +33,10 @@ export function Homepage() {
 
         <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 py-12 px-6 text-center shadow-inner">
           <p className="text-2xl md:text-3xl lg:text-4xl font-serif italic text-gray-700 max-w-3xl mx-auto">
-            "Explore Turkey, Embrace the Journey."
+            {t("hero.tagline")}
           </p>
           <p className="text-gray-500 mt-2 text-xs md:text-sm tracking-wider uppercase">
-            Your Gateway to Unforgettable Experiences
+            {t("hero.subtitle")}
           </p>
         </div>
 

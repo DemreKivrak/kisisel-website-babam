@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export function PageEnd() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -9,7 +11,7 @@ export function PageEnd() {
         <div className="bg-[rgb(31,37,40)] min-h-90 flex flex-col md:flex-row justify-between px-4 md:px-8 py-8 md:py-0 overflow-x-hidden">
           <div className="mt-4 md:mt-10 mb-8 md:mb-0">
             <h1 className="text-white text-2xl md:text-3xl mt-4 md:mt-10 block mb-6">
-              Contact Us
+              {t("footer.contactUs")}
             </h1>
 
             {/* Phone Contact */}
@@ -22,7 +24,7 @@ export function PageEnd() {
                 ></img>
               </div>
               <div className="ml-9 md:ml-12">
-                <p className="text-gray-400 text-sm">Mobile & Whatsapp</p>
+                <p className="text-gray-400 text-sm">{t("contact.phone")}</p>
                 <a
                   href="tel:+905362238340"
                   className="text-white text-base md:text-lg font-semibold hover:text-green-400 transition"
@@ -43,7 +45,7 @@ export function PageEnd() {
               </div>
               <div className="ml-3 md:ml-5">
                 <p className="text-gray-400 text-sm">
-                  Send us an email anytime!
+                  {t("contact.sendEmail")}
                 </p>
                 <a
                   href="mailto:info@gurtour.com"
@@ -56,50 +58,50 @@ export function PageEnd() {
           </div>
 
           {/*quick links */}
-          <div className="text-white mb-6 md:mt-20 md:ml-20">
+          <div className="text-white mb-6 md:mt-20 md:ml-0 md:mr-15">
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/tours")}
             >
-              TOURS
+              {t("nav.tours").toUpperCase()}
             </p>
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/destinations")}
             >
-              DESTINATIONS
+              {t("nav.destinations").toUpperCase()}
             </p>
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/services")}
             >
-              RENTAL SERVICES
+              {t("nav.services").toUpperCase()}
             </p>
           </div>
-          <div className="text-white mb-6 md:mt-20">
+          <div className="text-white mb-6 md:mt-20 md:mr-15">
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/")}
             >
-              HOME
+              {t("nav.home").toUpperCase()}
             </p>
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/about")}
             >
-              ABOUT US
+              {t("nav.about").toUpperCase()}
             </p>
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/galery")}
             >
-              GALLERY
+              {t("nav.gallery").toUpperCase()}
             </p>
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
               onClick={() => navigate("/contact")}
             >
-              CONTACT US
+              {t("nav.contact").toUpperCase()}
             </p>
           </div>
           <div className="flex justify-center md:block">

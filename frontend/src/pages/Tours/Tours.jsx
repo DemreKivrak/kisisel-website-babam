@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Header } from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { TourPage } from "../../components/TourPage";
@@ -6,8 +7,8 @@ import { api } from "../../services/api";
 import { PageEnd } from "../../components/PageEnd";
 import { WhatsappContact } from "../../components/WhatsappContact";
 
-
 export function Tours() {
+  const { t } = useTranslation();
   const [selectedDestination, setSelectedDestination] = useState("All");
   const [tours, setTours] = useState([]);
   const [destinations, setDestinations] = useState(["All"]);
@@ -124,7 +125,7 @@ export function Tours() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Loading tours...</p>
+            <p className="text-gray-600 text-lg">{t("common.loading")}</p>
           </div>
         </div>
       </>
@@ -134,14 +135,14 @@ export function Tours() {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
       <title>Tours</title>
-      
+
       <Header />
 
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-amber-100 via-orange-50 to-amber-100 py-16 mt-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4 mt-5">
-            Discover Our Tours
+            {t("tours.allTours")}
           </h1>
           <p className="text-xl text-gray-600">
             Explore Turkey's most beautiful destinations with our curated tour
@@ -202,7 +203,7 @@ export function Tours() {
                     className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-md hover:shadow-lg transition-all duration-300 text-sm font-semibold cursor-pointer"
                     onClick={() => navigate(`/tourpage/${tour.id}`)}
                   >
-                    View Details
+                    {t("tours.viewDetails")}
                   </button>
                 </div>
               </div>
