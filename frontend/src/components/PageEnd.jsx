@@ -6,11 +6,6 @@ export function PageEnd() {
   return (
     <>
       <div className="flex-col">
-        <p className="bg-[rgb(31,37,40)] text-white">
-          sitemiz henüz geliştirme aşamasında olup,aktif tur satışımız veya araç
-          kiralama hizmetimiz bulunmamaktadır.
-        </p>
-
         <div className="bg-[rgb(31,37,40)] min-h-90 flex flex-col md:flex-row justify-between px-4 md:px-8 py-8 md:py-0 overflow-x-hidden">
           <div className="mt-4 md:mt-10 mb-8 md:mb-0">
             <h1 className="text-white text-2xl md:text-3xl mt-4 md:mt-10 block mb-6">
@@ -29,10 +24,10 @@ export function PageEnd() {
               <div className="ml-9 md:ml-12">
                 <p className="text-gray-400 text-sm">Mobile & Whatsapp</p>
                 <a
-                  href="tel:+908508887609"
+                  href="tel:+905362238340"
                   className="text-white text-base md:text-lg font-semibold hover:text-green-400 transition"
                 >
-                  +90 532 231 57 58
+                  +90 536 223 83 40
                 </a>
               </div>
             </div>
@@ -54,7 +49,7 @@ export function PageEnd() {
                   href="mailto:info@gurtour.com"
                   className="text-white text-base md:text-lg font-semibold hover:text-green-400 transition break-all"
                 >
-                  yukselkivrak@hotmail.com
+                  oltretour@hotmail.com
                 </a>
               </div>
             </div>

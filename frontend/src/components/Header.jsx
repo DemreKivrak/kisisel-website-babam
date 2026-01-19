@@ -59,9 +59,7 @@ export function Header() {
           src="icons8-phone-24.png"
           alt="phone"
         ></img>
-        <p className="text-white">
-          +90 532 231 57 58 | yukselkivrak@hotmail.com
-        </p>
+        <p className="text-white">+90 536 223 83 40 | oltretour@hotmail.com</p>
       </div>
       {/* Main Header */}
       <div
@@ -70,12 +68,14 @@ export function Header() {
         }`}
       >
         {/* Logo */}
-        <img
-          className="cursor-pointer h-12 md:h-24 ml-2 md:ml-10 flex-shrink-0"
-          src="logo-2-new.png"
-          alt="logo"
-          onClick={() => handleNavigate("/")}
-        />
+        <div>
+          <img
+            className="cursor-pointer h-12 md:h-24 ml-2 md:ml-10 flex-shrink-0 md:mb-1"
+            src="new-logo-oltre.png"
+            alt="logo"
+            onClick={() => handleNavigate("/")}
+          />
+        </div>
 
         {/* Hamburger Button - Mobile Only */}
         <button

@@ -56,7 +56,7 @@ export function Contact() {
 
       <div id="contact" className="max-w-7xl mx-auto px-4 py-16">
         {/* Quick Contact Cards */}
-        <div className="flex justify-evenly gap-6 mb-16">
+        <div className="md:flex justify-evenly md:gap-6 mb-16 flex flex-col md:flex-row gap-6">
           {/* Phone Card */}
           <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-1 border-dotted">
             <div className="flex flex-col items-center text-center">
@@ -74,7 +74,7 @@ export function Contact() {
                 href="tel:+905322315758"
                 className="text-2xl font-semibold text-green-400 hover:text-green-700 transition"
               >
-                +90 532 231 57 58
+                +90 536 223 83 40
               </a>
               <p className="text-sm text-gray-500 mt-2">Available 24/7</p>
             </div>
@@ -95,9 +95,31 @@ export function Contact() {
                 href="mailto:ornekemail@gmail.com"
                 className="text-xl font-semibold text-green-400 hover:text-green-700 transition break-all"
               >
-                yukselkivrak@hotmail.com
+                oltretour@hotmail.com
               </a>
               <p className="text-sm text-gray-500 mt-2">Response within 24h</p>
+            </div>
+          </div>
+
+          {/*location card */}
+
+          <div
+            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all
+           duration-300 transform hover:-translate-y-2 border-1 border-dotted md:w-65"
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-linear-to-br p-4 rounded-full mb-4 border-1 border-dotted">
+                <img
+                  className="h-12 w-12"
+                  src="icons8-location-100.png"
+                  alt="location"
+                />
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">LOCATION</h3>
+              <p className="">
+                Bozkurt Mah.Ergenekon Cad.Muratoğlu Çarşısı No:41 Kat:3
+                Daire:116 Pangaltı-Şişli/Istanbul
+              </p>
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { PageEnd } from "../components/PageEnd";
 import { WhatsappContact } from "../components/WhatsappContact";
-import { PagePopup } from "../components/PagePopup";
+
 
 export function Services() {
   const [carCategories, setCarCategories] = useState([]);
@@ -55,7 +55,7 @@ export function Services() {
 
   return (
     <>
-      <PagePopup />
+  
       <Header />
 
       {/* Hero Section */}

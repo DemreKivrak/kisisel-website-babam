@@ -5,7 +5,7 @@ import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
 import { PageEnd } from "../../components/PageEnd";
 import { WhatsappContact } from "../../components/WhatsappContact";
-import { PagePopup } from "../../components/PagePopup";
+
 
 export function Tours() {
   const [selectedDestination, setSelectedDestination] = useState("All");
@@ -134,7 +134,7 @@ export function Tours() {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
       <title>Tours</title>
-      <PagePopup />
+      
       <Header />
 
       {/* Hero Section */}

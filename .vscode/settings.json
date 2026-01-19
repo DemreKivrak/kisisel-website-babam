@@ -1,0 +1,8 @@
+{
+  "tailwindCSS.lint.cssConflict": "ignore",
+  "tailwindCSS.lint.recommendedVariantOrder": "ignore",
+  "css.lint.validProperties": [
+    "composes"
+  ],
+  "css.lint.unknownProperties": "ignore"
+}
