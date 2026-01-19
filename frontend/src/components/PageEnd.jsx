@@ -105,8 +105,8 @@ export function PageEnd() {
           <div className="flex justify-center md:block">
             <div>
               <img
-                className="h-40 md:h-70"
-                src="logo-white.png"
+                className="h-40 md:h-45 md:mt-14"
+                src="oltre-white.png"
                 alt="Logo"
               ></img>
             </div>
