@@ -1,5 +1,6 @@
 import express from "express";
-import sqlite3 from "sqlite3";
+import pkg from "pg";
+const { Pool } = pkg;
 import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
@@ -12,7 +13,17 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const DB_PATH = process.env.DB_PATH || "./database.sqlite";
+
+// PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? {
+          rejectUnauthorized: false,
+        }
+      : false,
+});
 
 // Cloudinary configuration
 cloudinary.config({
@@ -44,10 +55,9 @@ const corsOptions = {
       "https://www.anatoliahorizon.com",
       "https://www.oltretour.com",
       "https://anatoliahorizon.com",
-      "https://oltretour.com"
+      "https://oltretour.com",
     ];
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
+
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -59,157 +69,160 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Database initialization
-const db = new sqlite3.Database(DB_PATH, (err) => {
+// Test database connection and initialize
+pool.query("SELECT NOW()", (err, res) => {
   if (err) {
-    console.error("Database connection error:", err.message);
+    console.error("❌ Database connection error:", err);
+    process.exit(1);
   } else {
-    console.log("Connected to SQLite database at:", DB_PATH);
-    console.log("Environment variables - DB_PATH:", process.env.DB_PATH);
+    console.log("✅ Connected to PostgreSQL database");
     initializeDatabase();
   }
 });
 
 // Initialize database tables
-function initializeDatabase() {
-  // Destinations table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS destinations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT,
-      img TEXT,
-      highlights TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+async function initializeDatabase() {
+  const client = await pool.connect();
 
-  // Tours table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS tours (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      destination TEXT NOT NULL,
-      price TEXT,
-      duration TEXT,
-      description TEXT,
-      images TEXT,
-      overview TEXT,
-      highlights TEXT,
-      included TEXT,
-      not_included TEXT,
-      itinerary TEXT,
-      is_recommended INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+  try {
+    await client.query("BEGIN");
 
-  // Users table for admin authentication
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    // Destinations table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS destinations (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        img TEXT,
+        highlights TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  // Rental cars table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS rental_cars (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      model TEXT NOT NULL,
-      description TEXT,
-      images TEXT,
-      features TEXT,
-      transmission TEXT,
-      fuel TEXT,
-      doors TEXT,
-      daily_price TEXT,
-      weekly_price TEXT,
-      color TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    // Tours table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS tours (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        destination VARCHAR(255) NOT NULL,
+        price VARCHAR(100),
+        duration VARCHAR(100),
+        description TEXT,
+        images TEXT,
+        overview TEXT,
+        highlights TEXT,
+        included TEXT,
+        not_included TEXT,
+        itinerary TEXT,
+        is_recommended INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  // Gallery table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS gallery (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      type TEXT NOT NULL,
-      url TEXT NOT NULL,
-      thumbnail TEXT,
-      title TEXT NOT NULL,
-      description TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    // Users table - UPDATED with role and multi-admin support
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE,
+        full_name VARCHAR(255),
+        role VARCHAR(50) DEFAULT 'admin',
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  // Tour Pricing table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS tour_pricing (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tour_id INTEGER NOT NULL,
-      min_persons INTEGER NOT NULL,
-      max_persons INTEGER,
-      price_per_person TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (tour_id) REFERENCES tours(id) ON DELETE CASCADE
-    )
-  `);
+    // Rental cars table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS rental_cars (
+        id SERIAL PRIMARY KEY,
+        model VARCHAR(255) NOT NULL,
+        description TEXT,
+        images TEXT,
+        features TEXT,
+        transmission VARCHAR(50),
+        fuel VARCHAR(50),
+        doors VARCHAR(50),
+        daily_price VARCHAR(100),
+        weekly_price VARCHAR(100),
+        color VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  // Create default admin user if not exists
-  db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
-    if (!err && row.count === 0) {
+    // Gallery table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gallery (
+        id SERIAL PRIMARY KEY,
+        type VARCHAR(50) NOT NULL,
+        url TEXT NOT NULL,
+        thumbnail TEXT,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Tour Pricing table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS tour_pricing (
+        id SERIAL PRIMARY KEY,
+        tour_id INTEGER NOT NULL,
+        min_persons INTEGER NOT NULL,
+        max_persons INTEGER,
+        price_per_person VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (tour_id) REFERENCES tours(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Admin activity log table - NEW
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_activity_log (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        action VARCHAR(255) NOT NULL,
+        details TEXT,
+        ip_address VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await client.query("COMMIT");
+    console.log("✅ Database tables initialized");
+
+    // Create default admin user if not exists
+    const userCheck = await client.query("SELECT COUNT(*) as count FROM users");
+    if (parseInt(userCheck.rows[0].count) === 0) {
       const defaultUsername = "admin";
-      const defaultPassword = "admin123"; // Şifrenizi değiştirin!
-      bcrypt.hash(defaultPassword, 10, (err, hash) => {
-        if (!err) {
-          db.run("INSERT INTO users (username, password) VALUES (?, ?)", [
-            defaultUsername,
-            hash,
-          ]);
-          console.log(
-            "Default admin user created - Username: admin, Password: admin123"
-          );
-          console.log(
-            "⚠️  IMPORTANT: Change the default password immediately!"
-          );
-        }
-      });
-    }
-  });
+      const defaultPassword = "admin123";
+      const hash = await bcrypt.hash(defaultPassword, 10);
 
-  // Insert sample data if tables are empty
-  db.get("SELECT COUNT(*) as count FROM destinations", (err, row) => {
-    if (!err && row.count === 0) {
-      const destinations = [
-        {
-          name: "Istanbul",
-          description: "Where East meets West",
-          img: "istanbul.jpg",
-        },
-        {
-          name: "Cappadocia",
-          description: "Fairy chimneys and balloons",
-          img: "cappadocia.jpg",
-        },
-        {
-          name: "Antalya",
-          description: "Mediterranean paradise",
-          img: "antalya.jpg",
-        },
-      ];
-
-      const stmt = db.prepare(
-        "INSERT INTO destinations (name, description, img) VALUES (?, ?, ?)"
+      await client.query(
+        "INSERT INTO users (username, password, role, email, full_name) VALUES ($1, $2, $3, $4, $5)",
+        [
+          defaultUsername,
+          hash,
+          "super_admin",
+          "admin@example.com",
+          "Super Admin",
+        ],
       );
-      destinations.forEach((dest) => {
-        stmt.run(dest.name, dest.description, dest.img);
-      });
-      stmt.finalize();
+
+      console.log(
+        "✅ Default admin created - Username: admin, Password: admin123",
+      );
+      console.log("⚠️  IMPORTANT: Change the default password immediately!");
     }
-  });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("❌ Error initializing database:", err);
+  } finally {
+    client.release();
+  }
 }
 
 // JWT Secret Key
@@ -233,9 +246,23 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Helper function to log admin activity
+async function logActivity(userId, action, details = null, ipAddress = null) {
+  try {
+    await pool.query(
+      "INSERT INTO admin_activity_log (user_id, action, details, ip_address) VALUES ($1, $2, $3, $4)",
+      [userId, action, details, ipAddress],
+    );
+  } catch (err) {
+    console.error("Error logging activity:", err);
+  }
+}
+
 // Routes
 
-// Authentication endpoints
+// ===== AUTHENTICATION ENDPOINTS =====
+
+// Login
 app.post("/api/auth/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -245,43 +272,52 @@ app.post("/api/auth/login", async (req, res) => {
       .json({ error: "Username and password are required" });
   }
 
-  db.get(
-    "SELECT * FROM users WHERE username = ?",
-    [username],
-    async (err, user) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE username = $1 AND is_active = true",
+      [username],
+    );
 
-      if (!user) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-
-      const token = jwt.sign(
-        { id: user.id, username: user.username },
-        JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-
-      res.json({
-        token,
-        user: { id: user.id, username: user.username },
-      });
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
-  );
+
+    const user = result.rows[0];
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "24h" },
+    );
+
+    await logActivity(user.id, "LOGIN", null, req.ip);
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        email: user.email,
+        full_name: user.full_name,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Verify token endpoint
+// Verify token
 app.get("/api/auth/verify", verifyToken, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
 
-// Change password endpoint
+// Change password
 app.post("/api/auth/change-password", verifyToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
@@ -298,246 +334,333 @@ app.post("/api/auth/change-password", verifyToken, async (req, res) => {
   }
 
   try {
-    // Get current user from database
-    db.get(
-      "SELECT * FROM users WHERE id = ?",
-      [req.user.id],
-      async (err, user) => {
-        if (err) {
-          return res.status(500).json({ error: "Database error" });
-        }
+    const result = await pool.query("SELECT * FROM users WHERE id = $1", [
+      req.user.id,
+    ]);
 
-        if (!user) {
-          return res.status(404).json({ error: "User not found" });
-        }
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-        // Verify current password
-        const isValidPassword = await bcrypt.compare(
-          currentPassword,
-          user.password
-        );
-        if (!isValidPassword) {
-          return res
-            .status(401)
-            .json({ error: "Current password is incorrect" });
-        }
-
-        // Hash new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update password in database
-        db.run(
-          "UPDATE users SET password = ? WHERE id = ?",
-          [hashedPassword, req.user.id],
-          (err) => {
-            if (err) {
-              return res
-                .status(500)
-                .json({ error: "Failed to update password" });
-            }
-
-            res.json({ message: "Password changed successfully" });
-          }
-        );
-      }
+    const user = result.rows[0];
+    const isValidPassword = await bcrypt.compare(
+      currentPassword,
+      user.password,
     );
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: "Current password is incorrect" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+      "UPDATE users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2",
+      [hashedPassword, req.user.id],
+    );
+
+    await logActivity(req.user.id, "CHANGE_PASSWORD");
+
+    res.json({ message: "Password changed successfully" });
   } catch (error) {
     console.error("Change password error:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// Setup admin endpoint (TEMPORARY - remove after first use)
-app.post("/api/setup-admin", async (req, res) => {
+// ===== ADMIN MANAGEMENT ENDPOINTS (NEW) =====
+
+// Get all admin users (super_admin only)
+app.get("/api/admin/users", verifyToken, async (req, res) => {
   try {
-    // Check if any users exist
-    db.get("SELECT COUNT(*) as count FROM users", async (err, row) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
+    const currentUser = await pool.query(
+      "SELECT role FROM users WHERE id = $1",
+      [req.user.id],
+    );
 
-      // If users exist, don't allow setup
-      if (row.count > 0) {
-        return res.status(400).json({ error: "Admin already exists" });
-      }
+    if (currentUser.rows[0].role !== "super_admin") {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
 
-      // Create default admin
-      const defaultUsername = "admin";
-      const defaultPassword = "admin123";
-      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+    const result = await pool.query(
+      "SELECT id, username, email, full_name, role, is_active, created_at FROM users ORDER BY created_at DESC",
+    );
 
-      db.run(
-        "INSERT INTO users (username, password) VALUES (?, ?)",
-        [defaultUsername, hashedPassword],
-        (err) => {
-          if (err) {
-            return res.status(500).json({ error: "Failed to create admin" });
-          }
-
-          res.json({
-            message: "Admin user created successfully",
-            username: defaultUsername,
-            password: defaultPassword,
-          });
-        }
-      );
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Get all destinations
-app.get("/api/destinations", (req, res) => {
-  db.all("SELECT * FROM destinations ORDER BY created_at DESC", (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(rows);
+// Create new admin user (super_admin only)
+app.post("/api/admin/users", verifyToken, async (req, res) => {
+  const { username, password, email, full_name, role } = req.body;
+
+  try {
+    const currentUser = await pool.query(
+      "SELECT role FROM users WHERE id = $1",
+      [req.user.id],
+    );
+
+    if (currentUser.rows[0].role !== "super_admin") {
+      return res.status(403).json({ error: "Unauthorized" });
     }
-  });
+
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      "INSERT INTO users (username, password, email, full_name, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, full_name, role",
+      [username, hashedPassword, email, full_name, role || "admin"],
+    );
+
+    await logActivity(req.user.id, "CREATE_USER", `Created user: ${username}`);
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    if (err.code === "23505") {
+      // Unique constraint violation
+      res.status(400).json({ error: "Username or email already exists" });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
+  }
+});
+
+// Update admin user (super_admin only)
+app.put("/api/admin/users/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { email, full_name, role, is_active } = req.body;
+
+  try {
+    const currentUser = await pool.query(
+      "SELECT role FROM users WHERE id = $1",
+      [req.user.id],
+    );
+
+    if (currentUser.rows[0].role !== "super_admin") {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    const result = await pool.query(
+      "UPDATE users SET email = $1, full_name = $2, role = $3, is_active = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id, username, email, full_name, role, is_active",
+      [email, full_name, role, is_active, id],
+    );
+
+    await logActivity(req.user.id, "UPDATE_USER", `Updated user ID: ${id}`);
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete admin user (super_admin only)
+app.delete("/api/admin/users/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const currentUser = await pool.query(
+      "SELECT role FROM users WHERE id = $1",
+      [req.user.id],
+    );
+
+    if (currentUser.rows[0].role !== "super_admin") {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    if (req.user.id === parseInt(id)) {
+      return res.status(400).json({ error: "Cannot delete your own account" });
+    }
+
+    await pool.query("DELETE FROM users WHERE id = $1", [id]);
+    await logActivity(req.user.id, "DELETE_USER", `Deleted user ID: ${id}`);
+
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get activity log
+app.get("/api/admin/activity-log", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT al.*, u.username 
+      FROM admin_activity_log al
+      JOIN users u ON al.user_id = u.id
+      ORDER BY al.created_at DESC
+      LIMIT 100
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===== DESTINATIONS ENDPOINTS =====
+
+// Get all destinations
+app.get("/api/destinations", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM destinations ORDER BY created_at DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Get single destination
-app.get("/api/destinations/:id", (req, res) => {
-  db.get(
-    "SELECT * FROM destinations WHERE id = ?",
-    [req.params.id],
-    (err, row) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else if (!row) {
-        res.status(404).json({ error: "Destination not found" });
-      } else {
-        res.json(row);
-      }
+app.get("/api/destinations/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM destinations WHERE id = $1",
+      [req.params.id],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Destination not found" });
     }
-  );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Create new destination
-app.post("/api/destinations", verifyToken, (req, res) => {
+// Create destination
+app.post("/api/destinations", verifyToken, async (req, res) => {
   const { name, description, img, highlights } = req.body;
-  db.run(
-    "INSERT INTO destinations (name, description, img, highlights) VALUES (?, ?, ?, ?)",
-    [name, description, img, highlights || ""],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ id: this.lastID, name, description, img, highlights });
-      }
-    }
-  );
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO destinations (name, description, img, highlights) VALUES ($1, $2, $3, $4) RETURNING *",
+      [name, description, img, highlights || ""],
+    );
+
+    await logActivity(req.user.id, "CREATE_DESTINATION", `Created: ${name}`);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Update destination
-app.put("/api/destinations/:id", verifyToken, (req, res) => {
+app.put("/api/destinations/:id", verifyToken, async (req, res) => {
   const { name, description, img, highlights } = req.body;
-  db.run(
-    "UPDATE destinations SET name = ?, description = ?, img = ?, highlights = ? WHERE id = ?",
-    [name, description, img, highlights || "", req.params.id],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Destination updated", changes: this.changes });
-      }
-    }
-  );
+
+  try {
+    const result = await pool.query(
+      "UPDATE destinations SET name = $1, description = $2, img = $3, highlights = $4 WHERE id = $5 RETURNING *",
+      [name, description, img, highlights || "", req.params.id],
+    );
+
+    await logActivity(
+      req.user.id,
+      "UPDATE_DESTINATION",
+      `Updated ID: ${req.params.id}`,
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Delete destination
-app.delete("/api/destinations/:id", verifyToken, (req, res) => {
-  db.run(
-    "DELETE FROM destinations WHERE id = ?",
-    [req.params.id],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Destination deleted", changes: this.changes });
-      }
-    }
-  );
+app.delete("/api/destinations/:id", verifyToken, async (req, res) => {
+  try {
+    await pool.query("DELETE FROM destinations WHERE id = $1", [req.params.id]);
+    await logActivity(
+      req.user.id,
+      "DELETE_DESTINATION",
+      `Deleted ID: ${req.params.id}`,
+    );
+    res.json({ message: "Destination deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+// ===== TOURS ENDPOINTS =====
+
 // Get all tours
-app.get("/api/tours", (req, res) => {
+app.get("/api/tours", async (req, res) => {
   const { destination } = req.query;
-  let query = "SELECT * FROM tours";
-  let params = [];
 
-  if (destination) {
-    query += " WHERE destination = ?";
-    params.push(destination);
-  }
+  try {
+    let query = "SELECT * FROM tours";
+    let params = [];
 
-  query += " ORDER BY created_at DESC";
-
-  db.all(query, params, (err, tours) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      // Get pricing for each tour
-      const tourIds = tours.map((t) => t.id);
-      if (tourIds.length === 0) {
-        return res.json(tours);
-      }
-
-      const placeholders = tourIds.map(() => "?").join(",");
-      db.all(
-        `SELECT * FROM tour_pricing WHERE tour_id IN (${placeholders}) ORDER BY min_persons ASC`,
-        tourIds,
-        (err, pricingData) => {
-          if (err) {
-            console.error("Error fetching pricing:", err);
-            return res.json(tours);
-          }
-
-          // Attach pricing to tours
-          const toursWithPricing = tours.map((tour) => ({
-            ...tour,
-            pricing: pricingData.filter((p) => p.tour_id === tour.id),
-          }));
-
-          res.json(toursWithPricing);
-        }
-      );
+    if (destination) {
+      query += " WHERE destination = $1";
+      params.push(destination);
     }
-  });
+
+    query += " ORDER BY created_at DESC";
+
+    const toursResult = await pool.query(query, params);
+    const tours = toursResult.rows;
+
+    if (tours.length === 0) {
+      return res.json([]);
+    }
+
+    // Get pricing for all tours
+    const tourIds = tours.map((t) => t.id);
+    const pricingResult = await pool.query(
+      "SELECT * FROM tour_pricing WHERE tour_id = ANY($1) ORDER BY min_persons ASC",
+      [tourIds],
+    );
+
+    // Attach pricing to tours
+    const toursWithPricing = tours.map((tour) => ({
+      ...tour,
+      pricing: pricingResult.rows.filter((p) => p.tour_id === tour.id),
+    }));
+
+    res.json(toursWithPricing);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Get single tour
-app.get("/api/tours/:id", (req, res) => {
-  db.get("SELECT * FROM tours WHERE id = ?", [req.params.id], (err, tour) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else if (!tour) {
-      res.status(404).json({ error: "Tour not found" });
-    } else {
-      // Get pricing for this tour
-      db.all(
-        "SELECT * FROM tour_pricing WHERE tour_id = ? ORDER BY min_persons ASC",
-        [tour.id],
-        (err, pricing) => {
-          if (err) {
-            console.error("Error fetching pricing:", err);
-            return res.json(tour);
-          }
+app.get("/api/tours/:id", async (req, res) => {
+  try {
+    const tourResult = await pool.query("SELECT * FROM tours WHERE id = $1", [
+      req.params.id,
+    ]);
 
-          res.json({
-            ...tour,
-            pricing: pricing || [],
-          });
-        }
-      );
+    if (tourResult.rows.length === 0) {
+      return res.status(404).json({ error: "Tour not found" });
     }
-  });
+
+    const tour = tourResult.rows[0];
+
+    // Get pricing
+    const pricingResult = await pool.query(
+      "SELECT * FROM tour_pricing WHERE tour_id = $1 ORDER BY min_persons ASC",
+      [tour.id],
+    );
+
+    res.json({
+      ...tour,
+      pricing: pricingResult.rows,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Create new tour
-app.post("/api/tours", verifyToken, (req, res) => {
+// Create tour
+app.post("/api/tours", verifyToken, async (req, res) => {
   const {
     name,
     destination,
@@ -552,47 +675,36 @@ app.post("/api/tours", verifyToken, (req, res) => {
     itinerary,
     is_recommended,
   } = req.body;
-  db.run(
-    "INSERT INTO tours (name, destination, price, duration, description, images, overview, highlights, included, not_included, itinerary, is_recommended) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    [
-      name,
-      destination,
-      price,
-      duration,
-      description,
-      images,
-      overview,
-      highlights,
-      included,
-      not_included,
-      itinerary,
-      is_recommended ? 1 : 0,
-    ],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({
-          id: this.lastID,
-          name,
-          destination,
-          price,
-          duration,
-          description,
-          images,
-          overview,
-          highlights,
-          included,
-          not_included,
-          itinerary,
-        });
-      }
-    }
-  );
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO tours (name, destination, price, duration, description, images, overview, highlights, included, not_included, itinerary, is_recommended) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+      [
+        name,
+        destination,
+        price,
+        duration,
+        description,
+        images,
+        overview,
+        highlights,
+        included,
+        not_included,
+        itinerary,
+        is_recommended ? 1 : 0,
+      ],
+    );
+
+    await logActivity(req.user.id, "CREATE_TOUR", `Created: ${name}`);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Update tour
-app.put("/api/tours/:id", verifyToken, (req, res) => {
+app.put("/api/tours/:id", verifyToken, async (req, res) => {
   const {
     name,
     destination,
@@ -607,64 +719,72 @@ app.put("/api/tours/:id", verifyToken, (req, res) => {
     itinerary,
     is_recommended,
   } = req.body;
-  db.run(
-    "UPDATE tours SET name = ?, destination = ?, price = ?, duration = ?, description = ?, images = ?, overview = ?, highlights = ?, included = ?, not_included = ?, itinerary = ?, is_recommended = ? WHERE id = ?",
-    [
-      name,
-      destination,
-      price,
-      duration,
-      description,
-      images,
-      overview,
-      highlights,
-      included,
-      not_included,
-      itinerary,
-      is_recommended ? 1 : 0,
-      req.params.id,
-    ],
-    function (err) {
-      if (err) {
-        console.error("Update tour error:", err);
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Tour updated", changes: this.changes });
-      }
-    }
-  );
+
+  try {
+    const result = await pool.query(
+      `UPDATE tours SET name = $1, destination = $2, price = $3, duration = $4, description = $5, images = $6, 
+       overview = $7, highlights = $8, included = $9, not_included = $10, itinerary = $11, is_recommended = $12 
+       WHERE id = $13 RETURNING *`,
+      [
+        name,
+        destination,
+        price,
+        duration,
+        description,
+        images,
+        overview,
+        highlights,
+        included,
+        not_included,
+        itinerary,
+        is_recommended ? 1 : 0,
+        req.params.id,
+      ],
+    );
+
+    await logActivity(
+      req.user.id,
+      "UPDATE_TOUR",
+      `Updated ID: ${req.params.id}`,
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Delete tour
-app.delete("/api/tours/:id", verifyToken, (req, res) => {
-  db.run("DELETE FROM tours WHERE id = ?", [req.params.id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json({ message: "Tour deleted", changes: this.changes });
-    }
-  });
+app.delete("/api/tours/:id", verifyToken, async (req, res) => {
+  try {
+    await pool.query("DELETE FROM tours WHERE id = $1", [req.params.id]);
+    await logActivity(
+      req.user.id,
+      "DELETE_TOUR",
+      `Deleted ID: ${req.params.id}`,
+    );
+    res.json({ message: "Tour deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ===== TOUR PRICING ENDPOINTS =====
 
-// Get pricing for a specific tour
-app.get("/api/tours/:tourId/pricing", (req, res) => {
-  db.all(
-    "SELECT * FROM tour_pricing WHERE tour_id = ? ORDER BY min_persons ASC",
-    [req.params.tourId],
-    (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json(rows);
-      }
-    }
-  );
+// Get pricing for a tour
+app.get("/api/tours/:tourId/pricing", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM tour_pricing WHERE tour_id = $1 ORDER BY min_persons ASC",
+      [req.params.tourId],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Create new pricing entry for a tour
-app.post("/api/tours/:tourId/pricing", verifyToken, (req, res) => {
+// Create pricing entry
+app.post("/api/tours/:tourId/pricing", verifyToken, async (req, res) => {
   const { min_persons, max_persons, price_per_person } = req.body;
   const tourId = req.params.tourId;
 
@@ -674,64 +794,53 @@ app.post("/api/tours/:tourId/pricing", verifyToken, (req, res) => {
       .json({ error: "min_persons and price_per_person are required" });
   }
 
-  db.run(
-    "INSERT INTO tour_pricing (tour_id, min_persons, max_persons, price_per_person) VALUES (?, ?, ?, ?)",
-    [tourId, min_persons, max_persons, price_per_person],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({
-          id: this.lastID,
-          tour_id: tourId,
-          min_persons,
-          max_persons,
-          price_per_person,
-        });
-      }
-    }
-  );
+  try {
+    const result = await pool.query(
+      "INSERT INTO tour_pricing (tour_id, min_persons, max_persons, price_per_person) VALUES ($1, $2, $3, $4) RETURNING *",
+      [tourId, min_persons, max_persons, price_per_person],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Update pricing entry
-app.put("/api/tours/:tourId/pricing/:id", verifyToken, (req, res) => {
+app.put("/api/tours/:tourId/pricing/:id", verifyToken, async (req, res) => {
   const { min_persons, max_persons, price_per_person } = req.body;
 
-  db.run(
-    "UPDATE tour_pricing SET min_persons = ?, max_persons = ?, price_per_person = ? WHERE id = ? AND tour_id = ?",
-    [
-      min_persons,
-      max_persons,
-      price_per_person,
-      req.params.id,
-      req.params.tourId,
-    ],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Pricing updated", changes: this.changes });
-      }
-    }
-  );
+  try {
+    const result = await pool.query(
+      "UPDATE tour_pricing SET min_persons = $1, max_persons = $2, price_per_person = $3 WHERE id = $4 AND tour_id = $5 RETURNING *",
+      [
+        min_persons,
+        max_persons,
+        price_per_person,
+        req.params.id,
+        req.params.tourId,
+      ],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Delete pricing entry
-app.delete("/api/tours/:tourId/pricing/:id", verifyToken, (req, res) => {
-  db.run(
-    "DELETE FROM tour_pricing WHERE id = ? AND tour_id = ?",
-    [req.params.id, req.params.tourId],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Pricing deleted", changes: this.changes });
-      }
-    }
-  );
+app.delete("/api/tours/:tourId/pricing/:id", verifyToken, async (req, res) => {
+  try {
+    await pool.query(
+      "DELETE FROM tour_pricing WHERE id = $1 AND tour_id = $2",
+      [req.params.id, req.params.tourId],
+    );
+    res.json({ message: "Pricing deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Image upload endpoint
+// ===== IMAGE UPLOAD =====
+
 app.post("/api/upload", verifyToken, upload.single("image"), (req, res) => {
   try {
     if (!req.file) {
@@ -750,46 +859,46 @@ app.post("/api/upload", verifyToken, upload.single("image"), (req, res) => {
 // ===== RENTAL CARS ENDPOINTS =====
 
 // Get all rental cars
-app.get("/api/rental-cars", (req, res) => {
-  db.all("SELECT * FROM rental_cars ORDER BY created_at DESC", (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      // Parse JSON strings back to arrays/objects
-      const cars = rows.map((car) => ({
-        ...car,
-        images: car.images ? JSON.parse(car.images) : [],
-        features: car.features ? JSON.parse(car.features) : [],
-      }));
-      res.json(cars);
-    }
-  });
+app.get("/api/rental-cars", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM rental_cars ORDER BY created_at DESC",
+    );
+    const cars = result.rows.map((car) => ({
+      ...car,
+      images: car.images ? JSON.parse(car.images) : [],
+      features: car.features ? JSON.parse(car.features) : [],
+    }));
+    res.json(cars);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Get single rental car
-app.get("/api/rental-cars/:id", (req, res) => {
-  db.get(
-    "SELECT * FROM rental_cars WHERE id = ?",
-    [req.params.id],
-    (err, row) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else if (!row) {
-        res.status(404).json({ error: "Rental car not found" });
-      } else {
-        const car = {
-          ...row,
-          images: row.images ? JSON.parse(row.images) : [],
-          features: row.features ? JSON.parse(row.features) : [],
-        };
-        res.json(car);
-      }
+app.get("/api/rental-cars/:id", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM rental_cars WHERE id = $1", [
+      req.params.id,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Rental car not found" });
     }
-  );
+
+    const car = result.rows[0];
+    res.json({
+      ...car,
+      images: car.images ? JSON.parse(car.images) : [],
+      features: car.features ? JSON.parse(car.features) : [],
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Create new rental car
-app.post("/api/rental-cars", verifyToken, (req, res) => {
+// Create rental car
+app.post("/api/rental-cars", verifyToken, async (req, res) => {
   const {
     model,
     description,
@@ -803,33 +912,33 @@ app.post("/api/rental-cars", verifyToken, (req, res) => {
     color,
   } = req.body;
 
-  db.run(
-    `INSERT INTO rental_cars (model, description, images, features, transmission, fuel, doors, daily_price, weekly_price, color)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      model,
-      description,
-      JSON.stringify(images || []),
-      JSON.stringify(features || []),
-      transmission,
-      fuel,
-      doors,
-      daily_price,
-      weekly_price,
-      color,
-    ],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ id: this.lastID, message: "Rental car created" });
-      }
-    }
-  );
+  try {
+    const result = await pool.query(
+      `INSERT INTO rental_cars (model, description, images, features, transmission, fuel, doors, daily_price, weekly_price, color)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [
+        model,
+        description,
+        JSON.stringify(images || []),
+        JSON.stringify(features || []),
+        transmission,
+        fuel,
+        doors,
+        daily_price,
+        weekly_price,
+        color,
+      ],
+    );
+
+    await logActivity(req.user.id, "CREATE_CAR", `Created: ${model}`);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Update rental car
-app.put("/api/rental-cars/:id", verifyToken, (req, res) => {
+app.put("/api/rental-cars/:id", verifyToken, async (req, res) => {
   const {
     model,
     description,
@@ -843,67 +952,70 @@ app.put("/api/rental-cars/:id", verifyToken, (req, res) => {
     color,
   } = req.body;
 
-  db.run(
-    `UPDATE rental_cars SET model = ?, description = ?, images = ?, features = ?, transmission = ?, fuel = ?, doors = ?, daily_price = ?, weekly_price = ?, color = ? WHERE id = ?`,
-    [
-      model,
-      description,
-      JSON.stringify(images || []),
-      JSON.stringify(features || []),
-      transmission,
-      fuel,
-      doors,
-      daily_price,
-      weekly_price,
-      color,
-      req.params.id,
-    ],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Rental car updated" });
-      }
-    }
-  );
+  try {
+    const result = await pool.query(
+      `UPDATE rental_cars SET model = $1, description = $2, images = $3, features = $4, transmission = $5, fuel = $6, doors = $7, daily_price = $8, weekly_price = $9, color = $10 WHERE id = $11 RETURNING *`,
+      [
+        model,
+        description,
+        JSON.stringify(images || []),
+        JSON.stringify(features || []),
+        transmission,
+        fuel,
+        doors,
+        daily_price,
+        weekly_price,
+        color,
+        req.params.id,
+      ],
+    );
+
+    await logActivity(
+      req.user.id,
+      "UPDATE_CAR",
+      `Updated ID: ${req.params.id}`,
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Delete rental car
-app.delete("/api/rental-cars/:id", verifyToken, (req, res) => {
-  db.run(
-    "DELETE FROM rental_cars WHERE id = ?",
-    [req.params.id],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Rental car deleted" });
-      }
-    }
-  );
+app.delete("/api/rental-cars/:id", verifyToken, async (req, res) => {
+  try {
+    await pool.query("DELETE FROM rental_cars WHERE id = $1", [req.params.id]);
+    await logActivity(
+      req.user.id,
+      "DELETE_CAR",
+      `Deleted ID: ${req.params.id}`,
+    );
+    res.json({ message: "Rental car deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// ============================================
-// Gallery Routes
-// ============================================
+// ===== GALLERY ENDPOINTS =====
 
 // Get all gallery items
-app.get("/api/gallery", (req, res) => {
-  db.all("SELECT * FROM gallery ORDER BY created_at DESC", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(rows);
-    }
-  });
+app.get("/api/gallery", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM gallery ORDER BY created_at DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Add gallery item (image)
+// Add gallery image
 app.post(
   "/api/gallery/image",
   verifyToken,
   upload.single("image"),
-  (req, res) => {
+  async (req, res) => {
     const { title, description } = req.body;
 
     if (!req.file) {
@@ -913,32 +1025,25 @@ app.post(
     const url = req.file.path;
     const thumbnail = req.file.path.replace(
       "/upload/",
-      "/upload/w_400,h_300,c_fill/"
+      "/upload/w_400,h_300,c_fill/",
     );
 
-    db.run(
-      "INSERT INTO gallery (type, url, thumbnail, title, description) VALUES (?, ?, ?, ?, ?)",
-      ["image", url, thumbnail, title, description],
-      function (err) {
-        if (err) {
-          res.status(500).json({ error: err.message });
-        } else {
-          res.json({
-            id: this.lastID,
-            type: "image",
-            url,
-            thumbnail,
-            title,
-            description,
-          });
-        }
-      }
-    );
-  }
+    try {
+      const result = await pool.query(
+        "INSERT INTO gallery (type, url, thumbnail, title, description) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        ["image", url, thumbnail, title, description],
+      );
+
+      await logActivity(req.user.id, "ADD_GALLERY_IMAGE", title);
+      res.json(result.rows[0]);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
 );
 
-// Add gallery item (video)
-app.post("/api/gallery/video", verifyToken, (req, res) => {
+// Add gallery video
+app.post("/api/gallery/video", verifyToken, async (req, res) => {
   const { url, title, description } = req.body;
 
   if (!url || !title) {
@@ -955,94 +1060,98 @@ app.post("/api/gallery/video", verifyToken, (req, res) => {
     embedUrl = `https://www.youtube.com/embed/${videoId}`;
   }
 
-  // Get YouTube thumbnail
   const videoId = embedUrl.split("/embed/")[1]?.split("?")[0];
   const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-  db.run(
-    "INSERT INTO gallery (type, url, thumbnail, title, description) VALUES (?, ?, ?, ?, ?)",
-    ["video", embedUrl, thumbnail, title, description],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({
-          id: this.lastID,
-          type: "video",
-          url: embedUrl,
-          thumbnail,
-          title,
-          description,
-        });
-      }
-    }
-  );
+  try {
+    const result = await pool.query(
+      "INSERT INTO gallery (type, url, thumbnail, title, description) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      ["video", embedUrl, thumbnail, title, description],
+    );
+
+    await logActivity(req.user.id, "ADD_GALLERY_VIDEO", title);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Update gallery item
-app.put("/api/gallery/:id", verifyToken, (req, res) => {
+app.put("/api/gallery/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { title, description } = req.body;
 
-  db.run(
-    "UPDATE gallery SET title = ?, description = ? WHERE id = ?",
-    [title, description, id],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else if (this.changes === 0) {
-        res.status(404).json({ error: "Gallery item not found" });
-      } else {
-        res.json({ message: "Gallery item updated" });
-      }
-    }
-  );
-});
+  try {
+    const result = await pool.query(
+      "UPDATE gallery SET title = $1, description = $2 WHERE id = $3 RETURNING *",
+      [title, description, id],
+    );
 
-// Delete gallery item
-app.delete("/api/gallery/:id", verifyToken, (req, res) => {
-  const { id } = req.params;
-
-  db.get("SELECT * FROM gallery WHERE id = ?", [id], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (!row) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: "Gallery item not found" });
     }
 
-    // If it's an image, delete from Cloudinary
-    if (row.type === "image" && row.url.includes("cloudinary")) {
-      const publicId = row.url.split("/").slice(-2).join("/").split(".")[0];
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete gallery item
+app.delete("/api/gallery/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query("SELECT * FROM gallery WHERE id = $1", [
+      id,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Gallery item not found" });
+    }
+
+    const item = result.rows[0];
+
+    // If image, delete from Cloudinary
+    if (item.type === "image" && item.url.includes("cloudinary")) {
+      const publicId = item.url.split("/").slice(-2).join("/").split(".")[0];
       cloudinary.uploader.destroy(publicId, (error) => {
         if (error) console.error("Error deleting from Cloudinary:", error);
       });
     }
 
-    db.run("DELETE FROM gallery WHERE id = ?", [id], function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
-        res.json({ message: "Gallery item deleted" });
-      }
-    });
-  });
+    await pool.query("DELETE FROM gallery WHERE id = $1", [id]);
+    await logActivity(req.user.id, "DELETE_GALLERY", item.title);
+
+    res.json({ message: "Gallery item deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
+// ===== UTILITY ENDPOINTS =====
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", timestamp: new Date().toISOString() });
+  res.json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    database: "PostgreSQL",
+  });
 });
 
-// Root endpoint - API info
+// Root endpoint
 app.get("/", (req, res) => {
   res.json({
-    message: "Tourism Website API",
+    message: "Tourism Website API - PostgreSQL",
     status: "running",
     endpoints: {
+      auth: "/api/auth",
       destinations: "/api/destinations",
       tours: "/api/tours",
-      auth: "/api/auth",
+      rentalCars: "/api/rental-cars",
+      gallery: "/api/gallery",
+      admin: "/api/admin",
       upload: "/api/upload",
       health: "/api/health",
     },
@@ -1051,16 +1160,21 @@ app.get("/", (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📊 Database: PostgreSQL`);
 });
 
 // Graceful shutdown
-process.on("SIGINT", () => {
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log("Database connection closed");
-    process.exit(0);
-  });
+process.on("SIGINT", async () => {
+  console.log("\n🛑 Shutting down gracefully...");
+  await pool.end();
+  console.log("✅ Database connection closed");
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  console.log("\n🛑 SIGTERM received. Shutting down gracefully...");
+  await pool.end();
+  console.log("✅ Database connection closed");
+  process.exit(0);
 });
