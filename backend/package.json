@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "start:postgres": "node index-postgres.js",
     "dev": "nodemon index.js",
+    "migrate": "node migrate-to-postgres.js",
     "zip": "powershell \"Get-ChildItem -Path . -Exclude node_modules,database.sqlite,*.zip,*.log,.env,dist,temp-check | Compress-Archive -DestinationPath deployment.zip -Force\""
   },
   "keywords": [
@@ -25,6 +27,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
+    "pg": "^8.11.3",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

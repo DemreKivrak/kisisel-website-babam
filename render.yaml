@@ -1,17 +1,28 @@
 services:
+  # PostgreSQL Database
+  - type: pserv
+    name: kisisel-website-postgres
+    plan: starter
+    region: frankfurt
+    databaseName: tourism_db
+    databaseUser: tourism_user
+    ipAllowList: []
+
   # Backend API Service
   - type: web
     name: kisisel-website-backend
     runtime: node
     plan: starter
-    region: frankfurt # veya oregon
+    region: frankfurt
     buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    startCommand: cd backend && node index-postgres.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DB_PATH
-        value: /data/database.sqlite
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kisisel-website-postgres
+          property: connectionString
       - key: PORT
         value: 10000
       - key: JWT_SECRET
@@ -24,10 +35,6 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-    disk:
-      name: database-disk
-      mountPath: /data
-      sizeGB: 1
 
   # Frontend Static Site
   - type: web
