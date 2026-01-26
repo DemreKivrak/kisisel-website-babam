@@ -14,11 +14,29 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Check if DATABASE_URL is provided
+if (!process.env.DATABASE_URL) {
+  console.error("❌ DATABASE_URL is not set in .env file");
+  console.log("\n📋 Please set up your database:");
+  console.log("   Option 1: Install PostgreSQL locally");
+  console.log("   - Download: https://www.postgresql.org/download/");
+  console.log("   - Set DATABASE_URL in .env:");
+  console.log(
+    "     DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/tourism_website\n",
+  );
+  console.log("   Option 2: Use remote PostgreSQL (Render)");
+  console.log("   - Uncomment the production DATABASE_URL in .env\n");
+  process.exit(1);
+}
+
 // PostgreSQL connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === "production"
+  ssl: process.env.DATABASE_URL?.includes("render.com")
+    ? {
+        rejectUnauthorized: false,
+      }
+    : process.env.NODE_ENV === "production"
       ? {
           rejectUnauthorized: false,
         }
@@ -244,6 +262,14 @@ const verifyToken = (req, res, next) => {
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });
   }
+};
+
+// Middleware to verify super admin role
+const verifySuperAdmin = (req, res, next) => {
+  if (req.user.role !== "super_admin") {
+    return res.status(403).json({ error: "Access denied. Super admin only." });
+  }
+  next();
 };
 
 // Helper function to log admin activity
@@ -1128,6 +1154,276 @@ app.delete("/api/gallery/:id", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ===== UTILITY ENDPOINTS =====
+
+// ===== ADMIN MANAGEMENT ENDPOINTS (SUPER ADMIN ONLY) =====
+
+// Get all admins
+app.get("/api/admin/users", verifyToken, verifySuperAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, username, email, full_name, role, is_active, created_at FROM users ORDER BY created_at DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create new admin
+app.post(
+  "/api/admin/users",
+  verifyToken,
+  verifySuperAdmin,
+  async (req, res) => {
+    const { username, password, email, full_name, role } = req.body;
+
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters" });
+    }
+
+    if (!role || !["admin", "super_admin"].includes(role)) {
+      return res
+        .status(400)
+        .json({ error: "Invalid role. Must be 'admin' or 'super_admin'" });
+    }
+
+    try {
+      // Check if username already exists
+      const existingUser = await pool.query(
+        "SELECT id FROM users WHERE username = $1",
+        [username],
+      );
+
+      if (existingUser.rows.length > 0) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Insert new user
+      const result = await pool.query(
+        "INSERT INTO users (username, password, email, full_name, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, full_name, role, created_at",
+        [username, hashedPassword, email || null, full_name || null, role],
+      );
+
+      await logActivity(
+        req.user.id,
+        "CREATE_ADMIN",
+        `Created new admin: ${username}`,
+        req.ip,
+      );
+
+      res.status(201).json({
+        message: "Admin created successfully",
+        user: result.rows[0],
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
+
+// Update admin
+app.put(
+  "/api/admin/users/:id",
+  verifyToken,
+  verifySuperAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    const { username, email, full_name, role, is_active } = req.body;
+
+    if (!role || !["admin", "super_admin"].includes(role)) {
+      return res
+        .status(400)
+        .json({ error: "Invalid role. Must be 'admin' or 'super_admin'" });
+    }
+
+    try {
+      // Check if user exists
+      const userCheck = await pool.query("SELECT * FROM users WHERE id = $1", [
+        id,
+      ]);
+
+      if (userCheck.rows.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Don't allow changing own super_admin status
+      if (parseInt(id) === req.user.id && role !== "super_admin") {
+        return res
+          .status(400)
+          .json({ error: "Cannot change your own super admin status" });
+      }
+
+      // Update user
+      const result = await pool.query(
+        "UPDATE users SET username = $1, email = $2, full_name = $3, role = $4, is_active = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING id, username, email, full_name, role, is_active, updated_at",
+        [
+          username,
+          email,
+          full_name,
+          role,
+          is_active !== undefined ? is_active : true,
+          id,
+        ],
+      );
+
+      await logActivity(
+        req.user.id,
+        "UPDATE_ADMIN",
+        `Updated admin: ${username}`,
+        req.ip,
+      );
+
+      res.json({
+        message: "Admin updated successfully",
+        user: result.rows[0],
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
+
+// Delete admin
+app.delete(
+  "/api/admin/users/:id",
+  verifyToken,
+  verifySuperAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      // Check if user exists
+      const userCheck = await pool.query("SELECT * FROM users WHERE id = $1", [
+        id,
+      ]);
+
+      if (userCheck.rows.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Don't allow deleting yourself
+      if (parseInt(id) === req.user.id) {
+        return res
+          .status(400)
+          .json({ error: "Cannot delete your own account" });
+      }
+
+      const username = userCheck.rows[0].username;
+
+      // Delete user
+      await pool.query("DELETE FROM users WHERE id = $1", [id]);
+
+      await logActivity(
+        req.user.id,
+        "DELETE_ADMIN",
+        `Deleted admin: ${username}`,
+        req.ip,
+      );
+
+      res.json({ message: "Admin deleted successfully" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
+
+// Reset admin password (by super admin)
+app.post(
+  "/api/admin/users/:id/reset-password",
+  verifyToken,
+  verifySuperAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ error: "New password is required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters" });
+    }
+
+    try {
+      // Check if user exists
+      const userCheck = await pool.query("SELECT * FROM users WHERE id = $1", [
+        id,
+      ]);
+
+      if (userCheck.rows.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const username = userCheck.rows[0].username;
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      await pool.query(
+        "UPDATE users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2",
+        [hashedPassword, id],
+      );
+
+      await logActivity(
+        req.user.id,
+        "RESET_PASSWORD",
+        `Reset password for: ${username}`,
+        req.ip,
+      );
+
+      res.json({ message: "Password reset successfully" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
+
+// Get admin activity logs
+app.get(
+  "/api/admin/activity-logs",
+  verifyToken,
+  verifySuperAdmin,
+  async (req, res) => {
+    const limit = parseInt(req.query.limit) || 100;
+
+    try {
+      const result = await pool.query(
+        `SELECT 
+        l.id, 
+        l.action, 
+        l.details, 
+        l.ip_address, 
+        l.created_at,
+        u.username,
+        u.full_name
+      FROM admin_activity_log l
+      JOIN users u ON l.user_id = u.id
+      ORDER BY l.created_at DESC
+      LIMIT $1`,
+        [limit],
+      );
+      res.json(result.rows);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
 
 // ===== UTILITY ENDPOINTS =====
 

@@ -72,8 +72,26 @@ export function AuthProvider({ children }) {
     return localStorage.getItem("adminToken");
   };
 
+  const isSuperAdmin = () => {
+    return user?.role === "super_admin";
+  };
+
+  const isAdmin = () => {
+    return user?.role === "admin" || user?.role === "super_admin";
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, getToken }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        getToken,
+        isSuperAdmin,
+        isAdmin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

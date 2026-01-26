@@ -129,7 +129,7 @@ export const api = {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify(data),
-      }
+      },
     );
     if (!response.ok) throw new Error("Failed to update pricing");
     return response.json();
@@ -141,7 +141,7 @@ export const api = {
       {
         method: "DELETE",
         headers: getAuthHeaders(),
-      }
+      },
     );
     if (!response.ok) throw new Error("Failed to delete pricing");
     return response.json();
@@ -279,6 +279,120 @@ export const api = {
       headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error("Failed to delete gallery item");
+    return response.json();
+  },
+
+  // Admin Management (Super Admin only)
+  getAdminUsers: async () => {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to fetch admin users");
+    return response.json();
+  },
+
+  createAdminUser: async (userData) => {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to create admin user");
+    }
+    return response.json();
+  },
+
+  updateAdminUser: async (id, userData) => {
+    const response = await fetch(`${API_URL}/admin/users/${id}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to update admin user");
+    }
+    return response.json();
+  },
+
+  deleteAdminUser: async (id) => {
+    const response = await fetch(`${API_URL}/admin/users/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to delete admin user");
+    }
+    return response.json();
+  },
+
+  resetAdminPassword: async (id, newPassword) => {
+    const response = await fetch(
+      `${API_URL}/admin/users/${id}/reset-password`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ newPassword }),
+      },
+    );
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to reset password");
+    }
+    return response.json();
+  },
+
+  getActivityLogs: async (limit = 100) => {
+    const response = await fetch(
+      `${API_URL}/admin/activity-logs?limit=${limit}`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to fetch activity logs");
+    return response.json();
+  },
+
+  // Authentication
+  login: async (username, password) => {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Login failed");
+    }
+    return response.json();
+  },
+
+  verifyToken: async () => {
+    const response = await fetch(`${API_URL}/auth/verify`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Token verification failed");
+    return response.json();
+  },
+
+  changePassword: async (currentPassword, newPassword) => {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to change password");
+    }
     return response.json();
   },
 };

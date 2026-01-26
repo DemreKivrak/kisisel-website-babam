@@ -11,6 +11,8 @@ export function Admin() {
   const [tours, setTours] = useState([]);
   const [rentalCars, setRentalCars] = useState([]);
   const [galleryItems, setGalleryItems] = useState([]);
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
@@ -33,10 +35,20 @@ export function Admin() {
     price_per_person: "",
   });
 
-  // Load data on mount
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Admin management state
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [adminFormData, setAdminFormData] = useState({
+    username: "",
+    password: "",
+    email: "",
+    full_name: "",
+    role: "admin",
+    is_active: true,
+  });
+  const [editingAdmin, setEditingAdmin] = useState(null);
+  const [adminError, setAdminError] = useState("");
+
+  const isSuperAdmin = user?.role === "super_admin";
 
   const loadData = async () => {
     try {
@@ -51,6 +63,20 @@ export function Admin() {
       setTours(toursData);
       setRentalCars(rentalCarsData);
       setGalleryItems(galleryData);
+
+      // Load admin users and activity logs if super admin
+      if (user?.role === "super_admin") {
+        try {
+          const [usersData, logsData] = await Promise.all([
+            api.getAdminUsers(),
+            api.getActivityLogs(50),
+          ]);
+          setAdminUsers(usersData);
+          setActivityLogs(logsData);
+        } catch (error) {
+          console.error("Error loading admin data:", error);
+        }
+      }
     } catch (error) {
       console.error("Error loading data:", error);
       alert("Failed to load data from server");
@@ -58,6 +84,36 @@ export function Admin() {
       setLoading(false);
     }
   };
+
+  // Load data on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  // Reload admin data when switching to admin tabs
+  useEffect(() => {
+    const loadAdminData = async () => {
+      if (
+        user?.role === "super_admin" &&
+        (activeTab === "admin-users" || activeTab === "activity-logs")
+      ) {
+        try {
+          const [usersData, logsData] = await Promise.all([
+            api.getAdminUsers(),
+            api.getActivityLogs(50),
+          ]);
+          setAdminUsers(usersData);
+          setActivityLogs(logsData);
+        } catch (error) {
+          console.error("Error loading admin data:", error);
+        }
+      }
+    };
+    loadAdminData();
+  }, [activeTab, user]);
 
   // Logout handler
   const handleLogout = () => {
@@ -93,7 +149,7 @@ export function Admin() {
     try {
       await api.changePassword(
         passwordData.currentPassword,
-        passwordData.newPassword
+        passwordData.newPassword,
       );
       setPasswordSuccess(true);
       setPasswordData({
@@ -180,8 +236,8 @@ export function Admin() {
       await api.updateDestination(editingItem, updatedData);
       setDestinations(
         destinations.map((d) =>
-          d.id === editingItem ? { ...d, ...updatedData } : d
-        )
+          d.id === editingItem ? { ...d, ...updatedData } : d,
+        ),
       );
       setEditingItem(null);
       setFormData({});
@@ -256,7 +312,7 @@ export function Admin() {
     if (confirm("Are you sure you want to remove this image?")) {
       const currentImages = formData.images ? formData.images.split(",") : [];
       const updatedImages = currentImages.filter(
-        (img) => img.trim() !== imageUrl.trim()
+        (img) => img.trim() !== imageUrl.trim(),
       );
       setFormData({ ...formData, images: updatedImages.join(",") });
     }
@@ -285,7 +341,7 @@ export function Admin() {
 
       await api.updateTour(editingItem, updatedData);
       setTours(
-        tours.map((t) => (t.id === editingItem ? { ...t, ...updatedData } : t))
+        tours.map((t) => (t.id === editingItem ? { ...t, ...updatedData } : t)),
       );
       setEditingItem(null);
       setFormData({});
@@ -408,8 +464,8 @@ export function Admin() {
         await api.updateRentalCar(editingItem.id, carData);
         setRentalCars(
           rentalCars.map((c) =>
-            c.id === editingItem.id ? { ...carData, id: c.id } : c
-          )
+            c.id === editingItem.id ? { ...carData, id: c.id } : c,
+          ),
         );
         handleCancel();
       } catch (error) {
@@ -441,6 +497,93 @@ export function Admin() {
     setNewPricing({ min_persons: "", max_persons: "", price_per_person: "" });
   };
 
+  // Admin Management Functions
+  const handleAddAdmin = () => {
+    setEditingAdmin(null);
+    setAdminFormData({
+      username: "",
+      password: "",
+      email: "",
+      full_name: "",
+      role: "admin",
+      is_active: true,
+    });
+    setAdminError("");
+    setShowAdminModal(true);
+  };
+
+  const handleEditAdmin = (admin) => {
+    setEditingAdmin(admin);
+    setAdminFormData({
+      ...admin,
+      password: "", // Don't show existing password
+    });
+    setAdminError("");
+    setShowAdminModal(true);
+  };
+
+  const handleSaveAdmin = async (e) => {
+    e.preventDefault();
+    setAdminError("");
+
+    try {
+      if (editingAdmin) {
+        // Update existing admin
+        const updateData = {
+          username: adminFormData.username,
+          email: adminFormData.email,
+          full_name: adminFormData.full_name,
+          role: adminFormData.role,
+          is_active: adminFormData.is_active,
+        };
+        await api.updateAdminUser(editingAdmin.id, updateData);
+        const updatedUsers = await api.getAdminUsers();
+        setAdminUsers(updatedUsers);
+        alert("Admin updated successfully");
+      } else {
+        // Create new admin
+        await api.createAdminUser(adminFormData);
+        const updatedUsers = await api.getAdminUsers();
+        setAdminUsers(updatedUsers);
+        alert("Admin created successfully");
+      }
+      setShowAdminModal(false);
+    } catch (error) {
+      setAdminError(error.message);
+    }
+  };
+
+  const handleDeleteAdmin = async (adminId, username) => {
+    if (confirm(`Are you sure you want to delete admin user: ${username}?`)) {
+      try {
+        await api.deleteAdminUser(adminId);
+        const updatedUsers = await api.getAdminUsers();
+        setAdminUsers(updatedUsers);
+        alert("Admin deleted successfully");
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+  };
+
+  const handleResetPassword = async (adminId, username) => {
+    const newPassword = prompt(
+      `Enter new password for ${username} (minimum 6 characters):`,
+    );
+    if (newPassword) {
+      if (newPassword.length < 6) {
+        alert("Password must be at least 6 characters");
+        return;
+      }
+      try {
+        await api.resetAdminPassword(adminId, newPassword);
+        alert("Password reset successfully");
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -462,8 +605,18 @@ export function Admin() {
             <p className="text-gray-600">
               Manage destinations and tours{" "}
               {user && (
-                <span className="text-sm text-amber-600 font-medium">
-                  • Logged in as {user.username}
+                <span className="text-sm font-medium">
+                  • Logged in as{" "}
+                  <span className="text-amber-600">{user.username}</span>{" "}
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs ${
+                      user.role === "super_admin"
+                        ? "bg-purple-100 text-purple-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {user.role === "super_admin" ? "Super Admin" : "Admin"}
+                  </span>
                 </span>
               )}
             </p>
@@ -554,6 +707,30 @@ export function Admin() {
           >
             Galeri ({galleryItems.length})
           </button>
+          {isSuperAdmin && (
+            <>
+              <button
+                onClick={() => setActiveTab("admin-users")}
+                className={`px-6 py-3 rounded-lg font-semibold transition ${
+                  activeTab === "admin-users"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Admin Users ({adminUsers.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("activity-logs")}
+                className={`px-6 py-3 rounded-lg font-semibold transition ${
+                  activeTab === "activity-logs"
+                    ? "bg-indigo-600 text-white shadow-lg"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Activity Logs
+              </button>
+            </>
+          )}
         </div>
 
         {/* Destinations Tab */}
@@ -1111,7 +1288,7 @@ export function Admin() {
                                     onClick={() =>
                                       handleDeletePricing(
                                         formData.id,
-                                        pricing.id
+                                        pricing.id,
                                       )
                                     }
                                     className="text-red-600 hover:text-red-800 font-semibold"
@@ -1770,13 +1947,13 @@ export function Admin() {
                       await api.addGalleryImage(
                         imageFile,
                         formData.title,
-                        formData.description
+                        formData.description,
                       );
                     } else {
                       await api.addGalleryVideo(
                         formData.url,
                         formData.title,
-                        formData.description
+                        formData.description,
                       );
                     }
 
@@ -1939,7 +2116,7 @@ export function Admin() {
                               await api.updateGalleryItem(
                                 editingItem.id,
                                 editingItem.title,
-                                editingItem.description
+                                editingItem.description,
                               );
                               await loadData();
                               setEditingItem(null);
@@ -1977,7 +2154,7 @@ export function Admin() {
                           onClick={async () => {
                             if (
                               confirm(
-                                "Bu öğeyi silmek istediğinize emin misiniz?"
+                                "Bu öğeyi silmek istediğinize emin misiniz?",
                               )
                             ) {
                               try {
@@ -2006,6 +2183,336 @@ export function Admin() {
               <p>Henüz galeri öğesi eklenmemiş.</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Admin Users Tab (Super Admin Only) */}
+      {activeTab === "admin-users" && isSuperAdmin && (
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Admin User Management</h2>
+            <button
+              onClick={handleAddAdmin}
+              className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition flex items-center gap-2"
+            >
+              <span className="text-xl">+</span> Add New Admin
+            </button>
+          </div>
+
+          {/* Admin Users Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-3 text-left">Username</th>
+                  <th className="px-4 py-3 text-left">Full Name</th>
+                  <th className="px-4 py-3 text-left">Email</th>
+                  <th className="px-4 py-3 text-left">Role</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-left">Created At</th>
+                  <th className="px-4 py-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adminUsers.map((admin) => (
+                  <tr key={admin.id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium">{admin.username}</td>
+                    <td className="px-4 py-3">{admin.full_name || "-"}</td>
+                    <td className="px-4 py-3">{admin.email || "-"}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          admin.role === "super_admin"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {admin.role === "super_admin" ? "Super Admin" : "Admin"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          admin.is_active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {admin.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {new Date(admin.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => handleEditAdmin(admin)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+                          title="Edit"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleResetPassword(admin.id, admin.username)
+                          }
+                          className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 text-sm"
+                          title="Reset Password"
+                        >
+                          Reset Pwd
+                        </button>
+                        {admin.id !== user.id && (
+                          <button
+                            onClick={() =>
+                              handleDeleteAdmin(admin.id, admin.username)
+                            }
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+                            title="Delete"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {adminUsers.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              <p>No admin users found.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Activity Logs Tab (Super Admin Only) */}
+      {activeTab === "activity-logs" && isSuperAdmin && (
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Admin Activity Logs</h2>
+            <button
+              onClick={async () => {
+                const logs = await api.getActivityLogs(50);
+                setActivityLogs(logs);
+              }}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {/* Activity Logs Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-3 text-left">Date/Time</th>
+                  <th className="px-4 py-3 text-left">User</th>
+                  <th className="px-4 py-3 text-left">Action</th>
+                  <th className="px-4 py-3 text-left">Details</th>
+                  <th className="px-4 py-3 text-left">IP Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activityLogs.map((log) => (
+                  <tr key={log.id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-600">
+                      {new Date(log.created_at).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div>
+                        <div className="font-medium">{log.username}</div>
+                        {log.full_name && (
+                          <div className="text-xs text-gray-500">
+                            {log.full_name}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-semibold">
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {log.details || "-"}
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 text-xs">
+                      {log.ip_address || "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {activityLogs.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              <p>No activity logs found.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Admin Modal */}
+      {showAdminModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold mb-6">
+              {editingAdmin ? "Edit Admin User" : "Create New Admin User"}
+            </h2>
+
+            {adminError && (
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+                <p className="text-sm">{adminError}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveAdmin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  value={adminFormData.username}
+                  onChange={(e) =>
+                    setAdminFormData({
+                      ...adminFormData,
+                      username: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  placeholder="Enter username"
+                  required
+                />
+              </div>
+
+              {!editingAdmin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password *
+                  </label>
+                  <input
+                    type="password"
+                    value={adminFormData.password}
+                    onChange={(e) =>
+                      setAdminFormData({
+                        ...adminFormData,
+                        password: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    placeholder="Enter password (min 6 characters)"
+                    required={!editingAdmin}
+                    minLength={6}
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={adminFormData.full_name}
+                  onChange={(e) =>
+                    setAdminFormData({
+                      ...adminFormData,
+                      full_name: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  placeholder="Enter full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={adminFormData.email}
+                  onChange={(e) =>
+                    setAdminFormData({
+                      ...adminFormData,
+                      email: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  placeholder="Enter email"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role *
+                </label>
+                <select
+                  value={adminFormData.role}
+                  onChange={(e) =>
+                    setAdminFormData({
+                      ...adminFormData,
+                      role: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  required
+                >
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </div>
+
+              {editingAdmin && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    checked={adminFormData.is_active}
+                    onChange={(e) =>
+                      setAdminFormData({
+                        ...adminFormData,
+                        is_active: e.target.checked,
+                      })
+                    }
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="is_active"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Account Active
+                  </label>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition"
+                >
+                  {editingAdmin ? "Update Admin" : "Create Admin"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAdminModal(false);
+                    setAdminError("");
+                  }}
+                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
