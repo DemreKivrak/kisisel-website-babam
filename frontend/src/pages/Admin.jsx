@@ -289,6 +289,7 @@ export function Admin() {
           included: formData.included || "",
           not_included: formData.not_included || "",
           itinerary: formData.itinerary || "",
+          language: formData.language || "tr",
           is_recommended: formData.is_recommended || false,
         });
         setTours([...tours, newTour]);
@@ -339,7 +340,11 @@ export function Admin() {
         images: imageUrls.join(","),
       };
 
-      await api.updateTour(editingItem, updatedData);
+      console.log("Updating tour with data:", updatedData); // Debug log
+
+      const response = await api.updateTour(editingItem, updatedData);
+      console.log("Update response:", response); // Debug log
+
       setTours(
         tours.map((t) => (t.id === editingItem ? { ...t, ...updatedData } : t)),
       );
@@ -974,6 +979,19 @@ export function Admin() {
                     }
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                   />
+                  <select
+                    value={formData.language || "tr"}
+                    onChange={(e) =>
+                      setFormData({ ...formData, language: e.target.value })
+                    }
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="tr">Turkish (Türkçe)</option>
+                    <option value="en">English (İngilizce)</option>
+                    <option value="de">German (Almanca)</option>
+                    <option value="ru">Russian (Rusça)</option>
+                    <option value="ar">Arabic (Arapça)</option>
+                  </select>
                   <textarea
                     placeholder="Overview"
                     value={formData.overview || ""}
@@ -1127,6 +1145,26 @@ export function Admin() {
                           }
                           className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                         />
+                        <select
+                          value={formData.language || "tr"}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              language: e.target.value,
+                            })
+                          }
+                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                        >
+                          <option value="tr">Turkish (Türkçe)</option>
+                          <option value="en">English (İngilizce)</option>
+                          <option value="de">German (Almanca)</option>
+                          <option value="ru">Russian (Rusça)</option>
+                          <option value="ar">Arabic (Arapça)</option>
+                          <option value="fr">French (Fransızca)</option>
+                          <option value="es">Spanish (İspanyolca)</option>
+                          <option value="it">Italian (İtalyanca)</option>
+                          <option value="ja">Japanese (Japonca)</option>
+                        </select>
                         <textarea
                           placeholder="Overview"
                           value={formData.overview || ""}

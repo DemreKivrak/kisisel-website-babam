@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Header } from "../../components/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
 import { PageEnd } from "../../components/PageEnd";
@@ -9,15 +9,42 @@ import { WhatsappContact } from "../../components/WhatsappContact";
 
 export function Tours() {
   const { t } = useTranslation();
+  const location = useLocation();
   const [selectedDestination, setSelectedDestination] = useState("All");
+  const [selectedLanguage, setSelectedLanguage] = useState("All");
   const [tours, setTours] = useState([]);
   const [destinations, setDestinations] = useState(["All"]);
+  const [availableLanguages, setAvailableLanguages] = useState(["All"]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const languageNames = {
+    All: "All Languages",
+    tr: "🇹🇷 Türkçe",
+    en: "🇬🇧 English",
+    de: "🇩🇪 Deutsch",
+    ru: "🇷🇺 Русский",
+    ar: "🇸🇦 العربية",
+    fr: "🇫🇷 Français",
+    es: "🇪🇸 Español",
+    it: "🇮🇹 Italiano",
+    ja: "🇯🇵 日本語",
+  };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // Separate effect to watch for URL changes
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const languageParam = urlParams.get("language");
+    if (languageParam) {
+      setSelectedLanguage(languageParam);
+    } else {
+      setSelectedLanguage("All");
+    }
+  }, [location.search]);
 
   const loadData = async () => {
     try {
@@ -48,6 +75,13 @@ export function Tours() {
         ...new Set(toursData.map((t) => t.destination)),
       ];
       setDestinations(uniqueDestinations);
+
+      // Build languages list from unique tour languages
+      const uniqueLanguages = [
+        "All",
+        ...new Set(toursData.map((t) => t.language || "tr")),
+      ];
+      setAvailableLanguages(uniqueLanguages);
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -55,67 +89,29 @@ export function Tours() {
     }
   };
 
-  const toursHardcoded = [
-    {
-      id: 1,
-      name: "MEDITERRANEAN GLAMOUR",
-      destination: "Antalya",
-      duration: "04 Nights / 05 Days",
-      price: "775 €",
-      img: "homepage-pic-1.jpg",
-      type: "Guaranteed Departured Tour with Flights",
-    },
-    {
-      id: 2,
-      name: "CAPPADOCIA DAYDREAM",
-      destination: "Cappadocia",
-      duration: "01 Night / 02 Days",
-      price: "365 €",
-      img: "homepage-pic-1.jpg",
-      type: "Guaranteed Departured Tours",
-    },
-    {
-      id: 3,
-      name: "ISTANBUL HIGHLIGHTS",
-      destination: "Istanbul",
-      duration: "03 Nights / 04 Days",
-      price: "520 €",
-      img: "homepage-pic-1.jpg",
-      type: "Guaranteed Departured Tour with Flights",
-    },
-    {
-      id: 4,
-      name: "AEGEAN PARADISE",
-      destination: "Bodrum",
-      duration: "05 Nights / 06 Days",
-      price: "890 €",
-      img: "homepage-pic-1.jpg",
-      type: "Guaranteed Departured Tour with Flights",
-    },
-    {
-      id: 5,
-      name: "BLACK SEA ADVENTURE",
-      destination: "Trabzon",
-      duration: "04 Nights / 05 Days",
-      price: "650 €",
-      img: "homepage-pic-1.jpg",
-      type: "Guaranteed Departured Tours",
-    },
-    {
-      id: 6,
-      name: "PAMUKKALE THERMAL",
-      destination: "Pamukkale",
-      duration: "02 Nights / 03 Days",
-      price: "425 €",
-      img: "homepage-pic-1.jpg",
-      type: "Guaranteed Departured Tours",
-    },
-  ];
+  const filteredTours = tours.filter((tour) => {
+    const matchesDestination =
+      selectedDestination === "All" || tour.destination === selectedDestination;
+    const matchesLanguage =
+      selectedLanguage === "All" ||
+      (tour.language || "tr") === selectedLanguage;
 
-  const filteredTours =
-    selectedDestination === "All"
-      ? tours
-      : tours.filter((tour) => tour.destination === selectedDestination);
+    // Debug logging
+    if (selectedLanguage !== "All") {
+      console.log(
+        "Tour:",
+        tour.name,
+        "Language:",
+        tour.language || "tr",
+        "Selected:",
+        selectedLanguage,
+        "Matches:",
+        matchesLanguage,
+      );
+    }
+
+    return matchesDestination && matchesLanguage;
+  });
 
   if (loading) {
     return (
@@ -153,20 +149,48 @@ export function Tours() {
 
       {/* Filter Section */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {destinations.map((dest) => (
-            <button
-              key={dest}
-              onClick={() => setSelectedDestination(dest)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                selectedDestination === dest
-                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg scale-105"
-                  : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
-              }`}
-            >
-              {dest}
-            </button>
-          ))}
+        {/* Language Filter */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">
+            Filter by Language:
+          </h3>
+          <div className="flex flex-wrap justify-center gap-3">
+            {availableLanguages.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setSelectedLanguage(lang)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                  selectedLanguage === lang
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105"
+                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                }`}
+              >
+                {languageNames[lang] || lang}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Destination Filter */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">
+            Filter by Destination:
+          </h3>
+          <div className="flex flex-wrap justify-center gap-3">
+            {destinations.map((dest) => (
+              <button
+                key={dest}
+                onClick={() => setSelectedDestination(dest)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                  selectedDestination === dest
+                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg scale-105"
+                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                }`}
+              >
+                {dest}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Tours Grid */}
@@ -183,6 +207,10 @@ export function Tours() {
                   alt={tour.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
+                {/*language badge*/}
+                <div className="absolute top-3 right-3 bg-gradient-to-r from bg-orange-400 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                  {languageNames[tour.language]}
+                </div>
               </div>
 
               {/* Tour Info */}

@@ -21,6 +21,18 @@ export function TourPage() {
     });
   };
 
+  const languageNames = {
+    tr: "Turkish",
+    en: "English",
+    de: "German",
+    ru: "Russian",
+    ar: "Arabic",
+    fr: "French",
+    es: "Spanish",
+    it: "Italian",
+    ja: "Japanese",
+  };
+
   useEffect(() => {
     const fetchTourData = async () => {
       try {
@@ -272,7 +284,7 @@ export function TourPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
-                  <span>English-speaking guide</span>
+                  <span>{languageNames[tourData.language]} speaking guide</span>
                 </div>
               </div>
             </div>

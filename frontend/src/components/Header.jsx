@@ -10,6 +10,7 @@ export function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [isOnTop, setIsOnTop] = useState(true);
   const [destinations, setDestinations] = useState([]);
+  const [toursByLanguage, setToursByLanguage] = useState({});
   const [mobileDestinationsOpen, setMobileDestinationsOpen] = useState(false);
   const { mobileMenuOpen, setMobileMenuOpen } = useMenu();
   const navigate = useNavigate();
@@ -39,7 +40,28 @@ export function Header() {
       }
     };
 
+    const loadTours = async () => {
+      try {
+        const allTours = await api.getTours();
+
+        // Group tours by language
+        const grouped = allTours.reduce((acc, tour) => {
+          const lang = tour.language || "tr";
+          if (!acc[lang]) {
+            acc[lang] = [];
+          }
+          acc[lang].push(tour);
+          return acc;
+        }, {});
+
+        setToursByLanguage(grouped);
+      } catch (error) {
+        console.error("Error loading tours:", error);
+      }
+    };
+
     loadDestinations();
+    loadTours();
   }, []);
 
   const handleNavigate = (path) => {
@@ -99,7 +121,147 @@ export function Header() {
               onClick={() => navigate("/tours")}
             >
               {t("nav.tours")}
+              <svg
+                className="w-4 h-4 transition-transform group-hover:rotate-180"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </a>
+            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[250px] py-2 z-50 border-1 border-gray-200">
+              {Object.keys(toursByLanguage).length > 0 ? (
+                <>
+                  {toursByLanguage["tr"] &&
+                    toursByLanguage["tr"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=tr");
+                        }}
+                      >
+                        🇹🇷 Türkçe Turlar ({toursByLanguage["tr"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["en"] &&
+                    toursByLanguage["en"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=en");
+                        }}
+                      >
+                        🇬🇧 English Tours ({toursByLanguage["en"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["de"] &&
+                    toursByLanguage["de"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=de");
+                        }}
+                      >
+                        🇩🇪 Deutsche Touren ({toursByLanguage["de"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["ru"] &&
+                    toursByLanguage["ru"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=ru");
+                        }}
+                      >
+                        🇷🇺 Русские туры ({toursByLanguage["ru"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["ar"] &&
+                    toursByLanguage["ar"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=ar");
+                        }}
+                      >
+                        🇸🇦 جولات عربية ({toursByLanguage["ar"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["fr"] &&
+                    toursByLanguage["fr"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=fr");
+                        }}
+                      >
+                        🇫🇷 Circuits français ({toursByLanguage["fr"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["es"] &&
+                    toursByLanguage["es"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=es");
+                        }}
+                      >
+                        🇪🇸 Tours en español ({toursByLanguage["es"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["it"] &&
+                    toursByLanguage["it"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=it");
+                        }}
+                      >
+                        🇮🇹 Tour italiani ({toursByLanguage["it"].length})
+                      </li>
+                    )}
+                  {toursByLanguage["ja"] &&
+                    toursByLanguage["ja"].length > 0 && (
+                      <li
+                        className="px-4 py-2 hover:bg-amber-50 cursor-pointer transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/tours?language=ja");
+                        }}
+                      >
+                        🇯🇵 日本語ツアー ({toursByLanguage["ja"].length})
+                      </li>
+                    )}
+                  <li className="border-t border-gray-200 mt-1 pt-1">
+                    <a
+                      className="block px-4 py-2 hover:bg-amber-50 cursor-pointer transition font-semibold text-amber-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate("/tours");
+                      }}
+                    >
+                      View All Tours →
+                    </a>
+                  </li>
+                </>
+              ) : (
+                <li className="px-4 py-2 text-gray-500">No tours available</li>
+              )}
+            </ul>
           </div>
 
           <div className="relative group">

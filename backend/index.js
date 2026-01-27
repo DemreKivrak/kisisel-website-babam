@@ -70,6 +70,9 @@ const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
       "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "http://localhost:5176",
       "https://www.anatoliahorizon.com",
       "https://www.oltretour.com",
       "https://anatoliahorizon.com",
@@ -132,9 +135,23 @@ async function initializeDatabase() {
         included TEXT,
         not_included TEXT,
         itinerary TEXT,
+        language VARCHAR(10) DEFAULT 'tr',
         is_recommended INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
+    `);
+
+    // Add language column to existing tours table if it doesn't exist
+    await client.query(`
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'tours' AND column_name = 'language'
+        ) THEN 
+          ALTER TABLE tours ADD COLUMN language VARCHAR(10) DEFAULT 'tr';
+        END IF;
+      END $$;
     `);
 
     // Users table - UPDATED with role and multi-admin support
@@ -480,17 +497,27 @@ app.delete("/api/destinations/:id", verifyToken, async (req, res) => {
 
 // ===== TOURS ENDPOINTS =====
 
-// Get all tours
+// Get all tours with optional destination and language filter
 app.get("/api/tours", async (req, res) => {
-  const { destination } = req.query;
+  const { destination, language } = req.query;
 
   try {
     let query = "SELECT * FROM tours";
     let params = [];
+    let conditions = [];
 
     if (destination) {
-      query += " WHERE destination = $1";
+      conditions.push(`destination = $${params.length + 1}`);
       params.push(destination);
+    }
+
+    if (language) {
+      conditions.push(`language = $${params.length + 1}`);
+      params.push(language);
+    }
+
+    if (conditions.length > 0) {
+      query += " WHERE " + conditions.join(" AND ");
     }
 
     query += " ORDER BY created_at DESC";
@@ -563,13 +590,14 @@ app.post("/api/tours", verifyToken, async (req, res) => {
     included,
     not_included,
     itinerary,
+    language,
     is_recommended,
   } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO tours (name, destination, price, duration, description, images, overview, highlights, included, not_included, itinerary, is_recommended) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+      `INSERT INTO tours (name, destination, price, duration, description, images, overview, highlights, included, not_included, itinerary, language, is_recommended) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
         name,
         destination,
@@ -582,6 +610,7 @@ app.post("/api/tours", verifyToken, async (req, res) => {
         included,
         not_included,
         itinerary,
+        language || "tr",
         is_recommended ? 1 : 0,
       ],
     );
@@ -607,14 +636,17 @@ app.put("/api/tours/:id", verifyToken, async (req, res) => {
     included,
     not_included,
     itinerary,
+    language,
     is_recommended,
   } = req.body;
+
+  console.log("Updating tour ID:", req.params.id, "with language:", language); // Debug log
 
   try {
     const result = await pool.query(
       `UPDATE tours SET name = $1, destination = $2, price = $3, duration = $4, description = $5, images = $6, 
-       overview = $7, highlights = $8, included = $9, not_included = $10, itinerary = $11, is_recommended = $12 
-       WHERE id = $13 RETURNING *`,
+       overview = $7, highlights = $8, included = $9, not_included = $10, itinerary = $11, language = $12, is_recommended = $13 
+       WHERE id = $14 RETURNING *`,
       [
         name,
         destination,
@@ -627,10 +659,13 @@ app.put("/api/tours/:id", verifyToken, async (req, res) => {
         included,
         not_included,
         itinerary,
+        language || "tr",
         is_recommended ? 1 : 0,
         req.params.id,
       ],
     );
+
+    console.log("Updated tour result:", result.rows[0]); // Debug log
 
     await logActivity(
       req.user.id,
