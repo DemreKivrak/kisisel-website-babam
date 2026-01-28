@@ -140,10 +140,7 @@ export function Tours() {
           <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4 mt-5">
             {t("tours.allTours")}
           </h1>
-          <p className="text-xl text-gray-600">
-            Explore Turkey's most beautiful destinations with our curated tour
-            packages
-          </p>
+          <p className="text-xl text-gray-600">{t("tours.exploreSubtitle")}</p>
         </div>
       </div>
 
@@ -152,7 +149,7 @@ export function Tours() {
         {/* Language Filter */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Filter by Language:
+            {t("tours.filterByLanguage")}
           </h3>
           <div className="flex flex-wrap justify-center gap-3">
             {availableLanguages.map((lang) => (
@@ -174,7 +171,7 @@ export function Tours() {
         {/* Destination Filter */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Filter by Destination:
+            {t("tours.filterByDestination")}
           </h3>
           <div className="flex flex-wrap justify-center gap-3">
             {destinations.map((dest) => (
@@ -242,9 +239,7 @@ export function Tours() {
         {/* No Results */}
         {filteredTours.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-2xl text-gray-500">
-              No tours found for this destination
-            </p>
+            <p className="text-2xl text-gray-500">{t("tours.noToursFound")}</p>
           </div>
         )}
       </div>

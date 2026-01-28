@@ -71,6 +71,11 @@ const resources = {
         "Carefully curated experiences designed to create unforgettable memories",
       "tours.recommendedBadge": "RECOMMENDED",
       "tours.expertGuide": "Expert Guide Included",
+      "tours.exploreSubtitle":
+        "Explore Turkey's most beautiful destinations with our curated tour packages",
+      "tours.filterByLanguage": "Filter by Language:",
+      "tours.filterByDestination": "Filter by Destination:",
+      "tours.noToursFound": "No tours found for this destination",
 
       // About
       "about.title": "About Us",
@@ -262,6 +267,11 @@ const resources = {
         "Unutulmaz anılar yaratmak için özenle hazırlanmış deneyimler",
       "tours.recommendedBadge": "ÖNERİLEN",
       "tours.expertGuide": "Uzman Rehber Dahil",
+      "tours.exploreSubtitle":
+        "Özenle hazırlanmış tur paketlerimizle Türkiye'nin en güzel destinasyonlarını keşfedin",
+      "tours.filterByLanguage": "Dile Göre Filtrele:",
+      "tours.filterByDestination": "Destinasyona Göre Filtrele:",
+      "tours.noToursFound": "Bu destinasyon için tur bulunamadı",
 
       // About
       "about.title": "Hakkımızda",
@@ -430,6 +440,11 @@ const resources = {
         "Sorgfältig kuratierte Erlebnisse, die unvergessliche Erinnerungen schaffen",
       "tours.recommendedBadge": "EMPFOHLEN",
       "tours.expertGuide": "Expertenführer inbegriffen",
+      "tours.exploreSubtitle":
+        "Entdecken Sie die schönsten Reiseziele der Türkei mit unseren kuratierten Tourpaketen",
+      "tours.filterByLanguage": "Nach Sprache filtern:",
+      "tours.filterByDestination": "Nach Ziel filtern:",
+      "tours.noToursFound": "Keine Touren für dieses Ziel gefunden",
       "common.learnMore": "Mehr erfahren",
       "common.bookNow": "Jetzt buchen",
     },
@@ -480,6 +495,11 @@ const resources = {
         "Des expériences soigneusement sélectionnées conçues pour créer des souvenirs inoubliables",
       "tours.recommendedBadge": "RECOMMANDÉ",
       "tours.expertGuide": "Guide expert inclus",
+      "tours.exploreSubtitle":
+        "Explorez les plus belles destinations de la Turquie avec nos forfaits touristiques sélectionnés",
+      "tours.filterByLanguage": "Filtrer par langue:",
+      "tours.filterByDestination": "Filtrer par destination:",
+      "tours.noToursFound": "Aucun circuit trouvé pour cette destination",
       "common.learnMore": "En savoir plus",
       "common.bookNow": "Réserver maintenant",
     },
@@ -531,6 +551,11 @@ const resources = {
         "Experiencias cuidadosamente seleccionadas diseñadas para crear recuerdos inolvidables",
       "tours.recommendedBadge": "RECOMENDADO",
       "tours.expertGuide": "Guía experto incluido",
+      "tours.exploreSubtitle":
+        "Explore los destinos más hermosos de Turquía con nuestros paquetes turísticos seleccionados",
+      "tours.filterByLanguage": "Filtrar por idioma:",
+      "tours.filterByDestination": "Filtrar por destino:",
+      "tours.noToursFound": "No se encontraron tours para este destino",
       "common.learnMore": "Más información",
       "common.bookNow": "Reservar ahora",
     },
@@ -581,6 +606,11 @@ const resources = {
         "Тщательно подобранные впечатления, созданные для незабываемых воспоминаний",
       "tours.recommendedBadge": "РЕКОМЕНДУЕТСЯ",
       "tours.expertGuide": "Экспертный гид включен",
+      "tours.exploreSubtitle":
+        "Откройте для себя самые красивые направления Турции с нашими туристическими пакетами",
+      "tours.filterByLanguage": "Фильтр по языку:",
+      "tours.filterByDestination": "Фильтр по направлению:",
+      "tours.noToursFound": "Туры для этого направления не найдены",
       "common.learnMore": "Узнать больше",
       "common.bookNow": "Забронировать сейчас",
     },
@@ -632,6 +662,11 @@ const resources = {
         "忘れられない思い出を作るために注意深く選ばれた体験",
       "tours.recommendedBadge": "おすすめ",
       "tours.expertGuide": "専門ガイド含まれる",
+      "tours.exploreSubtitle":
+        "厳選されたツアーパッケージでトルコの最も美しい目的地を探索",
+      "tours.filterByLanguage": "言語でフィルター:",
+      "tours.filterByDestination": "目的地でフィルター:",
+      "tours.noToursFound": "この目的地のツアーは見つかりませんでした",
       "common.learnMore": "詳しく見る",
       "common.bookNow": "今すぐ予約",
     },
