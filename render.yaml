@@ -1,11 +1,10 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: kisisel-website-postgres
+databases:
+  - name: kisisel-website-postgres
     plan: starter
     region: frankfurt
     ipAllowList: []
 
+services:
   # Backend API Service
   - type: web
     name: kisisel-website-backend
