@@ -4,8 +4,6 @@ services:
     name: kisisel-website-postgres
     plan: starter
     region: frankfurt
-    databaseName: tourism_db
-    databaseUser: tourism_user
     ipAllowList: []
 
   # Backend API Service
