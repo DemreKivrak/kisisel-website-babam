@@ -10,7 +10,7 @@ export function Homepage() {
   return (
     <>
       <div className="relative bg-gradient-to-b from-gray-50 to-white overflow-x-hidden max-w-full">
-        <title>Oltre Tour Travel Agency</title>
+        <title>{t("hero.companyName")}</title>
         <Header />
 
         <div className="relative">
@@ -25,7 +25,7 @@ export function Homepage() {
           <div className="absolute inset-0 flex items-center justify-center text-center px-4">
             <div className="max-w-4xl">
               <h1 className="text-3xl md:text-5xl lg:text-6xl text-white mb-6 drop-shadow-2xl mt-14 font-serif">
-                OLTRE TOUR TRAVEL AGENCY
+                {t("hero.companyName")}
               </h1>
             </div>
           </div>

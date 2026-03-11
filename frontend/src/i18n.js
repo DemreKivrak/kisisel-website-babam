@@ -25,6 +25,7 @@ const resources = {
       "nav.carRental": "Car Rental",
 
       // Homepage
+      "hero.companyName": "OLTRE TOUR TRAVEL AGENCY",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "Explore Turkey, Embrace the Journey.",
       "hero.subtitle": "Your Gateway to Unforgettable Experiences",
@@ -240,7 +241,7 @@ const resources = {
       // Header & Navigation
       "nav.home": "Ana Sayfa",
       "nav.tours": "Turlar",
-      "nav.destinations": "Destinasyonlar",
+      "nav.destinations": "Rotalar",
       "nav.services": "Hizmetler",
       "nav.about": "Hakkımızda",
       "nav.gallery": "Galeri",
@@ -248,6 +249,7 @@ const resources = {
       "nav.carRental": "Araç Kiralama",
 
       // Homepage
+      "hero.companyName": "OLTRE SEYAHAT TURİZM",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "Türkiye'yi Keşfedin, Yolculuğu Benimseyin.",
       "hero.subtitle": "Unutulmaz Deneyimlere Açılan Kapınız",
@@ -296,10 +298,10 @@ const resources = {
       "tours.recommendedBadge": "ÖNERİLEN",
       "tours.expertGuide": "Uzman Rehber Dahil",
       "tours.exploreSubtitle":
-        "Özenle hazırlanmış tur paketlerimizle Türkiye'nin en güzel destinasyonlarını keşfedin",
+        "Özenle hazırlanmış tur paketlerimizle Türkiye'nin en güzel rotaları keşfedin",
       "tours.filterByLanguage": "Dile Göre Filtrele:",
-      "tours.filterByDestination": "Destinasyona Göre Filtrele:",
-      "tours.noToursFound": "Bu destinasyon için tur bulunamadı",
+      "tours.filterByDestination": "Rotalara Göre Filtrele:",
+      "tours.noToursFound": "Bu Rota için tur bulunamadı",
 
       // About
       "about.title": "Hakkımızda",
@@ -415,17 +417,17 @@ const resources = {
       "services.contactUs": "İletişime Geçin",
 
       // Destinations
-      "destinations.title": "Destinasyonlar",
+      "destinations.title": "Rotalar",
       "destinations.explore": "Keşfet",
       "destinations.discover": "Keşfedin",
-      "destinations.exploreTitle": "Destinasyonları Keşfedin",
+      "destinations.exploreTitle": "Rotaları Keşfedin",
       "destinations.subtitle":
         "Türkiye'nin en büyüleyici lokasyonlarını keşfedin ve mükemmel turunuzu bulun",
-      "destinations.backButton": "Destinasyonlara Geri Dön",
+      "destinations.backButton": "Rotalara Geri Dön",
       "destinations.topAttractions": "En İyi Cazibe Merkezleri",
       "destinations.availableTours": "Müsait Turlar",
-      "destinations.loadingText": "Destinasyonlar yükleniyor...",
-      "destinations.popularTitle": "Popüler Destinasyonlar",
+      "destinations.loadingText": "Rotalar yükleniyor...",
+      "destinations.popularTitle": "Popüler Rotalar",
       "destinations.popularSubtitle":
         "Türkiye'nin en nefes kesici lokasyonlarını ve gizli cennetlerini keşfedin",
       "destinations.exploreMore": "Daha Fazla Keşfet",
@@ -433,8 +435,7 @@ const resources = {
       // Gallery
       "gallery.title": "Galeri",
       "gallery.allPhotos": "Tüm Fotoğraflar",
-      "gallery.subtitle":
-        "Turlarımızdan en güzel anları ve destinasyonları keşfedin",
+      "gallery.subtitle": "Turlarımızdan en güzel anları ve rotaları keşfedin",
       "gallery.all": "Tümü",
       "gallery.photos": "Fotoğraflar",
       "gallery.videos": "Videolar",
@@ -466,6 +467,7 @@ const resources = {
       "nav.gallery": "Galerie",
       "nav.contact": "Kontakt",
       "nav.carRental": "Autovermietung",
+      "hero.companyName": "OLTRE TOUR REISEAGENTUR",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "Entdecken Sie die Türkei, Erleben Sie die Reise.",
       "destinations.exploreTitle": "Reiseziele erkunden",
@@ -555,6 +557,7 @@ const resources = {
       "nav.gallery": "Galerie",
       "nav.contact": "Contact",
       "nav.carRental": "Location de voiture",
+      "hero.companyName": "OLTRE TOUR AGENCE DE VOYAGE",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "Explorez la Turquie, Embrassez le Voyage.",
       "destinations.exploreTitle": "Explorer les destinations",
@@ -643,6 +646,7 @@ const resources = {
       "nav.gallery": "Galería",
       "nav.contact": "Contacto",
       "nav.carRental": "Alquiler de coches",
+      "hero.companyName": "OLTRE TOUR AGENCIA DE VIAJES",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "Explora Turquía, Abraza el Viaje.",
       "destinations.exploreTitle": "Explorar destinos",
@@ -732,6 +736,7 @@ const resources = {
       "nav.gallery": "Галерея",
       "nav.contact": "Контакты",
       "nav.carRental": "Аренда автомобилей",
+      "hero.companyName": "OLTRE TOUR ТУРИСТИЧЕСКОЕ АГЕНТСТВО",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "Исследуйте Турцию, Наслаждайтесь Путешествием.",
       "destinations.exploreTitle": "Исследуйте направления",
@@ -820,6 +825,7 @@ const resources = {
       "nav.gallery": "ギャラリー",
       "nav.contact": "お問い合わせ",
       "nav.carRental": "レンタカー",
+      "hero.companyName": "OLTRE TOUR 旅行代理店",
       "hero.title": "ANATOLIA HORIZON TRAVEL",
       "hero.tagline": "トルコを探索し、旅を楽しもう。",
       "destinations.exploreTitle": "目的地を探索",

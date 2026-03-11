@@ -3,9 +3,29 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
+import { motion } from "framer-motion";
 
 export function About() {
   const { t } = useTranslation();
+
+  // Animasyon varyantları
+  const fadeInLeft = {
+    hidden: { opacity: 0, x: -100 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
+  const fadeInRight = {
+    hidden: { opacity: 0, x: 100 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
   return (
     <>
       <Header />
@@ -70,66 +90,114 @@ export function About() {
             <p className="text-gray-600">{t("about.whyChooseSubtitle")}</p>
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-32">
             {/* Service 1 */}
-            <div className="grid md:grid-cols-2 gap-8 items-center md:mb-50 ">
-              <div className="h-80 flex items-center justify-center ">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <motion.div
+                className="h-80 flex items-center justify-center "
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInLeft}
+              >
                 {/* Placeholder for image */}
                 <img className="rounded-2xl" src="fleet.jpg"></img>
-              </div>
-              <div className="p-8">
+              </motion.div>
+              <motion.div
+                className="p-8"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInRight}
+              >
                 <h3 className="font-semibold text-2xl text-gray-900 mb-4">
                   {t("about.fleetTitle")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
                   {t("about.fleetDesc")}
                 </p>
-              </div>
+              </motion.div>
             </div>
 
             {/* Service 2 */}
             <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="p-8 order-2 md:order-1 md:mb-50">
+              <motion.div
+                className="p-8 order-2 md:order-1 md:mb-50"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInLeft}
+              >
                 <h3 className="font-semibold text-2xl text-gray-900 mb-4">
                   {t("about.corporateTitle")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
                   {t("about.corporateDesc")}
                 </p>
-              </div>
-              <div className=" h-80 flex items-center justify-center order-1 md:order-2">
+              </motion.div>
+              <motion.div
+                className="h-80 flex items-center justify-center order-1 md:order-2"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInRight}
+              >
                 <img className="rounded-2xl" src="corparete.png"></img>
-              </div>
+              </motion.div>
             </div>
 
             {/* Service 3 */}
-            <div className="grid md:grid-cols-2 gap-8 items-center md:mb-50">
-              <div className=" h-80 flex items-center justify-center">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <motion.div
+                className="h-80 flex items-center justify-center"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInLeft}
+              >
                 <img className="rounded-2xl" src="domestic.png"></img>
-              </div>
-              <div className="p-8">
+              </motion.div>
+              <motion.div
+                className="p-8"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInRight}
+              >
                 <h3 className="font-semibold text-2xl text-gray-900 mb-4">
                   {t("about.touristTitle")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
                   {t("about.touristDesc")}
                 </p>
-              </div>
+              </motion.div>
             </div>
 
             {/* Service 4 */}
-            <div className="grid md:grid-cols-2 gap-8 items-center md:mb-65">
-              <div className="p-8 order-2 md:order-1">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <motion.div
+                className="p-8 order-2 md:order-1"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInLeft}
+              >
                 <h3 className="font-semibold text-2xl text-gray-900 mb-4">
                   {t("about.expertTitle")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
                   {t("about.expertDesc")}
                 </p>
-              </div>
-              <div className=" h-80 flex items-center justify-center order-1 md:order-2">
+              </motion.div>
+              <motion.div
+                className="h-80 flex items-center justify-center order-1 md:order-2"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.3 }}
+                variants={fadeInRight}
+              >
                 <img className="rounded-2xl" src="staff.png"></img>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
