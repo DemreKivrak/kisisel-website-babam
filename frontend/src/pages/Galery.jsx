@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
-import { PageEnd } from "../components/PageEnd";
+import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Galery() {
@@ -250,7 +250,7 @@ export function Galery() {
         </>
       )}
       <WhatsappContact />
-      <PageEnd />
+      <Footer />
     </>
   );
 }

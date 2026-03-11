@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Header } from "./Header";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { Footer } from "../components/Footer";
 
 export function TourPage() {
   const { t } = useTranslation();
@@ -437,6 +438,7 @@ export function TourPage() {
           </button>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

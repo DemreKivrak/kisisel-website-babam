@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../services/api";
-import { PageEnd } from "../components/PageEnd";
+import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Services() {
@@ -234,7 +234,7 @@ export function Services() {
         </div>
       </div>
       <WhatsappContact />
-      <PageEnd />
+      <Footer />
     </>
   );
 }

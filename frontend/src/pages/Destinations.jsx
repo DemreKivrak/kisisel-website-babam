@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Header } from "../components/Header";
 import { api } from "../services/api";
-import { PageEnd } from "../components/PageEnd";
+import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Destinations() {
@@ -321,7 +321,7 @@ export function Destinations() {
         )}
       </div>
       <WhatsappContact />
-      <PageEnd />
+      <Footer />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { Header } from "../components/Header";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { PageEnd } from "../components/PageEnd";
+import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
 
 export function Contact() {
@@ -192,7 +192,7 @@ export function Contact() {
         </div>
       </div>
       <WhatsappContact />
-      <PageEnd />
+      <Footer />
     </div>
   );
 }

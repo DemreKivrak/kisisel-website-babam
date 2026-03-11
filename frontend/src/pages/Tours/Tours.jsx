@@ -4,7 +4,7 @@ import { Header } from "../../components/Header";
 import { useNavigate, useLocation } from "react-router-dom";
 import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
-import { PageEnd } from "../../components/PageEnd";
+import { Footer } from "../../components/Footer";
 import { WhatsappContact } from "../../components/WhatsappContact";
 
 export function Tours() {
@@ -244,7 +244,7 @@ export function Tours() {
         )}
       </div>
       <WhatsappContact />
-      <PageEnd />
+      <Footer />
     </div>
   );
 }

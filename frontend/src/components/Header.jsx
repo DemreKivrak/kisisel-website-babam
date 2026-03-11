@@ -70,7 +70,7 @@ export function Header() {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full z-10">
+    <div className="fixed top-0 left-0 w-full z-50">
       {/* Top Contact Bar - Hidden on mobile */}
       <div
         className={`bg-gray-500/50 h-10 hidden md:flex items-center text-[12px] border-b border-gray-200 transition-all duration-300 ${
