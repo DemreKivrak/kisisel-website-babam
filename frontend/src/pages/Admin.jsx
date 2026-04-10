@@ -2,6 +2,64 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SortableImage({ id, src, onRemove }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: "grab",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="relative group"
+    >
+      <img
+        src={src}
+        alt="Tour image"
+        className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+        draggable={false}
+      />
+      <button
+        type="button"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={() => onRemove(src)}
+        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+        title="Remove image"
+      >
+        ×
+      </button>
+    </div>
+  );
+}
 
 export function Admin() {
   const navigate = useNavigate();
@@ -49,6 +107,8 @@ export function Admin() {
   const [adminError, setAdminError] = useState("");
 
   const isSuperAdmin = user?.role === "super_admin";
+
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const loadData = async () => {
     try {
@@ -317,6 +377,20 @@ export function Admin() {
       );
       setFormData({ ...formData, images: updatedImages.join(",") });
     }
+  };
+
+  const handleImageDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const imgs = (formData.images || "")
+      .split(",")
+      .map((x) => x.trim())
+      .filter(Boolean);
+    const oldIndex = imgs.indexOf(active.id);
+    const newIndex = imgs.indexOf(over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(imgs, oldIndex, newIndex);
+    setFormData({ ...formData, images: reordered.join(",") });
   };
 
   const handleUpdateTour = async () => {
@@ -1230,25 +1304,34 @@ export function Admin() {
                             Current Images
                           </label>
                           {formData.images && formData.images.trim() !== "" ? (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                              {formData.images.split(",").map((img, idx) => (
-                                <div key={idx} className="relative group">
-                                  <img
-                                    src={img.trim()}
-                                    alt={`Tour image ${idx + 1}`}
-                                    className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveTourImage(img)}
-                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                                    title="Remove image"
-                                  >
-                                    ×
-                                  </button>
+                            <DndContext
+                              sensors={sensors}
+                              collisionDetection={closestCenter}
+                              onDragEnd={handleImageDragEnd}
+                            >
+                              <SortableContext
+                                items={formData.images
+                                  .split(",")
+                                  .map((x) => x.trim())
+                                  .filter(Boolean)}
+                                strategy={rectSortingStrategy}
+                              >
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                  {formData.images
+                                    .split(",")
+                                    .map((x) => x.trim())
+                                    .filter(Boolean)
+                                    .map((img) => (
+                                      <SortableImage
+                                        key={img}
+                                        id={img}
+                                        src={img}
+                                        onRemove={handleRemoveTourImage}
+                                      />
+                                    ))}
                                 </div>
-                              ))}
-                            </div>
+                              </SortableContext>
+                            </DndContext>
                           ) : (
                             <p className="text-sm text-gray-500 mb-4">
                               No images uploaded yet

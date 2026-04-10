@@ -10,7 +10,7 @@ export function Footer() {
       <div className="flex-col">
         <div className="bg-[rgb(31,37,40)] min-h-90 flex flex-col md:flex-row justify-between px-4 md:px-8 py-8 md:py-0 overflow-x-hidden">
           <div className="mt-4 md:mt-10 mb-8 md:mb-0">
-            <h1 className="text-white text-2xl md:text-3xl mt-4 md:mt-10 block mb-6">
+            <h1 className="text-white text-2xl md:text-3xl mt-4 md:mt-8 block mb-6 md:ml-12">
               {t("footer.contactUs")}
             </h1>
 
@@ -23,7 +23,7 @@ export function Footer() {
                   alt="Phone"
                 ></img>
               </div>
-              <div className="ml-9 md:ml-12">
+              <div className="ml-9 md:ml-6">
                 <p className="text-gray-400 text-sm">{t("contact.phone")}</p>
                 <a
                   href="tel:+905362238340"

@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const API_URL = import.meta.env.VITE_API_URL || "/api";
 
   const checkAuth = useCallback(async () => {
-    const token = localStorage.getItem("adminToken");
+    const token = sessionStorage.getItem("adminToken");
     if (token) {
       try {
         const response = await fetch(`${API_URL}/auth/verify`, {
@@ -23,11 +23,11 @@ export function AuthProvider({ children }) {
           const data = await response.json();
           setUser(data.user);
         } else {
-          localStorage.removeItem("adminToken");
+          sessionStorage.removeItem("adminToken");
         }
       } catch (error) {
         console.error("Auth check failed:", error);
-        localStorage.removeItem("adminToken");
+        sessionStorage.removeItem("adminToken");
       }
     }
     setLoading(false);
@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
       }
 
       const data = await response.json();
-      localStorage.setItem("adminToken", data.token);
+      sessionStorage.setItem("adminToken", data.token);
       setUser(data.user);
       navigate("/admin");
       return { success: true };
@@ -63,13 +63,13 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("adminToken");
+    sessionStorage.removeItem("adminToken");
     setUser(null);
     navigate("/login");
   };
 
   const getToken = () => {
-    return localStorage.getItem("adminToken");
+    return sessionStorage.getItem("adminToken");
   };
 
   const isSuperAdmin = () => {

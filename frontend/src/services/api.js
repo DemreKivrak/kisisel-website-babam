@@ -2,7 +2,7 @@ const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 // Helper to get auth token from localStorage
 const getAuthToken = () => {
-  return localStorage.getItem("adminToken");
+  return sessionStorage.getItem("adminToken");
 };
 
 // Helper to create headers with auth token
@@ -165,20 +165,6 @@ export const api = {
     });
 
     if (!response.ok) throw new Error("Failed to upload image");
-    return response.json();
-  },
-
-  // Change Password
-  changePassword: async (currentPassword, newPassword) => {
-    const response = await fetch(`${API_URL}/auth/change-password`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ currentPassword, newPassword }),
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to change password");
-    }
     return response.json();
   },
 
