@@ -71,17 +71,17 @@ export function Recommended() {
 
   return (
     <div className="py-16 px-4 bg-gradient-to-b from-white to-amber-50/30 overflow-hidden">
-      <div className="text-center mb-16">
-        <div className="inline-block px-4">
-          <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase mb-2 block">
-            {t("tours.handpicked")}
-          </span>
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900  to-gray-900 bg-clip-text text-transparent font-serif">
-            {t("tours.recommended")}
-          </h1>
-          <div className="w-32 md:w-150 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto rounded-full"></div>
-        </div>
-        <p className="mt-6 text-gray-600 text-base md:text-lg max-w-2xl mx-auto px-4">
+      <div className="text-center mb-16 relative">
+        <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
+          02
+        </span>
+        <p className="text-amber-500 text-xs font-semibold tracking-[0.25em] uppercase mb-4">
+          {t("tours.handpicked")}
+        </p>
+        <h1 className="text-4xl md:text-5xl font-roboto-condensed font-semibold text-gray-900 tracking-tight leading-none mb-6">
+          {t("tours.recommended")}
+        </h1>
+        <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
           {t("tours.recommendedSubtitle")}
         </p>
       </div>
@@ -90,7 +90,7 @@ export function Recommended() {
         {/* Sol Ok */}
         <button
           onClick={() => scroll("left")}
-          className="hidden md:block absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+          className="hidden md:block absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer"
         >
           <svg
             className="w-6 h-6 text-gray-800"
@@ -110,7 +110,7 @@ export function Recommended() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 md:px-12 py-4 snap-x snap-mandatory"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-4 snap-x snap-mandatory"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {recommended.map((tour, i) => (
@@ -219,7 +219,7 @@ export function Recommended() {
         {/* Sağ Ok */}
         <button
           onClick={() => scroll("right")}
-          className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+          className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer"
         >
           <svg
             className="w-6 h-6 text-gray-800"
