@@ -59,27 +59,31 @@ export function Recommended() {
       });
     }
   };
+  const startAutoScroll = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      const el = scrollContainerRef.current;
+      if (!el) return;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: 400, behavior: "smooth" });
+      }
+    }, 2000);
+  };
+
   // Auto-scroll: görünürlük takibi
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          intervalRef.current = setInterval(() => {
-            const el = scrollContainerRef.current;
-            if (!el) return;
-
-            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
-            if (atEnd) {
-              el.scrollTo({ left: 0, behavior: "smooth" });
-            } else {
-              el.scrollBy({ left: 400, behavior: "smooth" });
-            }
-          }, 3000); // her 3 saniyede bir
+          startAutoScroll();
         } else {
           clearInterval(intervalRef.current);
         }
       },
-      { threshold: 0.3 }, // %30'u görünürse tetikle
+      { threshold: 0.3 },
     );
 
     if (containerRef.current) observer.observe(containerRef.current);
@@ -88,7 +92,7 @@ export function Recommended() {
       observer.disconnect();
       clearInterval(intervalRef.current);
     };
-  }, [recommended]); // recommended yüklendikten sonra başlasın
+  }, [recommended]);
 
   if (loading) {
     return (
@@ -105,10 +109,8 @@ export function Recommended() {
     <div
       ref={containerRef}
       onMouseEnter={() => clearInterval(intervalRef.current)}
-      onMouseLeave={() => {
-        /* interval'i yeniden başlat */
-      }}
-      className="py-16 px-4 bg-gradient-to-b from-white to-amber-50/30 overflow-hidden"
+      onMouseLeave={() => startAutoScroll()}
+      className="py-16 px-4 bg-gradient-to-b from-white to-amber-50/30 overflow-hidden "
     >
       <div className="text-center mb-16 relative">
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">

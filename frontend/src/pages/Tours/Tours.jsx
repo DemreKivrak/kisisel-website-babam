@@ -348,7 +348,7 @@ export function Tours() {
           {filteredTours.map((tour) => (
             <div
               key={tour.id}
-              className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group"
+              className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group flex flex-col"
             >
               {/* Tour Image */}
               <div className="relative h-64 overflow-hidden">
@@ -364,7 +364,7 @@ export function Tours() {
               </div>
 
               {/* Tour Info */}
-              <div className="p-5">
+              <div className="p-5 flex flex-col flex-1">
                 <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
                   {tour.duration}
                 </p>
@@ -373,7 +373,7 @@ export function Tours() {
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">{tour.type}</p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 mt-auto">
                   <span className="text-sm font-semibold text-amber-600">
                     📍 {tour.destination}
                   </span>

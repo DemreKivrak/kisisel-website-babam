@@ -37,27 +37,31 @@ export function DestinationsComp() {
       });
     }
   };
+  const startAutoScroll = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      const el = scrollContainerRef.current;
+      if (!el) return;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: 400, behavior: "smooth" });
+      }
+    }, 2000);
+  };
+
   // Auto-scroll: görünürlük takibi
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          intervalRef.current = setInterval(() => {
-            const el = scrollContainerRef.current;
-            if (!el) return;
-
-            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
-            if (atEnd) {
-              el.scrollTo({ left: 0, behavior: "smooth" });
-            } else {
-              el.scrollBy({ left: 400, behavior: "smooth" });
-            }
-          }, 3000); // her 3 saniyede bir
+          startAutoScroll();
         } else {
           clearInterval(intervalRef.current);
         }
       },
-      { threshold: 0.3 }, // %30'u görünürse tetikle
+      { threshold: 0.3 },
     );
 
     if (containerRef.current) observer.observe(containerRef.current);
@@ -66,7 +70,7 @@ export function DestinationsComp() {
       observer.disconnect();
       clearInterval(intervalRef.current);
     };
-  }, [destinations]); // recommended yüklendikten sonra başlasın
+  }, [destinations]);
 
   if (loading) {
     return (
@@ -83,9 +87,7 @@ export function DestinationsComp() {
     <div
       ref={containerRef}
       onMouseEnter={() => clearInterval(intervalRef.current)}
-      onMouseLeave={() => {
-        /* interval'i yeniden başlat */
-      }}
+      onMouseLeave={() => startAutoScroll()}
       className="py-16 px-4 overflow-hidden"
     >
       <div className="text-center mb-12 relative">
