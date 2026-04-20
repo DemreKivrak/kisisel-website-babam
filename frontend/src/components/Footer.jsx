@@ -108,7 +108,7 @@ export function Footer() {
             <div>
               <img
                 className="h-40 md:h-45 md:mt-14"
-                src="oltre-white.png"
+                src="/oltre-white.png"
                 alt="Logo"
               ></img>
             </div>

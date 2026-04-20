@@ -74,9 +74,14 @@ const resources = {
       "tours.expertGuide": "Expert Guide Included",
       "tours.exploreSubtitle":
         "Explore Turkey's most beautiful destinations with our curated tour packages",
-      "tours.filterByLanguage": "Filter by Language:",
-      "tours.filterByDestination": "Filter by Destination:",
+      "tours.filterByLanguage": "Filter by Language",
+      "tours.filterByDestination": "Filter by Destination",
       "tours.noToursFound": "No tours found for this destination",
+      "tours.sortBy": "Order",
+      "tours.allLanguages": "All Languages",
+      "tours.allDestinations": "All Destinations",
+      "tours.newestFirst": "Newest First",
+      "tours.oldestFirst": "Oldest First",
 
       // About
       "about.title": "About Us",
@@ -302,6 +307,11 @@ const resources = {
       "tours.filterByLanguage": "Dile Göre Filtrele:",
       "tours.filterByDestination": "Rotalara Göre Filtrele:",
       "tours.noToursFound": "Bu Rota için tur bulunamadı",
+      "tours.sortBy": "Sırala",
+      "tours.allLanguages": "Tüm Diller",
+      "tours.allDestinations": "Tüm Rotalar",
+      "tours.newestFirst": "En Yeni Önce",
+      "tours.oldestFirst": "En Eski Önce",
 
       // About
       "about.title": "Hakkımızda",
@@ -503,6 +513,11 @@ const resources = {
       "tours.filterByLanguage": "Nach Sprache filtern:",
       "tours.filterByDestination": "Nach Ziel filtern:",
       "tours.noToursFound": "Keine Touren für dieses Ziel gefunden",
+      "tours.sortBy": "Sortieren",
+      "tours.allLanguages": "Alle Sprachen",
+      "tours.allDestinations": "Alle Ziele",
+      "tours.newestFirst": "Neueste zuerst",
+      "tours.oldestFirst": "Älteste zuerst",
       "common.learnMore": "Mehr erfahren",
       "common.bookNow": "Jetzt buchen",
 
@@ -593,6 +608,11 @@ const resources = {
       "tours.filterByLanguage": "Filtrer par langue:",
       "tours.filterByDestination": "Filtrer par destination:",
       "tours.noToursFound": "Aucun circuit trouvé pour cette destination",
+      "tours.sortBy": "Trier",
+      "tours.allLanguages": "Toutes les langues",
+      "tours.allDestinations": "Toutes les destinations",
+      "tours.newestFirst": "Plus récent d'abord",
+      "tours.oldestFirst": "Plus ancien d'abord",
       "common.learnMore": "En savoir plus",
       "common.bookNow": "Réserver maintenant",
 
@@ -683,6 +703,11 @@ const resources = {
       "tours.filterByLanguage": "Filtrar por idioma:",
       "tours.filterByDestination": "Filtrar por destino:",
       "tours.noToursFound": "No se encontraron tours para este destino",
+      "tours.sortBy": "Ordenar",
+      "tours.allLanguages": "Todos los idiomas",
+      "tours.allDestinations": "Todos los destinos",
+      "tours.newestFirst": "Más reciente primero",
+      "tours.oldestFirst": "Más antiguo primero",
       "common.learnMore": "Más información",
       "common.bookNow": "Reservar ahora",
 
@@ -772,6 +797,11 @@ const resources = {
       "tours.filterByLanguage": "Фильтр по языку:",
       "tours.filterByDestination": "Фильтр по направлению:",
       "tours.noToursFound": "Туры для этого направления не найдены",
+      "tours.sortBy": "Сортировать",
+      "tours.allLanguages": "Все языки",
+      "tours.allDestinations": "Все направления",
+      "tours.newestFirst": "Сначала новые",
+      "tours.oldestFirst": "Сначала старые",
       "common.learnMore": "Узнать больше",
       "common.bookNow": "Забронировать сейчас",
 
@@ -861,6 +891,11 @@ const resources = {
       "tours.filterByLanguage": "言語でフィルター:",
       "tours.filterByDestination": "目的地でフィルター:",
       "tours.noToursFound": "この目的地のツアーは見つかりませんでした",
+      "tours.sortBy": "並び替え",
+      "tours.allLanguages": "すべての言語",
+      "tours.allDestinations": "すべての目的地",
+      "tours.newestFirst": "新しい順",
+      "tours.oldestFirst": "古い順",
       "common.learnMore": "詳しく見る",
       "common.bookNow": "今すぐ予約",
 

@@ -74,6 +74,7 @@ export function Admin() {
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
+  const [tourDestinationFilter, setTourDestinationFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [imageFile, setImageFile] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
@@ -348,7 +349,9 @@ export function Admin() {
           highlights: formData.highlights || "",
           included: formData.included || "",
           not_included: formData.not_included || "",
-          itinerary: formData.itinerary || "",
+          itinerary:
+            (formData.itinerary_disabled ? "[DISABLED]\n" : "") +
+            (formData.itinerary || ""),
           language: formData.language || "tr",
           is_recommended: formData.is_recommended || false,
         });
@@ -365,7 +368,14 @@ export function Admin() {
 
   const handleEditTour = (tour) => {
     setEditingItem(tour.id);
-    setFormData(tour);
+    const itineraryText = tour.itinerary || "";
+    const isDisabled = itineraryText.startsWith("[DISABLED]");
+    const cleanItinerary = itineraryText.replace(/^\[DISABLED\]\n?/, "");
+    setFormData({
+      ...tour,
+      itinerary: cleanItinerary,
+      itinerary_disabled: isDisabled,
+    });
     loadTourPricing(tour.id);
   };
 
@@ -412,6 +422,9 @@ export function Admin() {
       const updatedData = {
         ...formData,
         images: imageUrls.join(","),
+        itinerary:
+          (formData.itinerary_disabled ? "[DISABLED]\n" : "") +
+          (formData.itinerary || ""),
       };
 
       console.log("Updating tour with data:", updatedData); // Debug log
@@ -1102,15 +1115,46 @@ export function Admin() {
                     className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                     rows="4"
                   />
-                  <textarea
-                    placeholder="Itinerary - Format: Day 1 | Title | Description (each day on new line)"
-                    value={formData.itinerary || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, itinerary: e.target.value })
-                    }
-                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
-                    rows="6"
-                  />
+                  <div className="md:col-span-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Itinerary
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.itinerary_disabled || false}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              itinerary_disabled: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 accent-red-500"
+                        />
+                        <span className="text-sm text-red-600 font-medium">
+                          Hide on tour page
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-2">
+                      Multi-day: <code>Day 1 | Title | Description</code>{" "}
+                      &nbsp;|&nbsp; Single-day: <code>Title | Description</code>{" "}
+                      (each item on new line)
+                    </p>
+                    <textarea
+                      placeholder={
+                        "Multi-day: Day 1 | Title | Description\nSingle-day: Title | Description"
+                      }
+                      value={formData.itinerary || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, itinerary: e.target.value })
+                      }
+                      className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full ${formData.itinerary_disabled ? "opacity-50" : ""}`}
+                      rows="6"
+                      disabled={formData.itinerary_disabled || false}
+                    />
+                  </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Upload Images (Multiple)
@@ -1172,349 +1216,415 @@ export function Admin() {
             )}
 
             {/* Tours List */}
+            <div className="mb-4 flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-600">
+                Filter by Destination:
+              </label>
+              <select
+                value={tourDestinationFilter}
+                onChange={(e) => setTourDestinationFilter(e.target.value)}
+                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 text-sm"
+              >
+                <option value="">All Destinations</option>
+                {destinations.map((dest) => (
+                  <option key={dest.id} value={dest.name}>
+                    {dest.name}
+                  </option>
+                ))}
+              </select>
+              {tourDestinationFilter && (
+                <span className="text-sm text-gray-500">
+                  {
+                    tours.filter((t) => t.destination === tourDestinationFilter)
+                      .length
+                  }{" "}
+                  tour(s) found
+                </span>
+              )}
+            </div>
             <div className="space-y-4">
-              {tours.map((tour) => (
-                <div
-                  key={tour.id}
-                  className="bg-white rounded-lg shadow-md p-6"
-                >
-                  {editingItem === tour.id ? (
-                    <div>
-                      <h3 className="text-xl font-bold mb-4">Edit Tour</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          value={formData.name || ""}
-                          onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        />
-                        <select
-                          value={formData.destination || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              destination: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        >
-                          <option value="">Select Destination</option>
-                          {destinations.map((dest) => (
-                            <option key={dest.id} value={dest.name}>
-                              {dest.name}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          type="text"
-                          placeholder="Duration"
-                          value={formData.duration || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              duration: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        />
-                        <select
-                          value={formData.language || "tr"}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              language: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                        >
-                          <option value="tr">Turkish (Türkçe)</option>
-                          <option value="en">English (İngilizce)</option>
-                          <option value="de">German (Almanca)</option>
-                          <option value="ru">Russian (Rusça)</option>
-                          <option value="ar">Arabic (Arapça)</option>
-                          <option value="fr">French (Fransızca)</option>
-                          <option value="es">Spanish (İspanyolca)</option>
-                          <option value="it">Italian (İtalyanca)</option>
-                          <option value="ja">Japanese (Japonca)</option>
-                        </select>
-                        <textarea
-                          placeholder="Overview"
-                          value={formData.overview || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              overview: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
-                          rows="3"
-                        />
-                        <textarea
-                          placeholder="Highlights (one per line)"
-                          value={formData.highlights || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              highlights: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                          rows="4"
-                        />
-                        <textarea
-                          placeholder="Included (one per line)"
-                          value={formData.included || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              included: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                          rows="4"
-                        />
-                        <textarea
-                          placeholder="Not Included (one per line)"
-                          value={formData.not_included || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              not_included: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                          rows="4"
-                        />
-                        <textarea
-                          placeholder="Itinerary - Format: Day 1 | Title | Description (each day on new line)"
-                          value={formData.itinerary || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              itinerary: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
-                          rows="6"
-                        />
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Current Images
-                          </label>
-                          {formData.images && formData.images.trim() !== "" ? (
-                            <DndContext
-                              sensors={sensors}
-                              collisionDetection={closestCenter}
-                              onDragEnd={handleImageDragEnd}
-                            >
-                              <SortableContext
-                                items={formData.images
-                                  .split(",")
-                                  .map((x) => x.trim())
-                                  .filter(Boolean)}
-                                strategy={rectSortingStrategy}
-                              >
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                                  {formData.images
-                                    .split(",")
-                                    .map((x) => x.trim())
-                                    .filter(Boolean)
-                                    .map((img) => (
-                                      <SortableImage
-                                        key={img}
-                                        id={img}
-                                        src={img}
-                                        onRemove={handleRemoveTourImage}
-                                      />
-                                    ))}
-                                </div>
-                              </SortableContext>
-                            </DndContext>
-                          ) : (
-                            <p className="text-sm text-gray-500 mb-4">
-                              No images uploaded yet
-                            </p>
-                          )}
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Add More Images (Multiple)
-                          </label>
+              {tours
+                .filter(
+                  (tour) =>
+                    !tourDestinationFilter ||
+                    tour.destination === tourDestinationFilter,
+                )
+                .map((tour) => (
+                  <div
+                    key={tour.id}
+                    className="bg-white rounded-lg shadow-md p-6"
+                  >
+                    {editingItem === tour.id ? (
+                      <div>
+                        <h3 className="text-xl font-bold mb-4">Edit Tour</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <input
-                            type="file"
-                            accept="image/*"
-                            multiple
+                            type="text"
+                            value={formData.name || ""}
                             onChange={(e) =>
-                              setImageFiles(Array.from(e.target.files))
+                              setFormData({ ...formData, name: e.target.value })
                             }
-                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
                           />
-                          {imageFiles.length > 0 && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              {imageFiles.length} new file(s) selected
+                          <select
+                            value={formData.destination || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                destination: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                          >
+                            <option value="">Select Destination</option>
+                            {destinations.map((dest) => (
+                              <option key={dest.id} value={dest.name}>
+                                {dest.name}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            type="text"
+                            placeholder="Duration"
+                            value={formData.duration || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                duration: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                          />
+                          <select
+                            value={formData.language || "tr"}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                language: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                          >
+                            <option value="tr">Turkish (Türkçe)</option>
+                            <option value="en">English (İngilizce)</option>
+                            <option value="de">German (Almanca)</option>
+                            <option value="ru">Russian (Rusça)</option>
+                            <option value="ar">Arabic (Arapça)</option>
+                            <option value="fr">French (Fransızca)</option>
+                            <option value="es">Spanish (İspanyolca)</option>
+                            <option value="it">Italian (İtalyanca)</option>
+                            <option value="ja">Japanese (Japonca)</option>
+                          </select>
+                          <textarea
+                            placeholder="Overview"
+                            value={formData.overview || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                overview: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 md:col-span-2"
+                            rows="3"
+                          />
+                          <textarea
+                            placeholder="Highlights (one per line)"
+                            value={formData.highlights || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                highlights: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                            rows="4"
+                          />
+                          <textarea
+                            placeholder="Included (one per line)"
+                            value={formData.included || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                included: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                            rows="4"
+                          />
+                          <textarea
+                            placeholder="Not Included (one per line)"
+                            value={formData.not_included || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                not_included: e.target.value,
+                              })
+                            }
+                            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                            rows="4"
+                          />
+                          <div className="md:col-span-2">
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="text-sm font-medium text-gray-700">
+                                Itinerary
+                              </label>
+                              <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.itinerary_disabled || false}
+                                  onChange={(e) =>
+                                    setFormData({
+                                      ...formData,
+                                      itinerary_disabled: e.target.checked,
+                                    })
+                                  }
+                                  className="w-4 h-4 accent-red-500"
+                                />
+                                <span className="text-sm text-red-600 font-medium">
+                                  Hide on tour page
+                                </span>
+                              </label>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-2">
+                              Multi-day:{" "}
+                              <code>Day 1 | Title | Description</code>{" "}
+                              &nbsp;|&nbsp; Single-day:{" "}
+                              <code>Title | Description</code> (each item on new
+                              line)
                             </p>
-                          )}
-                          {uploading && (
-                            <p className="text-sm text-amber-600 mt-1">
-                              Uploading images...
-                            </p>
-                          )}
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={formData.is_recommended || false}
+                            <textarea
+                              placeholder={
+                                "Multi-day: Day 1 | Title | Description\nSingle-day: Title | Description"
+                              }
+                              value={formData.itinerary || ""}
                               onChange={(e) =>
                                 setFormData({
                                   ...formData,
-                                  is_recommended: e.target.checked,
+                                  itinerary: e.target.value,
                                 })
                               }
-                              className="w-4 h-4 text-amber-500 border-gray-300 rounded focus:ring-amber-500"
+                              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full ${formData.itinerary_disabled ? "opacity-50" : ""}`}
+                              rows="6"
+                              disabled={formData.itinerary_disabled || false}
                             />
-                            <span className="text-sm font-medium text-gray-700">
-                              Add to Recommended Tours (Homepage)
-                            </span>
-                          </label>
-                        </div>
-
-                        {/* Pricing Management Section */}
-                        <div className="md:col-span-2 border-t pt-4 mt-4">
-                          <h4 className="text-lg font-semibold text-gray-800 mb-4">
-                            💰 Pricing by Group Size
-                          </h4>
-
-                          {/* Existing Pricing */}
-                          {tourPricing.length > 0 ? (
-                            <div className="space-y-2 mb-4">
-                              {tourPricing.map((pricing) => (
-                                <div
-                                  key={pricing.id}
-                                  className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3"
-                                >
-                                  <div className="flex items-center gap-4">
-                                    <span className="bg-green-500 text-white font-bold px-3 py-1 rounded-full text-sm">
-                                      {pricing.min_persons}
-                                    </span>
-                                    <span className="text-xl font-bold text-gray-900">
-                                      {pricing.price_per_person}
-                                    </span>
-                                    <span className="text-gray-600 text-sm">
-                                      per person
-                                    </span>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDeletePricing(
-                                        formData.id,
-                                        pricing.id,
-                                      )
-                                    }
-                                    className="text-red-600 hover:text-red-800 font-semibold"
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-gray-500 mb-4">
-                              No pricing added yet
-                            </p>
-                          )}
-
-                          {/* Add New Pricing */}
-                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <h5 className="text-sm font-semibold text-gray-700 mb-3">
-                              Add New Pricing Entry
-                            </h5>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              <input
-                                type="text"
-                                placeholder="Group size (e.g., 1-2 persons)"
-                                value={newPricing.min_persons}
-                                onChange={(e) =>
-                                  setNewPricing({
-                                    ...newPricing,
-                                    min_persons: e.target.value,
-                                  })
-                                }
-                                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Price (e.g., 500 €)"
-                                value={newPricing.price_per_person}
-                                onChange={(e) =>
-                                  setNewPricing({
-                                    ...newPricing,
-                                    price_per_person: e.target.value,
-                                  })
-                                }
-                                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleAddPricing(formData.id)}
-                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 font-semibold"
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Current Images
+                            </label>
+                            {formData.images &&
+                            formData.images.trim() !== "" ? (
+                              <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleImageDragEnd}
                               >
-                                Add
-                              </button>
+                                <SortableContext
+                                  items={formData.images
+                                    .split(",")
+                                    .map((x) => x.trim())
+                                    .filter(Boolean)}
+                                  strategy={rectSortingStrategy}
+                                >
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                    {formData.images
+                                      .split(",")
+                                      .map((x) => x.trim())
+                                      .filter(Boolean)
+                                      .map((img) => (
+                                        <SortableImage
+                                          key={img}
+                                          id={img}
+                                          src={img}
+                                          onRemove={handleRemoveTourImage}
+                                        />
+                                      ))}
+                                  </div>
+                                </SortableContext>
+                              </DndContext>
+                            ) : (
+                              <p className="text-sm text-gray-500 mb-4">
+                                No images uploaded yet
+                              </p>
+                            )}
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Add More Images (Multiple)
+                            </label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={(e) =>
+                                setImageFiles(Array.from(e.target.files))
+                              }
+                              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 w-full"
+                            />
+                            {imageFiles.length > 0 && (
+                              <p className="text-sm text-gray-600 mt-1">
+                                {imageFiles.length} new file(s) selected
+                              </p>
+                            )}
+                            {uploading && (
+                              <p className="text-sm text-amber-600 mt-1">
+                                Uploading images...
+                              </p>
+                            )}
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.is_recommended || false}
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    is_recommended: e.target.checked,
+                                  })
+                                }
+                                className="w-4 h-4 text-amber-500 border-gray-300 rounded focus:ring-amber-500"
+                              />
+                              <span className="text-sm font-medium text-gray-700">
+                                Add to Recommended Tours (Homepage)
+                              </span>
+                            </label>
+                          </div>
+
+                          {/* Pricing Management Section */}
+                          <div className="md:col-span-2 border-t pt-4 mt-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                              💰 Pricing by Group Size
+                            </h4>
+
+                            {/* Existing Pricing */}
+                            {tourPricing.length > 0 ? (
+                              <div className="space-y-2 mb-4">
+                                {tourPricing.map((pricing) => (
+                                  <div
+                                    key={pricing.id}
+                                    className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3"
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <span className="bg-green-500 text-white font-bold px-3 py-1 rounded-full text-sm">
+                                        {pricing.min_persons}
+                                      </span>
+                                      <span className="text-xl font-bold text-gray-900">
+                                        {pricing.price_per_person}
+                                      </span>
+                                      <span className="text-gray-600 text-sm">
+                                        per person
+                                      </span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDeletePricing(
+                                          formData.id,
+                                          pricing.id,
+                                        )
+                                      }
+                                      className="text-red-600 hover:text-red-800 font-semibold"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-500 mb-4">
+                                No pricing added yet
+                              </p>
+                            )}
+
+                            {/* Add New Pricing */}
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                              <h5 className="text-sm font-semibold text-gray-700 mb-3">
+                                Add New Pricing Entry
+                              </h5>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <input
+                                  type="text"
+                                  placeholder="Group size (e.g., 1-2 persons)"
+                                  value={newPricing.min_persons}
+                                  onChange={(e) =>
+                                    setNewPricing({
+                                      ...newPricing,
+                                      min_persons: e.target.value,
+                                    })
+                                  }
+                                  className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="Price (e.g., 500 €)"
+                                  value={newPricing.price_per_person}
+                                  onChange={(e) =>
+                                    setNewPricing({
+                                      ...newPricing,
+                                      price_per_person: e.target.value,
+                                    })
+                                  }
+                                  className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddPricing(formData.id)}
+                                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 font-semibold"
+                                >
+                                  Add
+                                </button>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-2">
+                                💡 Enter custom text for group size (e.g., "1-2
+                                persons", "3+ persons")
+                              </p>
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">
-                              💡 Enter custom text for group size (e.g., "1-2
-                              persons", "3+ persons")
-                            </p>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex gap-3 mt-4">
-                        <button
-                          onClick={handleUpdateTour}
-                          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-                        >
-                          Update
-                        </button>
-                        <button
-                          onClick={handleCancel}
-                          className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-800">
-                          {tour.name}
-                        </h3>
-                        <div className="flex gap-4 text-gray-600 mt-2">
-                          <span>📍 {tour.destination}</span>
-                          <span>💰 {tour.price}</span>
-                          <span>🕐 {tour.duration}</span>
+                        <div className="flex gap-3 mt-4">
+                          <button
+                            onClick={handleUpdateTour}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+                          >
+                            Update
+                          </button>
+                          <button
+                            onClick={handleCancel}
+                            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400"
+                          >
+                            Cancel
+                          </button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditTour(tour)}
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTour(tour.id)}
-                          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                        >
-                          Delete
-                        </button>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">
+                            {tour.name}
+                          </h3>
+                          <div className="flex gap-4 text-gray-600 mt-2">
+                            <span>📍 {tour.destination}</span>
+                            <span>💰 {tour.price}</span>
+                            <span>🕐 {tour.duration}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditTour(tour)}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTour(tour.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))}
             </div>
           </div>
         )}

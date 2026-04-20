@@ -12,14 +12,18 @@ export function Tours() {
   const location = useLocation();
   const [selectedDestination, setSelectedDestination] = useState("All");
   const [selectedLanguage, setSelectedLanguage] = useState("All");
+  const [sortOrder, setSortOrder] = useState("newest");
+  const [searchQuery, setSearchQuery] = useState("");
   const [tours, setTours] = useState([]);
   const [destinations, setDestinations] = useState(["All"]);
   const [availableLanguages, setAvailableLanguages] = useState(["All"]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const languageNames = {
-    All: "All Languages",
+    All: t("tours.allLanguages"),
     tr: "🇹🇷 Türkçe",
     en: "🇬🇧 English",
     de: "🇩🇪 Deutsch",
@@ -89,29 +93,36 @@ export function Tours() {
     }
   };
 
-  const filteredTours = tours.filter((tour) => {
-    const matchesDestination =
-      selectedDestination === "All" || tour.destination === selectedDestination;
-    const matchesLanguage =
-      selectedLanguage === "All" ||
-      (tour.language || "tr") === selectedLanguage;
+  const filteredTours = tours
+    .filter((tour) => {
+      const matchesDestination =
+        selectedDestination === "All" ||
+        tour.destination === selectedDestination;
+      const matchesLanguage =
+        selectedLanguage === "All" ||
+        (tour.language || "tr") === selectedLanguage;
 
-    // Debug logging
-    if (selectedLanguage !== "All") {
-      console.log(
-        "Tour:",
-        tour.name,
-        "Language:",
-        tour.language || "tr",
-        "Selected:",
-        selectedLanguage,
-        "Matches:",
-        matchesLanguage,
-      );
-    }
+      // Debug logging
+      if (selectedLanguage !== "All") {
+        console.log(
+          "Tour:",
+          tour.name,
+          "Language:",
+          tour.language || "tr",
+          "Selected:",
+          selectedLanguage,
+          "Matches:",
+          matchesLanguage,
+        );
+      }
 
-    return matchesDestination && matchesLanguage;
-  });
+      return matchesDestination && matchesLanguage;
+    })
+    .sort((a, b) => {
+      if (sortOrder === "newest") return b.id - a.id;
+      if (sortOrder === "oldest") return a.id - b.id;
+      return 0;
+    });
 
   if (loading) {
     return (
@@ -145,48 +156,190 @@ export function Tours() {
       </div>
 
       {/* Filter Section */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Language Filter */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {t("tours.filterByLanguage")}
-          </h3>
-          <div className="flex flex-wrap justify-center gap-3">
-            {availableLanguages.map((lang) => (
-              <button
-                key={lang}
-                onClick={() => setSelectedLanguage(lang)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                  selectedLanguage === lang
-                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105"
-                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
-                }`}
-              >
-                {languageNames[lang] || lang}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Overlay to close dropdowns on outside click */}
+        {openDropdown && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setOpenDropdown(null)}
+          />
+        )}
 
-        {/* Destination Filter */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {t("tours.filterByDestination")}
-          </h3>
-          <div className="flex flex-wrap justify-center gap-3">
-            {destinations.map((dest) => (
-              <button
-                key={dest}
-                onClick={() => setSelectedDestination(dest)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                  selectedDestination === dest
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg scale-105"
-                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
-                }`}
+        <div className="max-w-3xl flex flex-col sm:flex-row gap-3 mb-8 mx-auto">
+          {/* Language Dropdown */}
+          <div className="relative flex-1">
+            <button
+              onClick={() =>
+                setOpenDropdown(openDropdown === "language" ? null : "language")
+              }
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              <span>{languageNames[selectedLanguage] || selectedLanguage}</span>
+              <svg
+                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === "language" ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {dest}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {openDropdown === "language" && (
+              <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                {availableLanguages.map((lang) => (
+                  <div
+                    key={lang}
+                    onClick={() => {
+                      setSelectedLanguage(lang);
+                      setOpenDropdown(null);
+                    }}
+                    className={`px-4 py-2.5 cursor-pointer hover:bg-amber-50 text-gray-700 transition-colors ${selectedLanguage === lang ? "bg-amber-50 font-semibold text-amber-600" : ""}`}
+                  >
+                    {languageNames[lang] || lang}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Destination Dropdown */}
+          <div className="relative flex-1">
+            <button
+              onClick={() =>
+                setOpenDropdown(
+                  openDropdown === "destination" ? null : "destination",
+                )
+              }
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              <span>
+                {selectedDestination === "All"
+                  ? t("tours.allDestinations")
+                  : selectedDestination}
+              </span>
+              <svg
+                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === "destination" ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {openDropdown === "destination" && (
+              <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                {destinations.map((dest) => (
+                  <div
+                    key={dest}
+                    onClick={() => {
+                      setSelectedDestination(dest);
+                      setOpenDropdown(null);
+                    }}
+                    className={`px-4 py-2.5 cursor-pointer hover:bg-amber-50 text-gray-700 transition-colors ${selectedDestination === dest ? "bg-amber-50 font-semibold text-amber-600" : ""}`}
+                  >
+                    {dest === "All" ? t("tours.allDestinations") : dest}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="relative flex-1">
+            <button
+              onClick={() =>
+                setOpenDropdown(openDropdown === "sort" ? null : "sort")
+              }
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              <span>
+                {sortOrder === "newest"
+                  ? t("tours.newestFirst")
+                  : t("tours.oldestFirst")}
+              </span>
+              <svg
+                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === "sort" ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {openDropdown === "sort" && (
+              <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                {[
+                  { value: "newest", label: t("tours.newestFirst") },
+                  { value: "oldest", label: t("tours.oldestFirst") },
+                ].map((opt) => (
+                  <div
+                    key={opt.value}
+                    onClick={() => {
+                      setSortOrder(opt.value);
+                      setOpenDropdown(null);
+                    }}
+                    className={`px-4 py-2.5 cursor-pointer hover:bg-amber-50 text-gray-700 transition-colors ${sortOrder === opt.value ? "bg-amber-50 font-semibold text-amber-600" : ""}`}
+                  >
+                    {opt.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {/*search bar */}
+          <div className="flex items-end">
+            <div
+              className={`flex items-center bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
+                searchOpen
+                  ? "w-56 px-3 "
+                  : "w-12 px-0 cursor-pointer justify-center !rounded-full"
+              }`}
+              style={{ height: "52px" }}
+              onClick={() => !searchOpen && setSearchOpen(true)}
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSearchOpen((prev) => !prev);
+                }}
+                className="flex-shrink-0 w-6 h-6 flex items-center justify-center"
+              >
+                <img
+                  src="/icons8-search-30.png"
+                  className="w-6 h-6 opacity-80 cursor-pointer"
+                />
               </button>
-            ))}
+              {searchOpen && (
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Search tours..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onBlur={() => {
+                    if (!searchQuery) setSearchOpen(false);
+                  }}
+                  onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+                  className="ml-2 flex-1 bg-transparent focus:outline-none text-gray-700 text-sm"
+                />
+              )}
+            </div>
           </div>
         </div>
 

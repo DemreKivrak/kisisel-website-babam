@@ -52,19 +52,32 @@ export function TourPage() {
           notIncluded: tour.not_included
             ? tour.not_included.split("\n").filter((n) => n.trim())
             : [],
-          itinerary: tour.itinerary
-            ? tour.itinerary
-                .split("\n")
-                .filter((i) => i.trim())
-                .map((item, idx) => {
-                  const parts = item.split("|").map((p) => p.trim());
+          itinerary: (() => {
+            const raw = tour.itinerary || "";
+            if (raw.startsWith("[DISABLED]")) return null;
+            return raw
+              .split("\n")
+              .filter((i) => i.trim())
+              .map((item, idx) => {
+                const parts = item.split("|").map((p) => p.trim());
+                if (parts.length >= 3) {
+                  // Multi-day: Day X | Title | Description
                   return {
+                    type: "multi",
                     day: idx + 1,
                     title: parts[1] || "Day Activity",
                     description: parts[2] || "",
                   };
-                })
-            : [],
+                } else {
+                  // Single-day: Title | Description
+                  return {
+                    type: "single",
+                    title: parts[0] || "",
+                    description: parts[1] || "",
+                  };
+                }
+              });
+          })(),
         };
 
         setTourData(parsedTour);
@@ -359,29 +372,43 @@ export function TourPage() {
           </section>
 
           {/* Itinerary */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {t("tours.itinerary")}
-            </h2>
-            <div className="space-y-4">
-              {tourData.itinerary.map((day) => (
-                <div
-                  key={day.day}
-                  className="border-l-4 border-amber-500 pl-6 pb-4"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="bg-amber-500 text-white font-bold px-3 py-1 rounded-full text-sm">
-                      Day {day.day}
-                    </span>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {day.title}
-                    </h3>
-                  </div>
-                  <p className="text-gray-700">{day.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+          {tourData.itinerary !== null && tourData.itinerary.length > 0 && (
+            <section className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                {t("tours.itinerary")}
+              </h2>
+              <div className="space-y-4">
+                {tourData.itinerary.map((item, idx) =>
+                  item.type === "multi" ? (
+                    <div
+                      key={idx}
+                      className="border-l-4 border-amber-500 pl-6 pb-4"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="bg-amber-500 text-white font-bold px-3 py-1 rounded-full text-sm">
+                          Day {item.day}
+                        </span>
+                        <h3 className="text-xl font-bold text-gray-900">
+                          {item.title}
+                        </h3>
+                      </div>
+                      <p className="text-gray-700">{item.description}</p>
+                    </div>
+                  ) : (
+                    <div
+                      key={idx}
+                      className="border-l-4 border-amber-400 pl-6 pb-4"
+                    >
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-700">{item.description}</p>
+                    </div>
+                  ),
+                )}
+              </div>
+            </section>
+          )}
 
           {/* Pricing Table */}
           <section ref={pricingRef}>

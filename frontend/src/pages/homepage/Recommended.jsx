@@ -231,7 +231,7 @@ export function Recommended() {
                 </div>
 
                 {/* CTA Button */}
-                <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg">
+                <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg cursor-pointer">
                   <span>{t("tours.viewDetails")}</span>
                   <svg
                     className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
