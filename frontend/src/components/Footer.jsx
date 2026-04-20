@@ -19,7 +19,7 @@ export function Footer() {
               <div className="bg-[rgb(42,48,51)] p-2 rounded-lg">
                 <img
                   className="h-6 w-6"
-                  src="icons8-phone-24.png"
+                  src="/icons8-phone-24.png"
                   alt="Phone"
                 ></img>
               </div>
@@ -39,7 +39,7 @@ export function Footer() {
               <div className="bg-[rgb(42,48,51)] p-2 rounded-lg">
                 <img
                   className="h-6 w-6"
-                  src="icons8-email-50.png"
+                  src="/icons8-email-50.png"
                   alt="Email"
                 ></img>
               </div>

@@ -9,6 +9,8 @@ export function DestinationsComp() {
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
+  const containerRef = useRef(null); // dış wrapper için yeni ref
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     loadDestinations();
@@ -35,6 +37,36 @@ export function DestinationsComp() {
       });
     }
   };
+  // Auto-scroll: görünürlük takibi
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          intervalRef.current = setInterval(() => {
+            const el = scrollContainerRef.current;
+            if (!el) return;
+
+            const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
+            if (atEnd) {
+              el.scrollTo({ left: 0, behavior: "smooth" });
+            } else {
+              el.scrollBy({ left: 400, behavior: "smooth" });
+            }
+          }, 3000); // her 3 saniyede bir
+        } else {
+          clearInterval(intervalRef.current);
+        }
+      },
+      { threshold: 0.3 }, // %30'u görünürse tetikle
+    );
+
+    if (containerRef.current) observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(intervalRef.current);
+    };
+  }, [destinations]); // recommended yüklendikten sonra başlasın
 
   if (loading) {
     return (
@@ -48,7 +80,14 @@ export function DestinationsComp() {
   }
 
   return (
-    <div className="py-16 px-4 overflow-hidden">
+    <div
+      ref={containerRef}
+      onMouseEnter={() => clearInterval(intervalRef.current)}
+      onMouseLeave={() => {
+        /* interval'i yeniden başlat */
+      }}
+      className="py-16 px-4 overflow-hidden"
+    >
       <div className="text-center mb-12 relative">
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
           01

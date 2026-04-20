@@ -7,15 +7,14 @@ export function LanguageSwitcher() {
   const dropdownRef = useRef(null);
 
   const languages = [
-    { code: "en", name: "English", flag: "🇬🇧" },
-    { code: "tr", name: "Türkçe", flag: "🇹🇷" },
-    { code: "de", name: "Deutsch", flag: "🇩🇪" },
-    { code: "fr", name: "Français", flag: "🇫🇷" },
-    { code: "es", name: "Español", flag: "🇪🇸" },
-    { code: "ru", name: "Русский", flag: "🇷🇺" },
-    { code: "ja", name: "日本語", flag: "🇯🇵" },
+    { code: "en", name: "English", countryCode: "gb" },
+    { code: "tr", name: "Türkçe", countryCode: "tr" },
+    { code: "de", name: "Deutsch", countryCode: "de" },
+    { code: "fr", name: "Français", countryCode: "fr" },
+    { code: "es", name: "Español", countryCode: "es" },
+    { code: "ru", name: "Русский", countryCode: "ru" },
+    { code: "ja", name: "日本語", countryCode: "jp" },
   ];
-
   const currentLanguage =
     languages.find((lang) => lang.code === i18n.language) || languages[0];
 
@@ -54,22 +53,11 @@ export function LanguageSwitcher() {
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all backdrop-blur-sm border border-white/20 cursor-pointer"
         aria-label="Select Language"
       >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-          />
-        </svg>
-        <span className="font-medium text-sm hidden sm:inline">
-          {currentLanguage.flag}
-        </span>
+        <img
+          src={`https://flagcdn.com/w20/${currentLanguage.countryCode}.png`}
+          alt={currentLanguage.name}
+          className="w-5 h-4 object-cover rounded-sm"
+        />
         <svg
           className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
@@ -97,7 +85,11 @@ export function LanguageSwitcher() {
                   : "text-gray-700"
               }`}
             >
-              <span className="text-2xl">{lang.flag}</span>
+              <img
+                src={`https://flagcdn.com/w40/${lang.countryCode}.png`}
+                alt={lang.name}
+                className="w-7 h-5 object-cover rounded-sm"
+              />
               <span className="text-sm">{lang.name}</span>
               {i18n.language === lang.code && (
                 <svg

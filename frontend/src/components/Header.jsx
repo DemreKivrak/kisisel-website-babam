@@ -81,7 +81,7 @@ export function Header() {
       >
         <img
           className="h-5 ml-5 mr-2"
-          src="icons8-phone-24.png"
+          src="/icons8-phone-24.png"
           alt="phone"
         ></img>
         <p className="text-white">+90 536 223 83 40 | oltretour@hotmail.com</p>
@@ -96,7 +96,7 @@ export function Header() {
         <div>
           <img
             className="cursor-pointer h-12 md:h-24 ml-2 md:ml-10 flex-shrink-0 md:mb-1"
-            src="new-logo-oltre.png"
+            src="/new-logo-oltre.png"
             alt="logo"
             onClick={() => handleNavigate("/")}
           />
