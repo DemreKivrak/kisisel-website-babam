@@ -6,6 +6,7 @@ import { TourPage } from "../../components/TourPage";
 import { api } from "../../services/api";
 import { Footer } from "../../components/Footer";
 import { WhatsappContact } from "../../components/WhatsappContact";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Tours() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export function Tours() {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const languageNames = {
     All: t("tours.allLanguages"),
@@ -115,8 +117,12 @@ export function Tours() {
           matchesLanguage,
         );
       }
+      const matchesSearch =
+        !searchQuery ||
+        tour.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tour.destination.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchesDestination && matchesLanguage;
+      return matchesDestination && matchesLanguage && matchesSearch;
     })
     .sort((a, b) => {
       if (sortOrder === "newest") return b.id - a.id;
@@ -155,7 +161,54 @@ export function Tours() {
         </div>
       </div>
 
-      {/* Filter Section */}
+      {/* Mobil filtre butonu - sadece küçük ekranlarda görünür */}
+      <div className="flex md:hidden gap-2 mb-4 px-4 mt-4">
+        <button
+          onClick={() => setMobileFilterOpen(true)}
+          className="px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center justify-center gap-2 font-medium text-gray-700"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
+            />
+          </svg>
+          <span>Filter</span>
+          {(selectedDestination !== "All" || selectedLanguage !== "All") && (
+            <span className="bg-amber-500 text-white text-xs rounded-full px-2 py-0.5">
+              {
+                [
+                  selectedDestination !== "All",
+                  selectedLanguage !== "All",
+                ].filter(Boolean).length
+              }
+            </span>
+          )}
+        </button>
+        <div className="flex-1 flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-3">
+          <img
+            src="/icons8-search-30.png"
+            className="w-5 h-5 opacity-60 flex-shrink-0"
+          />
+          <input
+            type="text"
+            placeholder="Search tours..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="ml-2 flex-1 bg-transparent focus:outline-none text-gray-700 text-sm py-3"
+          />
+        </div>
+      </div>
+
+      {/* Filter Section - sadece md+ ekranlarda göster */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Overlay to close dropdowns on outside click */}
         {openDropdown && (
@@ -165,9 +218,9 @@ export function Tours() {
           />
         )}
 
-        <div className="max-w-3xl flex flex-col sm:flex-row gap-3 mb-8 mx-auto">
+        <div className="hidden md:flex max-w-3xl flex-row gap-3 mb-8 mx-auto">
           {/* Language Dropdown */}
-          <div className="relative flex-1">
+          <div className="relative  md:flex-1">
             <button
               onClick={() =>
                 setOpenDropdown(openDropdown === "language" ? null : "language")
@@ -190,7 +243,10 @@ export function Tours() {
               </svg>
             </button>
             {openDropdown === "language" && (
-              <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div
+                className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
+                style={{ maxHeight: "240px", overflowY: "auto" }}
+              >
                 {availableLanguages.map((lang) => (
                   <div
                     key={lang}
@@ -237,7 +293,10 @@ export function Tours() {
               </svg>
             </button>
             {openDropdown === "destination" && (
-              <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div
+                className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
+                style={{ maxHeight: "240px", overflowY: "auto" }}
+              >
                 {destinations.map((dest) => (
                   <div
                     key={dest}
@@ -282,7 +341,10 @@ export function Tours() {
               </svg>
             </button>
             {openDropdown === "sort" && (
-              <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div
+                className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
+                style={{ maxHeight: "240px", overflowY: "auto" }}
+              >
                 {[
                   { value: "newest", label: t("tours.newestFirst") },
                   { value: "oldest", label: t("tours.oldestFirst") },
@@ -396,6 +458,184 @@ export function Tours() {
           </div>
         )}
       </div>
+      <AnimatePresence>
+        {mobileFilterOpen && (
+          <>
+            <motion.div
+              key="overlay"
+              className="fixed inset-0 bg-black/50 z-50 md:hidden"
+              onClick={() => setMobileFilterOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            <motion.div
+              key="panel"
+              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 p-6 md:hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            >
+              <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-6" />
+              <h3 className="text-lg font-bold mb-4">Filter & Order</h3>
+
+              {/* Language */}
+              <div className="mb-4">
+                <button
+                  onClick={() =>
+                    setOpenDropdown(
+                      openDropdown === "mob-language" ? null : "mob-language",
+                    )
+                  }
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium flex justify-between items-center"
+                >
+                  <span>
+                    {languageNames[selectedLanguage] || selectedLanguage}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === "mob-language" ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {openDropdown === "mob-language" && (
+                  <div className="border border-gray-200 rounded-xl mt-1 overflow-hidden">
+                    {availableLanguages.map((lang) => (
+                      <div
+                        key={lang}
+                        onClick={() => {
+                          setSelectedLanguage(lang);
+                          setOpenDropdown(null);
+                        }}
+                        className={`px-4 py-2.5 cursor-pointer hover:bg-amber-50 text-gray-700 ${selectedLanguage === lang ? "bg-amber-50 font-semibold text-amber-600" : ""}`}
+                      >
+                        {languageNames[lang] || lang}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Destination */}
+              <div className="mb-4">
+                <button
+                  onClick={() =>
+                    setOpenDropdown(
+                      openDropdown === "mob-destination"
+                        ? null
+                        : "mob-destination",
+                    )
+                  }
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium flex justify-between items-center"
+                >
+                  <span>
+                    {selectedDestination === "All"
+                      ? t("tours.allDestinations")
+                      : selectedDestination}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === "mob-destination" ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {openDropdown === "mob-destination" && (
+                  <div className="border border-gray-200 rounded-xl mt-1 overflow-hidden">
+                    {destinations.map((dest) => (
+                      <div
+                        key={dest}
+                        onClick={() => {
+                          setSelectedDestination(dest);
+                          setOpenDropdown(null);
+                        }}
+                        className={`px-4 py-2.5 cursor-pointer hover:bg-amber-50 text-gray-700 ${selectedDestination === dest ? "bg-amber-50 font-semibold text-amber-600" : ""}`}
+                      >
+                        {dest === "All" ? t("tours.allDestinations") : dest}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Sort */}
+              <div className="mb-6">
+                <button
+                  onClick={() =>
+                    setOpenDropdown(
+                      openDropdown === "mob-sort" ? null : "mob-sort",
+                    )
+                  }
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium flex justify-between items-center"
+                >
+                  <span>
+                    {sortOrder === "newest"
+                      ? t("tours.newestFirst")
+                      : t("tours.oldestFirst")}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === "mob-sort" ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {openDropdown === "mob-sort" && (
+                  <div className="border border-gray-200 rounded-xl mt-1 overflow-hidden">
+                    {[
+                      { value: "newest", label: t("tours.newestFirst") },
+                      { value: "oldest", label: t("tours.oldestFirst") },
+                    ].map((opt) => (
+                      <div
+                        key={opt.value}
+                        onClick={() => {
+                          setSortOrder(opt.value);
+                          setOpenDropdown(null);
+                        }}
+                        className={`px-4 py-2.5 cursor-pointer hover:bg-amber-50 text-gray-700 ${sortOrder === opt.value ? "bg-amber-50 font-semibold text-amber-600" : ""}`}
+                      >
+                        {opt.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="w-full bg-amber-500 text-white py-3 rounded-xl font-semibold"
+              >
+                APPLY
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <WhatsappContact />
       <Footer />
     </div>
