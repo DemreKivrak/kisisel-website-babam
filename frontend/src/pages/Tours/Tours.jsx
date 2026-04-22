@@ -52,6 +52,13 @@ export function Tours() {
     }
   }, [location.search]);
 
+  const resetFilters = () => {
+    setSelectedDestination("All");
+    setSelectedLanguage("All");
+    setSortOrder("newest");
+    setSearchQuery("");
+  };
+
   const loadData = async () => {
     try {
       const [toursData, destinationsData] = await Promise.all([
@@ -225,7 +232,7 @@ export function Tours() {
               onClick={() =>
                 setOpenDropdown(openDropdown === "language" ? null : "language")
               }
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
             >
               <span>{languageNames[selectedLanguage] || selectedLanguage}</span>
               <svg
@@ -271,7 +278,7 @@ export function Tours() {
                   openDropdown === "destination" ? null : "destination",
                 )
               }
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
             >
               <span>
                 {selectedDestination === "All"
@@ -319,7 +326,7 @@ export function Tours() {
               onClick={() =>
                 setOpenDropdown(openDropdown === "sort" ? null : "sort")
               }
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-700 font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
             >
               <span>
                 {sortOrder === "newest"
@@ -624,13 +631,23 @@ export function Tours() {
                   </div>
                 )}
               </div>
-
-              <button
-                onClick={() => setMobileFilterOpen(false)}
-                className="w-full bg-amber-500 text-white py-3 rounded-xl font-semibold"
-              >
-                APPLY
-              </button>
+              <div className="flex gap-x-2">
+                <button
+                  onClick={() => {
+                    resetFilters();
+                    setMobileFilterOpen(false);
+                  }}
+                  className="w-full bg-gray-400 text-white py-3 rounded-3xl flex-1 font-semibold"
+                >
+                  CLEAR
+                </button>
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className=" flex-2 w-full bg-amber-500 text-white py-3 rounded-3xl font-semibold"
+                >
+                  APPLY
+                </button>
+              </div>
             </motion.div>
           </>
         )}
