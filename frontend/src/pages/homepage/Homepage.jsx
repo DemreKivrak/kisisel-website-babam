@@ -36,7 +36,7 @@ export function Homepage() {
 
         <div className="relative">
           <video
-            className="w-full md:h-161 h-170 block object-cover"
+            className="w-full  h-dvh block object-cover"
             autoPlay
             loop
             muted
@@ -63,7 +63,7 @@ export function Homepage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 py-12 px-6 text-center shadow-inner">
+        <div className="bg-white py-12 px-6 text-center shadow-inner">
           <motion.div
             className="p-8 order-2 md:order-1 md:mt-10"
             initial="hidden"

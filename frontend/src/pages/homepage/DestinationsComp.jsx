@@ -88,9 +88,9 @@ export function DestinationsComp() {
       ref={containerRef}
       onMouseEnter={() => clearInterval(intervalRef.current)}
       onMouseLeave={() => startAutoScroll()}
-      className="py-16 px-4 overflow-hidden"
+      className="py-8 px-4 overflow-hidden"
     >
-      <div className="text-center mb-12 relative">
+      <div className="text-center mb-6 relative">
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
           01
         </span>
@@ -130,17 +130,17 @@ export function DestinationsComp() {
         <div className="overflow-hidden">
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-4 snap-x snap-mandatory"
+            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-2 snap-x snap-mandatory"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {destinations.map((dest, i) => (
               <div
                 key={i}
                 onClick={() => navigate(`/destinations#${dest.id}`)}
-                className="group relative flex-shrink-0 w-[280px] md:w-[calc(33.333%-1rem)] overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2 snap-center"
+                className="group relative flex-shrink-0 w-[280px] md:w-[240px] md:w-[calc(33.333%-1rem)] overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2 snap-center"
               >
                 {/* Image Container */}
-                <div className="relative h-96 overflow-hidden">
+                <div className="relative h-64 overflow-hidden">
                   <img
                     src={dest.img}
                     alt={dest.name}

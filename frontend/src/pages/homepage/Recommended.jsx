@@ -110,9 +110,9 @@ export function Recommended() {
       ref={containerRef}
       onMouseEnter={() => clearInterval(intervalRef.current)}
       onMouseLeave={() => startAutoScroll()}
-      className="py-16 px-4 bg-gradient-to-b from-white to-amber-50/30 overflow-hidden "
+      className="py-4 px-4 bg-gradient-to-b from-white to-amber-50/30 overflow-hidden "
     >
-      <div className="text-center mb-16 relative">
+      <div className="text-center mb-6 relative">
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
           02
         </span>
@@ -151,17 +151,16 @@ export function Recommended() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-4 snap-x snap-mandatory "
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-2 snap-x snap-mandatory "
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {recommended.map((tour, i) => (
             <div
               key={i}
-              onClick={() => navigate(`/tourpage/${tour.id}`)}
-              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 flex-shrink-0 w-[280px] md:w-96 snap-center"
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 flex-shrink-0 w-[80vw] max-w-[280px] md:w-[calc(25%-1.125rem)] md:max-w-none snap-center flex flex-col"
             >
               {/* Image Container */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-44 overflow-hidden">
                 <img
                   src={tour.img}
                   alt={tour.name}
@@ -187,9 +186,9 @@ export function Recommended() {
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-3 flex flex-col flex-1">
                 {/* Duration Badge */}
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2">
                   <div className="flex items-center gap-1 text-amber-600 bg-amber-50 px-3 py-1 rounded-full text-sm font-medium">
                     <svg
                       className="w-4 h-4"
@@ -209,12 +208,12 @@ export function Recommended() {
                 </div>
 
                 {/* Tour Name */}
-                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amber-600 transition-colors duration-300">
+                <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors duration-300">
                   {tour.name}
                 </h3>
 
                 {/* Features */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-1 mb-2">
                   <div className="flex items-center gap-2 text-sm text-gray-600"></div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <svg
@@ -233,21 +232,8 @@ export function Recommended() {
                 </div>
 
                 {/* CTA Button */}
-                <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg cursor-pointer">
+                <button className="mt-auto w-3/5 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2 rounded-3xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg cursor-pointer mx-auto">
                   <span>{t("tours.viewDetails")}</span>
-                  <svg
-                    className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
                 </button>
               </div>
 
