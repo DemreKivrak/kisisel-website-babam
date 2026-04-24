@@ -119,7 +119,7 @@ export function Recommended() {
         <p className="text-amber-500 text-xs font-semibold tracking-[0.25em] uppercase mb-4">
           {t("tours.handpicked")}
         </p>
-        <h1 className="text-4xl md:text-5xl font-roboto-condensed font-semibold text-gray-900 tracking-tight leading-none mb-6">
+        <h1 className="text-4xl md:text-5xl font-sans font-light tracking-tight text-gray-900  leading-relaxed mb-6 ">
           {t("tours.recommended")}
         </h1>
         <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
@@ -151,7 +151,7 @@ export function Recommended() {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-4 snap-x snap-mandatory"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2 py-4 snap-x snap-mandatory "
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {recommended.map((tour, i) => (
