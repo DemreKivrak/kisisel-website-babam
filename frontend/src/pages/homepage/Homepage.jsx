@@ -27,11 +27,21 @@ export function Homepage() {
       transition: { duration: 1.2, ease: "easeOut" },
     },
   };
+  const capitalize = (str) =>
+    str
+      .split(" ")
+      .map((word) =>
+        word.length === 0
+          ? word
+          : word[0].toLocaleUpperCase("tr") +
+            word.slice(1).toLocaleLowerCase("tr"),
+      )
+      .join(" ");
 
   return (
     <>
       <div className="relative bg-gradient-to-b from-gray-50 to-white overflow-x-hidden max-w-full">
-        <title>{t("hero.companyName")}</title>
+        <title>{capitalize(t("hero.companyName"))}</title>
         <Header />
 
         <div className="relative">
