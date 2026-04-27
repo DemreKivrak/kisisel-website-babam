@@ -110,14 +110,14 @@ export function Header() {
         >
           {/*menu items*/}
           <a
-            className="hover:text-amber-300 cursor-pointer transition"
+            className="hover:text-amber-300 cursor-pointer transition font-onest"
             onClick={() => handleNavigate("/")}
           >
             {t("nav.home")}
           </a>
           <div className="relative group">
             <a
-              className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
+              className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1 font-onest "
               onClick={() => navigate("/tours")}
             >
               {t("nav.tours")}
@@ -135,7 +135,7 @@ export function Header() {
                 />
               </svg>
             </a>
-            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[250px] py-2 z-50 border-1 border-gray-200">
+            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[250px] py-2 z-50 border-1 border-gray-200 ">
               {Object.keys(toursByLanguage).length > 0 ? (
                 <>
                   {toursByLanguage["tr"] &&
@@ -248,7 +248,7 @@ export function Header() {
                     )}
                   <li className="border-t border-gray-200 mt-1 pt-1">
                     <a
-                      className="block px-4 py-2 hover:bg-amber-50 cursor-pointer transition font-semibold text-amber-600"
+                      className="block px-4 py-2 hover:bg-amber-50 cursor-pointer transition font-medium text-amber-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate("/tours");
@@ -264,7 +264,7 @@ export function Header() {
             </ul>
           </div>
 
-          <div className="relative group">
+          <div className="relative group font-onest ">
             <a
               className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
               onClick={() => navigate("/destinations")}
@@ -304,7 +304,7 @@ export function Header() {
             </ul>
           </div>
 
-          <div className="relative group">
+          <div className="relative group font-onest ">
             <a
               className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1"
               onClick={() => navigate("/services")}
@@ -338,13 +338,13 @@ export function Header() {
           </div>
 
           <a
-            className="hover:text-amber-300 cursor-pointer transition"
+            className="hover:text-amber-300 cursor-pointer transition font-onest"
             onClick={() => navigate("/contact")}
           >
             {t("nav.contact")}
           </a>
 
-          <div className="relative group">
+          <div className="relative group font-onest">
             <a className="hover:text-amber-300 cursor-pointer transition flex items-center gap-1">
               {t("nav.about")}
               <svg
@@ -361,9 +361,9 @@ export function Header() {
                 />
               </svg>
             </a>
-            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1 border-gray-200">
+            <ul className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-0 bg-gray-50 text-gray-800 shadow-lg rounded-md mt-2 min-w-[200px] py-2 z-50 border-1 border-gray-200 font-onest">
               <li
-                className=" px-4 py-2 cursor-pointer transition hover:text-amber-300"
+                className=" px-4 py-2 cursor-pointer transition hover:text-amber-300 font-onest"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate("/about");

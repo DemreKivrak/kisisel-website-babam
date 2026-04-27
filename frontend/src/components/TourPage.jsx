@@ -131,7 +131,7 @@ export function TourPage() {
         {/* Back Button */}
         <button
           onClick={() => window.history.back()}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition group"
+          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition group cursor-pointer"
         >
           <svg
             className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
@@ -283,7 +283,7 @@ export function TourPage() {
                   </p>
                   <button
                     onClick={() => navigate("/contact#contact")}
-                    className="mt-4 w-full bg-linear-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                    className="button-type-1 mt-4 text-xl hover:scale-105"
                   >
                     {t("common.bookNow")}
                   </button>
@@ -459,7 +459,7 @@ export function TourPage() {
           </div>
           <button
             onClick={() => navigate("/contact#contact")}
-            className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer whitespace-nowrap"
+            className="bg-linear-to-r bg-gradient-to-r from-[rgb(36,54,61)] to-[rgb(49,76,88)] text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer whitespace-nowrap hover:bg-none hover:border-1 hover:text-[rgb(36,54,61)]"
           >
             {t("common.bookNow")}
           </button>

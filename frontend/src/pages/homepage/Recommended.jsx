@@ -119,7 +119,7 @@ export function Recommended() {
         <p className="text-amber-500 text-xs font-semibold tracking-[0.25em] uppercase mb-4">
           {t("tours.handpicked")}
         </p>
-        <h1 className="text-4xl md:text-5xl font-sans font-light tracking-tight text-gray-900  leading-relaxed mb-6 ">
+        <h1 className="text-4xl md:text-5xl font-onest font-bold tracking-tight text-gray-900  leading-relaxed mb-6 ">
           {t("tours.recommended")}
         </h1>
         <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
@@ -166,7 +166,7 @@ export function Recommended() {
                   alt={tour.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-400 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg z-10">
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-sky-400 to-sky-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg z-10">
                   {languageNames[tour.language]}
                 </div>
 
@@ -208,7 +208,7 @@ export function Recommended() {
                 </div>
 
                 {/* Tour Name */}
-                <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors duration-300">
+                <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-gray-800 transition-colors duration-300">
                   {tour.name}
                 </h3>
 
@@ -232,13 +232,16 @@ export function Recommended() {
                 </div>
 
                 {/* CTA Button */}
-                <button className="mt-auto w-3/5 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2 rounded-3xl font-semibold group-hover:from-amber-600 group-hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg cursor-pointer mx-auto">
+                <button
+                  onClick={() => navigate(`/tourpage/${tour.id}`)}
+                  className="mt-auto w-4/7 bg-gradient-to-r from-[rgb(36,54,61)] to-[rgb(49,76,88)] text-white py-2 rounded-3xl font-medium  transition-all duration-400 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg cursor-pointer mx-auto hover:bg-white hover:bg-none hover:text-[rgb(31,37,40)] hover:border-1 "
+                >
                   <span>{t("tours.viewDetails")}</span>
                 </button>
               </div>
 
               {/* Hover Border Effect */}
-              <div className="absolute inset-0 border-2 border-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
+              <div className="absolute inset-0 border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
             </div>
           ))}
         </div>

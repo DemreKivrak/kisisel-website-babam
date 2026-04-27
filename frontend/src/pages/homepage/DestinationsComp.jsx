@@ -97,7 +97,7 @@ export function DestinationsComp() {
         <p className="text-amber-500 text-xs font-semibold tracking-[0.25em] uppercase mb-4">
           {t("destinations.discover")}
         </p>
-        <h1 className="text-4xl md:text-5xl font-sans font-light tracking-tight text-gray-900 tracking-tight leading-relaxed mb-6">
+        <h1 className="text-4xl md:text-5xl font-onest font-bold tracking-tight text-gray-800 tracking-tight leading-relaxed mb-6">
           {t("destinations.popularTitle")}
         </h1>
         <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">

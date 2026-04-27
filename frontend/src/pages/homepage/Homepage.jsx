@@ -62,11 +62,11 @@ export function Homepage() {
           {/* Hero Text Overlay */}
           <div className="absolute inset-0 flex items-center justify-center text-center px-4">
             <div className="max-w-4xl">
-              <h1 className="text-3xl md:text-6xl lg:text-6xl text-white mb-6 drop-shadow-2xl mt-14 font-roboto-condensed font-bold">
+              <h1 className="text-3xl md:text-5xl lg:text-5xl text-white mb-6 drop-shadow-2xl mt-14 font-onest font-bold leading-snug md:leading-tight">
                 {t("hero.companyName")}
               </h1>
 
-              <p className="text-gray-200 mt-2 text-xs md:text-sm tracking-wider uppercase">
+              <p className="text-gray-200 mt-2 text-xs md:text-sm tracking-wider uppercase font-onest">
                 {t("hero.subtitle")}
               </p>
             </div>

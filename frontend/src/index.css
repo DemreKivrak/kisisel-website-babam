@@ -3,8 +3,15 @@
 @theme {
   --font-roboto: "Roboto", sans-serif;
   --font-roboto-condensed: "Roboto Condensed", sans-serif;
+  --font-onest: "Onest", sans-serif;
+  --font-inter: "inter", sans-serif: ;
 }
 
 html {
   scroll-behavior: smooth;
+}
+@layer components {
+  .button-type-1 {
+    @apply w-4/7 bg-gradient-to-r from-[rgb(36,54,61)] to-[rgb(49,76,88)] text-white py-2 rounded-3xl font-medium transition-all duration-400 flex items-center justify-center gap-2 shadow-md group-hover:shadow-lg cursor-pointer mx-auto hover:bg-white hover:bg-none hover:text-[rgb(31,37,40)] hover:border-1;
+  }
 }

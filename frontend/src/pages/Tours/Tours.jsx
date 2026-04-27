@@ -448,7 +448,7 @@ export function Tours() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 {/*language badge*/}
-                <div className="absolute top-3 right-3 bg-gradient-to-r from bg-orange-400 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                <div className="absolute top-3 right-3 bg-gradient-to-r from-sky-400 to-sky-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
                   {languageNames[tour.language]}
                 </div>
               </div>
@@ -464,11 +464,12 @@ export function Tours() {
                 <p className="text-sm text-gray-600 mb-4">{tour.type}</p>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200 mt-auto">
-                  <span className="text-sm font-semibold text-amber-600">
-                    📍 {tour.destination}
-                  </span>
+                  <div className="flex text-l  font-bold font-onest text-[rgb(36,54,61)] items-center">
+                    <img className="h-6" src="/icons8-location-100.png"></img>
+                    <span className="ml-1">{tour.destination} </span>
+                  </div>
                   <button
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-md hover:shadow-lg transition-all duration-300 text-sm font-semibold cursor-pointer"
+                    className="bg-gradient-to-r from-[rgb(36,54,61)] to-[rgb(49,76,88)] rounded-4xl text-white px-4 py-2 hover:shadow-lg transition-all duration-400 text-sm font-semibold cursor-pointer hover:bg-white hover:bg-none hover:text-[rgb(36,54,61)] hover:border-1"
                     onClick={() => navigate(`/tourpage/${tour.id}`)}
                   >
                     {t("tours.viewDetails")}

@@ -47,7 +47,12 @@ export function LanguageSwitcher() {
   }, []);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div
+      className="relative"
+      ref={dropdownRef}
+      onMouseEnter={() => window.innerWidth >= 768 && setIsOpen(true)}
+      onMouseLeave={() => window.innerWidth >= 768 && setIsOpen(false)}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all backdrop-blur-sm border border-white/20 cursor-pointer"
@@ -74,38 +79,40 @@ export function LanguageSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50 animate-fadeIn">
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => changeLanguage(lang.code)}
-              className={`w-full px-4 py-2.5 text-left hover:bg-amber-50 transition-colors flex items-center gap-3 cursor-pointer ${
-                i18n.language === lang.code
-                  ? "bg-amber-50 text-amber-700 font-semibold"
-                  : "text-gray-700"
-              }`}
-            >
-              <img
-                src={`https://flagcdn.com/w40/${lang.countryCode}.png`}
-                alt={lang.name}
-                className="w-7 h-5 object-cover rounded-sm"
-              />
-              <span className="text-sm">{lang.name}</span>
-              {i18n.language === lang.code && (
-                <svg
-                  className="w-5 h-5 ml-auto text-amber-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </button>
-          ))}
+        <div className="absolute right-0 top-full pt-2 w-52 z-50">
+          <div className="bg-white rounded-xl shadow-2xl border border-gray-200 py-2 animate-fadeIn">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => changeLanguage(lang.code)}
+                className={`w-full px-4 py-2.5 text-left hover:bg-amber-50 transition-colors flex items-center gap-3 cursor-pointer ${
+                  i18n.language === lang.code
+                    ? "bg-amber-50 text-amber-700 font-semibold"
+                    : "text-gray-700"
+                }`}
+              >
+                <img
+                  src={`https://flagcdn.com/w40/${lang.countryCode}.png`}
+                  alt={lang.name}
+                  className="w-7 h-5 object-cover rounded-sm"
+                />
+                <span className="text-sm">{lang.name}</span>
+                {i18n.language === lang.code && (
+                  <svg
+                    className="w-5 h-5 ml-auto text-amber-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
