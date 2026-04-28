@@ -88,7 +88,7 @@ export function DestinationsComp() {
       ref={containerRef}
       onMouseEnter={() => clearInterval(intervalRef.current)}
       onMouseLeave={() => startAutoScroll()}
-      className="py-8 px-4 overflow-hidden"
+      className="py-8 px-4 overflow-hidden "
     >
       <div className="text-center mb-6 relative">
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
@@ -109,10 +109,10 @@ export function DestinationsComp() {
         {/* Sol Ok */}
         <button
           onClick={() => scroll("left")}
-          className="hidden md:block absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer"
+          className="hidden md:block absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gray-600/30 hover:bg-white/30 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer"
         >
           <svg
-            className="w-6 h-6 text-gray-800"
+            className="w-6 h-6 text-gray-200 "
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -192,10 +192,10 @@ export function DestinationsComp() {
           {/* Sağ Ok */}
           <button
             onClick={() => scroll("right")}
-            className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer"
+            className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 z-10bg-gray-600/30 hover:bg-white/30 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 cursor-pointer"
           >
             <svg
-              className="w-6 h-6 text-gray-800"
+              className="w-6 h-6 text-gray-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

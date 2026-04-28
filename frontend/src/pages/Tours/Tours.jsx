@@ -253,7 +253,7 @@ export function Tours() {
               {openDropdown === "language" && (
                 <motion.div
                   key="language"
-                  className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
+                  className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200  shadow-lg"
                   style={{ maxHeight: "240px", overflowY: "auto" }}
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -310,7 +310,7 @@ export function Tours() {
               {openDropdown === "destination" && (
                 <motion.div
                   key="destination"
-                  className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
+                  className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200  shadow-lg"
                   style={{ maxHeight: "240px", overflowY: "auto" }}
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -365,7 +365,7 @@ export function Tours() {
               {openDropdown === "sort" && (
                 <motion.div
                   key="sort"
-                  className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
+                  className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 shadow-lg"
                   style={{ maxHeight: "240px", overflowY: "auto" }}
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}

@@ -80,7 +80,7 @@ export function LanguageSwitcher() {
 
       {isOpen && (
         <div className="absolute right-0 top-full pt-2 w-52 z-50">
-          <div className="bg-white rounded-xl shadow-2xl border border-gray-200 py-2 animate-fadeIn">
+          <div className="bg-white shadow-2xl border border-gray-200 py-2 animate-fadeIn">
             {languages.map((lang) => (
               <button
                 key={lang.code}

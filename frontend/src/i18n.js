@@ -82,6 +82,8 @@ const resources = {
       "tours.allDestinations": "All Destinations",
       "tours.newestFirst": "Newest First",
       "tours.oldestFirst": "Oldest First",
+      "tours.viewAll": "View All Tours →",
+      "tours.noToursAvailable": "No tours available",
 
       // About
       "about.title": "About Us",
@@ -230,6 +232,7 @@ const resources = {
       "common.seeMore": "See More",
       "common.loading": "Loading...",
       "common.error": "Error",
+      "whatsapp.contactUs": "Contact us",
     },
   },
   tr: {
@@ -312,6 +315,8 @@ const resources = {
       "tours.allDestinations": "Tüm Rotalar",
       "tours.newestFirst": "En Yeni Önce",
       "tours.oldestFirst": "En Eski Önce",
+      "tours.viewAll": "Tüm Turları Gör →",
+      "tours.noToursAvailable": "Tur bulunamadı",
 
       // About
       "about.title": "Hakkımızda",
@@ -459,6 +464,7 @@ const resources = {
       "common.seeMore": "Daha Fazla Gör",
       "common.loading": "Yükleniyor...",
       "common.error": "Hata",
+      "whatsapp.contactUs": "Bize Ulaşın",
     },
   },
   de: {
@@ -518,6 +524,8 @@ const resources = {
       "tours.allDestinations": "Alle Ziele",
       "tours.newestFirst": "Neueste zuerst",
       "tours.oldestFirst": "Älteste zuerst",
+      "tours.viewAll": "Alle Touren anzeigen →",
+      "tours.noToursAvailable": "Keine Touren verfügbar",
       "common.learnMore": "Mehr erfahren",
       "common.bookNow": "Jetzt buchen",
 
@@ -554,6 +562,7 @@ const resources = {
         "Mit unserer 25-jährigen Erfahrung und unserem umfangreichen Servicenetzwerk sind wir hier, um Ihnen das beste Reiseerlebnis zu bieten.",
       "about.discoverServices": "Entdecken Sie unsere Dienstleistungen",
       "about.getInTouch": "Kontakt aufnehmen",
+      "whatsapp.contactUs": "Kontaktieren Sie uns",
     },
   },
   fr: {
@@ -613,6 +622,8 @@ const resources = {
       "tours.allDestinations": "Toutes les destinations",
       "tours.newestFirst": "Plus récent d'abord",
       "tours.oldestFirst": "Plus ancien d'abord",
+      "tours.viewAll": "Voir tous les circuits →",
+      "tours.noToursAvailable": "Aucun circuit disponible",
       "common.learnMore": "En savoir plus",
       "common.bookNow": "Réserver maintenant",
 
@@ -648,6 +659,7 @@ const resources = {
         "Avec nos 25 ans d'expérience et notre large réseau de services, nous sommes là pour vous offrir la meilleure expérience de voyage.",
       "about.discoverServices": "Découvrez nos services",
       "about.getInTouch": "Nous contacter",
+      "whatsapp.contactUs": "Contactez-nous",
     },
   },
   es: {
@@ -708,6 +720,8 @@ const resources = {
       "tours.allDestinations": "Todos los destinos",
       "tours.newestFirst": "Más reciente primero",
       "tours.oldestFirst": "Más antiguo primero",
+      "tours.viewAll": "Ver todos los tours →",
+      "tours.noToursAvailable": "No hay tours disponibles",
       "common.learnMore": "Más información",
       "common.bookNow": "Reservar ahora",
 
@@ -743,6 +757,7 @@ const resources = {
         "Con nuestros 25 años de experiencia y amplia red de servicios, estamos aquí para ofrecerle la mejor experiencia de viaje.",
       "about.discoverServices": "Descubre nuestros servicios",
       "about.getInTouch": "Ponerse en contacto",
+      "whatsapp.contactUs": "Contáctenos",
     },
   },
   ru: {
@@ -802,6 +817,8 @@ const resources = {
       "tours.allDestinations": "Все направления",
       "tours.newestFirst": "Сначала новые",
       "tours.oldestFirst": "Сначала старые",
+      "tours.viewAll": "Посмотреть все туры →",
+      "tours.noToursAvailable": "Туры недоступны",
       "common.learnMore": "Узнать больше",
       "common.bookNow": "Забронировать сейчас",
 
@@ -836,6 +853,7 @@ const resources = {
         "С нашим 25-летним опытом и широкой сетью услуг мы здесь, чтобы предложить вам лучший опыт путешествий.",
       "about.discoverServices": "Откройте наши услуги",
       "about.getInTouch": "Связаться с нами",
+      "whatsapp.contactUs": "Свяжитесь с нами",
     },
   },
   ja: {
@@ -896,6 +914,8 @@ const resources = {
       "tours.allDestinations": "すべての目的地",
       "tours.newestFirst": "新しい順",
       "tours.oldestFirst": "古い順",
+      "tours.viewAll": "すべてのツアーを見る →",
+      "tours.noToursAvailable": "ツアーがありません",
       "common.learnMore": "詳しく見る",
       "common.bookNow": "今すぐ予約",
 
@@ -930,6 +950,7 @@ const resources = {
         "25年の経験と広範なサービスネットワークで、最高の旅行体験を提供するためにここにいます。",
       "about.discoverServices": "サービスを発見する",
       "about.getInTouch": "お問い合わせ",
+      "whatsapp.contactUs": "お問い合わせ",
     },
   },
 };

@@ -188,10 +188,10 @@ export function TourPage() {
               {/* Navigation Arrows */}
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-gray-600/30 hover:bg-white/30 p-3 rounded-full shadow-lg transition duration-300 hover:scale-115 cursor-pointer"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -206,10 +206,10 @@ export function TourPage() {
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-600/30 hover:bg-white/30 p-3 rounded-full shadow-lg transition duration-300 hover:scale-115 cursor-pointer"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
