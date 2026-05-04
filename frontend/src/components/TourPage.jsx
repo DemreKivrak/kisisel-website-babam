@@ -129,31 +129,29 @@ export function TourPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8 mt-30">
         {/* Back Button */}
-        <button
-          onClick={() => window.history.back()}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition group cursor-pointer"
-        >
-          <svg
-            className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Breadcrumb */}
+        <nav className=" ml-5 mb-8 hidden md:flex items-center gap-2 text-sm text-gray-500 mt-5">
+          <span
+            className="hover:text-blue-500 cursor-pointer transition"
+            onClick={() => navigate("/")}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          <span className="font-medium">{t("nav.tours")}</span>
-        </button>
-
+            Home
+          </span>
+          <span>/</span>
+          <span
+            onClick={() => navigate("/tours")}
+            className="hover:text-blue-500 cursor-pointer"
+          >
+            {t("nav.tours")}
+          </span>
+          <span>/</span>
+          <span className="text-gray-800 font-medium">This Tour</span>
+        </nav>
         {/* Image Gallery Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Main Image Slider */}
           <div className="relative">
-            <div className="relative h-96 lg:h-[500px] rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative h-96 lg:h-[400px] rounded-xl overflow-hidden shadow-2xl">
               {tourData.images[currentImageIndex] &&
               tourData.images[currentImageIndex] !== "homepage-pic-1.jpg" ? (
                 <img
@@ -255,12 +253,12 @@ export function TourPage() {
           <div>
             <div className="bg-white rounded-xl shadow-xl p-6 sticky top-24">
               <div className="mb-4">
-                <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
                   {tourData.destination}
                 </span>
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className=" text-xl md:text-3xl font-onest font-bold text-gray-900 mb-2">
                 {tourData.name}
               </h1>
 
@@ -288,17 +286,18 @@ export function TourPage() {
                     {t("common.bookNow")}
                   </button>
                 </div>
-              </div>
-
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-center gap-2"></div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span>Instant confirmation</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span>{languageNames[tourData.language]} speaking guide</span>
+                <div className="space-y-3 text-sm text-gray-600 mt-2">
+                  <div className="flex items-center gap-2"></div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    <span>Instant confirmation</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    <span>
+                      {languageNames[tourData.language]} speaking guide
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -309,15 +308,17 @@ export function TourPage() {
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Overview */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold font-onest text-gray-900 mb-4">
               {t("tours.overview")}
             </h2>
-            <p className="text-gray-700 leading-relaxed">{tourData.overview}</p>
+            <p className="text-gray-700 leading-relaxed ">
+              {tourData.overview}
+            </p>
           </section>
 
           {/* Highlights */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold font-onest text-gray-900 mb-4">
               {t("tours.highlights")}
             </h2>
             <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-30">
@@ -332,7 +333,7 @@ export function TourPage() {
 
           {/* What's Included */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl  font-onest font-bold text-gray-900 mb-4">
               {t("tours.included")}
             </h2>
             <div className="ml-2 md:ml-50 md:gap-x-55 grid grid-cols-2 mt-10 md:mt-0  md:grid-cols-2 gap-6">
@@ -412,7 +413,7 @@ export function TourPage() {
 
           {/* Pricing Table */}
           <section ref={pricingRef}>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl font-onest font-bold text-gray-900 mb-6">
               {t("tours.price")}
             </h2>
             {tourData.pricing && tourData.pricing.length > 0 ? (

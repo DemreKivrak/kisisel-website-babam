@@ -80,7 +80,7 @@ export function WhatsappContact() {
 
         <img
           ref={imgRef}
-          src="icons8-whatsapp-240.png"
+          src="/icons8-whatsapp-240.png"
           className=" cursor-pointer z-20 md:h-20 h-15 cursor-pointer "
           onClick={handleWhatsApp}
         ></img>

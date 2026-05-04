@@ -116,15 +116,10 @@ export function Recommended() {
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
           02
         </span>
-        <p className="text-amber-500 text-xs font-semibold tracking-[0.25em] uppercase mb-4">
-          {t("tours.handpicked")}
-        </p>
-        <h1 className="text-4xl md:text-5xl font-onest font-bold tracking-tight text-gray-900  leading-relaxed mb-6 ">
+
+        <h1 className="text-2xl md:text-5xl font-onest font-bold tracking-tight text-gray-900  leading-relaxed mb-6 justify-self-start ">
           {t("tours.recommended")}
         </h1>
-        <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-          {t("tours.recommendedSubtitle")}
-        </p>
       </div>
 
       <div className="max-w-7xl mx-auto relative px-2 md:px-0">

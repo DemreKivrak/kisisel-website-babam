@@ -342,7 +342,7 @@ export function Header() {
                       className=" px-4 py-2 cursor-pointer transition hover:text-white"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/destinations#${dest.id}`);
+                        navigate(`/destinations/${dest.id}`);
                       }}
                     >
                       <a className="block w-full">{dest.name}</a>
@@ -360,7 +360,7 @@ export function Header() {
           >
             <a
               className="hover:text-white cursor-pointer transition flex items-center gap-1"
-              onClick={() => navigate("/services")}
+              onClick={() => navigate("/car-rental")}
             >
               {t("nav.services")}
               <svg
@@ -391,7 +391,7 @@ export function Header() {
                     className=" px-4 py-2 cursor-pointer transition hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate("/services");
+                      navigate("/car-rental");
                     }}
                   >
                     <a className="block w-full">{t("nav.carRental")}</a>
@@ -546,7 +546,7 @@ export function Header() {
                   <a
                     key={dest.id}
                     className="block px-12 py-2 hover:bg-gray-100 cursor-pointer transition text-gray-600 text-sm"
-                    onClick={() => handleNavigate(`/destinations#${dest.id}`)}
+                    onClick={() => handleNavigate(`/destinations/${dest.id}`)}
                   >
                     {dest.name}
                   </a>
@@ -556,7 +556,7 @@ export function Header() {
           </div>
           <a
             className="px-6 py-3 hover:bg-gray-100 cursor-pointer transition text-gray-800"
-            onClick={() => handleNavigate("/services")}
+            onClick={() => handleNavigate("/car-rental")}
           >
             {t("nav.services")}
           </a>

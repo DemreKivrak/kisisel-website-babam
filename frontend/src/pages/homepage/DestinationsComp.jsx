@@ -90,17 +90,15 @@ export function DestinationsComp() {
       onMouseLeave={() => startAutoScroll()}
       className="py-8 px-4 overflow-hidden "
     >
-      <div className="text-center mb-6 relative">
+      <div className="text-left mb-6 relative">
         <span className="absolute inset-0 flex items-center justify-center text-[8rem] md:text-[12rem] font-black text-gray-100 select-none pointer-events-none leading-none -z-10">
           01
         </span>
-        <p className="text-amber-500 text-xs font-semibold tracking-[0.25em] uppercase mb-4">
-          {t("destinations.discover")}
-        </p>
-        <h1 className="text-4xl md:text-5xl font-onest font-bold tracking-tight text-gray-800 tracking-tight leading-relaxed mb-6">
+
+        <h1 className="text-2xl md:text-5xl font-onest font-bold tracking-tight text-gray-800 tracking-tight leading-relaxed mb-6">
           {t("destinations.popularTitle")}
         </h1>
-        <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
+        <p className="text-gray-500 text-sm md:text-base max-w-lg leading-relaxed">
           {t("destinations.popularSubtitle")}
         </p>
       </div>

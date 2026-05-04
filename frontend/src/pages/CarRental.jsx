@@ -5,11 +5,13 @@ import { useTranslation } from "react-i18next";
 import { api } from "../services/api";
 import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
+import { useNavigate } from "react-router-dom";
 
-export function Services() {
+export function CarRental() {
   const { t } = useTranslation();
   const [carCategories, setCarCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Services - Car Rental";
@@ -59,26 +61,48 @@ export function Services() {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 text-white py-20">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 pt-20">
-            {t("services.carRentalTitle")}
-          </h1>
-          <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto">
-            {t("services.subtitle")}
-          </p>
+
+      <div className="relative h-[65vh] md:h-[75vh] w-full overflow-hidden">
+        <img
+          src="/fleet.jpg"
+          alt="Tours"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-end">
+          <div className="max-w-7xl mx-auto px-4 w-full pb-10">
+            <h1 className="text-4xl md:text-6xl font-onest font-semibold text-white mb-3 justify-self-start">
+              {t("services.carRentalTitle")}
+            </h1>
+            <p className=" text-sm md:text-xl text-white/80 text-left font-onest">
+              {t("services.subtitle")}
+            </p>
+          </div>
         </div>
       </div>
 
+      {/* Breadcrumb */}
+      <nav className=" ml-5 mb-8 hidden md:flex items-center gap-2 text-sm text-gray-500 mt-5">
+        <span
+          className="hover:text-blue-500 cursor-pointer transition"
+          onClick={() => navigate("/")}
+        >
+          Home
+        </span>
+        <span>/</span>
+
+        <span className="text-gray-800 font-medium">
+          {t("services.carRentalTitle")}
+        </span>
+      </nav>
+
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-7xl mx-auto px-4 py-10">
         {/* Introduction */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">
+          <h2 className=" text-2xl md:text-4xl font-onest font-bold text-gray-800 mb-6 justify-self-start">
             {t("services.chooseVehicle")}
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-l md:text-lg font-onest text-gray-600 text-left max-w-5xl">
             {t("services.chooseDescription")}
           </p>
         </div>
@@ -216,7 +240,7 @@ export function Services() {
         </div>
 
         {/* Call to Action */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-3xl p-12 text-center">
+        <div className="bg-gradient-to-r from-[rgb(31,37,40)] to-[rgb(57,69,75)] text-white rounded-3xl p-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             {t("services.readyToRide")}
           </h2>
@@ -226,7 +250,7 @@ export function Services() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact#contact"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
+              className="bg-white/0  px-8 py-4 rounded-4xl font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg border-1 border-white text-white hover:text-[rgb(31,37,40)]"
             >
               {t("services.contactUs")}
             </Link>

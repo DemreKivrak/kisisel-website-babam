@@ -73,7 +73,7 @@ export function Footer() {
             </p>
             <p
               className="hover:text-green-300 cursor-pointer mb-2"
-              onClick={() => navigate("/services")}
+              onClick={() => navigate("/car-rental")}
             >
               {t("nav.services").toUpperCase()}
             </p>

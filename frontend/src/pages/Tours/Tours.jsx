@@ -159,14 +159,36 @@ export function Tours() {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-amber-100 via-orange-50 to-amber-100 py-16 mt-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4 mt-5">
-            {t("tours.allTours")}
-          </h1>
-          <p className="text-xl text-gray-600">{t("tours.exploreSubtitle")}</p>
+      <div className="relative h-[65vh] md:h-[75vh] w-full overflow-hidden">
+        <img
+          src="/homepage-pic.jpg"
+          alt="Tours"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-end">
+          <div className="max-w-7xl mx-auto px-4 w-full pb-10">
+            <h1 className="text-4xl md:text-6xl font-onest font-semibold text-white mb-3 justify-self-start">
+              {t("tours.allTours")}
+            </h1>
+            <p className=" text-sm md:text-xl text-white/80 text-left font-onest">
+              {t("tours.exploreSubtitle")}
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Breadcrumb */}
+      <nav className=" ml-5 mb-8 hidden md:flex items-center gap-2 text-sm text-gray-500 mt-5">
+        <span
+          className="hover:text-blue-500 cursor-pointer transition"
+          onClick={() => navigate("/")}
+        >
+          Home
+        </span>
+        <span>/</span>
+
+        <span className="text-gray-800 font-medium">{t("tours.allTours")}</span>
+      </nav>
 
       {/* Mobil filtre butonu - sadece küçük ekranlarda görünür */}
       <div className="flex md:hidden gap-2 mb-4 px-4 mt-4">
@@ -190,7 +212,7 @@ export function Tours() {
           </svg>
           <span>Filter</span>
           {(selectedDestination !== "All" || selectedLanguage !== "All") && (
-            <span className="bg-amber-500 text-white text-xs rounded-full px-2 py-0.5">
+            <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-0.5">
               {
                 [
                   selectedDestination !== "All",
@@ -674,7 +696,7 @@ export function Tours() {
                 </button>
                 <button
                   onClick={() => setMobileFilterOpen(false)}
-                  className=" flex-2 w-full bg-amber-500 text-white py-3 rounded-3xl font-semibold"
+                  className=" flex-2 w-full bg-blue-500 text-white py-3 rounded-3xl font-semibold"
                 >
                   APPLY
                 </button>
