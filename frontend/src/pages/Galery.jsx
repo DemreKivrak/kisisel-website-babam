@@ -4,6 +4,7 @@ import { Header } from "../components/Header";
 import { api } from "../services/api";
 import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
+import { useNavigate } from "react-router-dom";
 
 export function Galery() {
   const { t } = useTranslation();
@@ -11,6 +12,7 @@ export function Galery() {
   const [filter, setFilter] = useState("all");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Load gallery items from API
   useEffect(() => {
@@ -85,6 +87,21 @@ export function Galery() {
                 {t("gallery.subtitle")}
               </p>
             </div>
+
+            {/* Breadcrumb */}
+            <nav className=" ml-5 mt-10  hidden md:flex items-center gap-2 text-sm text-gray-500 mt-5">
+              <span
+                className="hover:text-blue-500 cursor-pointer transition"
+                onClick={() => navigate("/")}
+              >
+                {t("nav.home")}
+              </span>
+              <span>/</span>
+
+              <span className="text-gray-800 font-medium">
+                {t("gallery.title")}
+              </span>
+            </nav>
 
             {/* Filters */}
             <div className="flex justify-center gap-4 mb-12 flex-wrap">

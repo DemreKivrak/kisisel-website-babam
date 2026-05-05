@@ -101,14 +101,14 @@ export function SelectedDestination() {
             className="hover:text-blue-500 cursor-pointer transition"
             onClick={() => navigate("/")}
           >
-            Home
+            {t("nav.home")}
           </span>
           <span>/</span>
           <span
             className="hover:text-blue-500 cursor-pointer transition"
             onClick={() => navigate("/destinations")}
           >
-            Destinations
+            {t("nav.destinations")}
           </span>
           <span>/</span>
           <span className="text-gray-800 font-medium">{destination.name}</span>

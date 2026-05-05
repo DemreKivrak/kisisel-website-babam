@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import { Footer } from "../components/Footer";
 import { WhatsappContact } from "../components/WhatsappContact";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export function About() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Animasyon varyantları
   const fadeInLeft = {
@@ -67,22 +69,35 @@ export function About() {
       </div>
  */}
 
+      {/* Breadcrumb */}
+      <nav className=" ml-5 mt-10  hidden md:flex items-center gap-2 text-sm text-gray-500 mt-5">
+        <span
+          className="hover:text-blue-500 cursor-pointer transition"
+          onClick={() => navigate("/")}
+        >
+          {t("nav.home")}
+        </span>
+        <span>/</span>
+
+        <span className="text-gray-800 font-medium">{t("about.title")}</span>
+      </nav>
+
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 py-20">
+      <div className="max-w-5xl mx-auto px-4 ">
         {/* Introduction Section */}
         <div className="mb-24 md:mt-42 md:mb-42">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold font-onest text-gray-900 mb-8">
               Oltre Tours
             </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 leading-relaxed font-onest">
               {t("about.introText")}
             </p>
           </div>
         </div>
 
         {/* Why Choose Us Section */}
-        <div className="mb-24">
+        <div className="mb-24 font-onest">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               {t("about.whyChooseTitle")}
@@ -92,9 +107,9 @@ export function About() {
 
           <div className="space-y-32">
             {/* Service 1 */}
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="grid md:grid-cols-2 gap-8 items-center font-onest">
               <motion.div
-                className="h-80 flex items-center justify-center "
+                className="h-80 flex items-center justify-center font-onest"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.3 }}
@@ -204,12 +219,12 @@ export function About() {
 
         {/* Vision Section */}
         <div className="mb-24">
-          <div className="bg-gray-50 p-12 md:p-16 border-l-4 border-blue-600">
+          <div className="bg-gray-50 p-12 md:p-16 border-l-4 border-blue-900">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold font-onest text-gray-900 mb-6">
                 {t("about.visionTitle")}
               </h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-lg text-gray-700 font-onest leading-relaxed">
                 {t("about.visionText")}
               </p>
             </div>
@@ -229,7 +244,7 @@ export function About() {
         </div>
 
         {/* Call to Action */}
-        <div className="bg-gray-900 text-white p-12 md:p-16 text-center rounded-3xl">
+        <div className="bg-gray-900 text-white p-12 md:p-16 text-center rounded-3xl mb-15">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             {t("about.ctaTitle")}
           </h2>
@@ -238,14 +253,8 @@ export function About() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/car-rental"
-              className="bg-blue-600 text-white px-8 py-4 font-semibold hover:bg-blue-700 transition-colors rounded-3xl"
-            >
-              {t("about.discoverServices")}
-            </Link>
-            <Link
               to="/contact"
-              className="bg-white text-gray-900 px-8 py-4 font-semibold hover:bg-gray-100 transition-colors rounded-3xl"
+              className="bg-white/0 border-white px-8 py-4 font-semibold text-white border-1  rounded-4xl hover:bg-white transition duration-300 hover:text-gray-900"
             >
               {t("about.getInTouch")}
             </Link>

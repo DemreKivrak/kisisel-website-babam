@@ -183,7 +183,7 @@ export function Tours() {
           className="hover:text-blue-500 cursor-pointer transition"
           onClick={() => navigate("/")}
         >
-          Home
+          {t("nav.home")}
         </span>
         <span>/</span>
 
